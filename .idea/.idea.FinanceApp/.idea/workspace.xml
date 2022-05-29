@@ -9,7 +9,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="965a400e-2b37-407e-8bcd-2010aa390b1c" name="Changes" comment="feat: init">
+      <change afterPath="$PROJECT_DIR$/global.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/mongodb/MongoDB.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Controllers/WeatherForecastController.fs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/WeatherForecastController.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FinanceApp.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/FinanceApp.fsproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/WeatherForecast.fs" beforeDir="false" afterPath="$PROJECT_DIR$/WeatherForecast.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -18,6 +24,11 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b34cdea969917836c37b6dc15e916d3e5954856c12dd1caf3926e4a2a3a0dfe2/AuthorizationAppBuilderExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/bb60cc559f4ae5d3faa18b2c5233bd24652845d0a4b2db16c9c644b797bd7d/IAsyncCursor.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c4bf5b7e1f6dad83b16c10e468186df52ccb21277b3e31a56c4178a97/MongoClient.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -28,16 +39,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="node.js.detected.package.eslint" value="true" />
-    <property name="node.js.detected.package.tslint" value="true" />
-    <property name="node.js.selected.package.eslint" value="(autodetect)" />
-    <property name="node.js.selected.package.tslint" value="(autodetect)" />
-    <property name="vue.rearranger.settings.migration" value="true" />
-  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "settings.editor.selected.configurable": "RiderNuGetOptionsPageId",
+    "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "JSON"
+    ]
+  }
+}]]></component>
   <component name="RunManager" selected=".NET Launch Settings Profile.FinanceApp">
     <configuration name="FinanceApp" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/FinanceApp.fsproj" />
@@ -79,6 +98,7 @@
       <option name="presentableId" value="Default" />
       <updated>1653683411778</updated>
       <workItem from="1653683422475" duration="713000" />
+      <workItem from="1653853291389" duration="4177000" />
     </task>
     <task id="LOCAL-00001" summary="feat: init commit">
       <created>1653683463049</created>
@@ -101,7 +121,7 @@
     <option name="version" value="3" />
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
-  <component name="UnityProjectConfiguration" hasMinimizedUI="null" />
+  <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
   <component name="UnityUnitTestConfiguration" currentTestLauncher="NUnit" />
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -119,5 +139,9 @@
     <MESSAGE value="feat: init commit" />
     <MESSAGE value="feat: init" />
     <option name="LAST_COMMIT_MESSAGE" value="feat: init" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

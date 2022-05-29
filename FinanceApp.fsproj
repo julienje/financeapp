@@ -5,9 +5,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="WeatherForecast.fs"/>
-        <Compile Include="Controllers/WeatherForecastController.fs"/>
-        <Compile Include="Program.fs"/>
+        <Compile Include="WeatherForecast.fs" />
+        <Compile Include="Controllers/WeatherForecastController.fs" />
+        <Compile Include="Program.fs" />
+        <Compile Include="mongodb\MongoDB.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="MongoDB.Driver" Version="2.15.1" />
     </ItemGroup>
 
 </Project>
