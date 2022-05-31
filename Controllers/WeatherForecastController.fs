@@ -25,6 +25,7 @@ type WeatherForecastController(logger: ILogger<WeatherForecastController>) =
 
     [<HttpGet>]
     member _.Get() =
+        
         let rng = System.Random()
 
         [| for index in 0..4 ->

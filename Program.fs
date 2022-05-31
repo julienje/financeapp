@@ -11,7 +11,7 @@ module Program =
 
     [<EntryPoint>]
     let main args =
-
+        FinanceApp.mongodb.MongoDB.readAll
         let builder =
             WebApplication.CreateBuilder(args)
 

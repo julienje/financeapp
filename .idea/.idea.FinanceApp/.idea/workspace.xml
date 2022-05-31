@@ -8,14 +8,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="965a400e-2b37-407e-8bcd-2010aa390b1c" name="Changes" comment="feat: init">
-      <change afterPath="$PROJECT_DIR$/global.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/mongodb/MongoDB.fs" afterDir="false" />
+    <list default="true" id="965a400e-2b37-407e-8bcd-2010aa390b1c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Controllers/WeatherForecastController.fs" beforeDir="false" afterPath="$PROJECT_DIR$/Controllers/WeatherForecastController.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FinanceApp.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/FinanceApp.fsproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/WeatherForecast.fs" beforeDir="false" afterPath="$PROJECT_DIR$/WeatherForecast.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/mongodb/MongoDB.fs" beforeDir="false" afterPath="$PROJECT_DIR$/mongodb/MongoDB.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,24 +37,25 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "settings.editor.selected.configurable": "RiderNuGetOptionsPageId",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;RiderNuGetOptionsPageId&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "JSON"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;TEXT&quot;,
+      &quot;JSON&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected=".NET Launch Settings Profile.FinanceApp">
     <configuration name="FinanceApp" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
       <option name="LAUNCH_PROFILE_PROJECT_FILE_PATH" value="$PROJECT_DIR$/FinanceApp.fsproj" />
@@ -99,6 +98,7 @@
       <updated>1653683411778</updated>
       <workItem from="1653683422475" duration="713000" />
       <workItem from="1653853291389" duration="4177000" />
+      <workItem from="1654025307124" duration="2839000" />
     </task>
     <task id="LOCAL-00001" summary="feat: init commit">
       <created>1653683463049</created>
@@ -139,6 +139,26 @@
     <MESSAGE value="feat: init commit" />
     <MESSAGE value="feat: init" />
     <option name="LAST_COMMIT_MESSAGE" value="feat: init" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/mongodb/MongoDB.fs</url>
+          <line>26</line>
+          <properties documentPath="C:\Users\julie\RiderProjects\financeapp\mongodb\MongoDB.fs" initialLine="24" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
+            <option name="multiMethodBreakpoint" value="true" />
+            <startOffsets>
+              <option value="545" />
+            </startOffsets>
+            <endOffsets>
+              <option value="583" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />
