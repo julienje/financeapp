@@ -1,29 +1,46 @@
-namespace FinanceApp
-
-#nowarn "20"
-
+open FinanceApp
+open FinanceApp.DtoTypes
 open Microsoft.AspNetCore.Builder
-open Microsoft.Extensions.DependencyInjection
+open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Hosting
+open Microsoft.Extensions.DependencyInjection
+open Giraffe
 
-module Program =
-    let exitCode = 0
+let webApp =
+    choose [ GET
+             >=> route "/accounts"
+             >=> fun next context ->
+                     task {
+                         let! accounts = Service.handleGetAllAccountAsync ()
+                         return! json accounts next context
+                     }
+             POST
+             >=> route "/accounts/new"
+             >=> fun next context ->
+                     task {
+                         let! openAccountDto = context.BindJsonAsync<OpenAccountDto>()
+                         let! openAccount = Service.handleOpenAccountAsync openAccountDto
+                         return! json openAccount next context
+                     } ]
 
-    [<EntryPoint>]
-    let main args =
-        FinanceApp.mongodb.MongoDB.readAll
-        let builder =
-            WebApplication.CreateBuilder(args)
+let configureApp (app: IApplicationBuilder) =
+    // Add Giraffe to the ASP.NET Core pipeline
+    app.UseGiraffe webApp
 
-        builder.Services.AddControllers()
+let configureServices (services: IServiceCollection) =
+    // Add Giraffe dependencies
+    services.AddGiraffe() |> ignore
 
-        let app = builder.Build()
+[<EntryPoint>]
+let main _ =
+    Host
+        .CreateDefaultBuilder()
+        .ConfigureWebHostDefaults(fun webHostBuilder ->
+            webHostBuilder
+                .Configure(configureApp)
+                .ConfigureServices(configureServices)
+            |> ignore)
+        .Build()
+        .Run()
 
-        app.UseHttpsRedirection()
-
-        app.UseAuthorization()
-        app.MapControllers()
-
-        app.Run()
-
-        exitCode
+    0
