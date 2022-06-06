@@ -15,7 +15,7 @@ let webApp =
                          return! json accounts next context
                      }
              POST
-             >=> route "/accounts/new"
+             >=> route "/accounts"
              >=> fun next context ->
                      task {
                          let! openAccountDto = context.BindJsonAsync<OpenAccountDto>()

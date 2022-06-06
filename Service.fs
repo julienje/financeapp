@@ -22,7 +22,7 @@ module Service =
           Name = input.Name
           Company = input.Company
           OpenDate = input.OpenDate
-          CloseDate =  input.CloseDate }
+          CloseDate = input.CloseDate }
 
     let convertToBd (input: OpenAccountDto) : AccountDb =
         { _id = ObjectId.Empty
@@ -30,12 +30,13 @@ module Service =
           Company = input.Company
           OpenDate = input.OpenDate.ToString()
           CloseDate = null }
-        
+
     let convertToDomain (input: AccountDb) : Account =
         let closedDate =
             match DateTime.TryParse input.CloseDate with
             | true, value -> Some value
-            | _ -> None 
+            | _ -> None
+
         { Account.Id = input._id.ToString()
           Name = input.Name
           Company = input.Company
@@ -45,13 +46,22 @@ module Service =
     let handleGetAllAccountAsync () =
         task {
             let! accounts = MongoDb.findAsync collection
-            return accounts |> List.map convertToDomain |> List.map convertToDto
+
+            return
+                accounts
+                |> List.map convertToDomain
+                |> List.map convertToDto
         }
 
     let handleOpenAccountAsync (input: OpenAccountDto) =
         task {
-            let convert = convertToBd input
-            let! _ = MongoDb.openAccountAsync collection convert
-            let domain = convertToDomain convert
-            return convertToDto domain
+            let! accounts = MongoDb.getAccountByNameAndCompanyAsync collection input.Name input.Company
+            match accounts.IsEmpty with
+            | false -> return Error "The account with this name and company already exists"
+            | true ->
+                let forDb = convertToBd input
+                let! newEntry = MongoDb.openAccountAsync collection forDb
+                let domain = convertToDomain newEntry
+                let dto = convertToDto domain
+                return Ok dto
         }

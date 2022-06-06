@@ -1,0 +1,11 @@
+GET http://localhost:5165/accounts
+
+###
+POST http://localhost:5165/accounts
+Content-Type: application/json
+
+{
+  "Name": "A conto",
+  "Company": "UBS",
+  "OpenDate": "2022-01-01"
+}
