@@ -9,13 +9,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="965a400e-2b37-407e-8bcd-2010aa390b1c" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/FinanceDBRequests.http" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/.name" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DtoTypes.fs" beforeDir="false" afterPath="$PROJECT_DIR$/DtoTypes.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FinanceApp.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/FinanceApp.fsproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FinanceDBRequests.http" beforeDir="false" afterPath="$PROJECT_DIR$/FinanceDBRequests.http" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MongoDb.fs" beforeDir="false" afterPath="$PROJECT_DIR$/MongoDb.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Properties/launchSettings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Properties/launchSettings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Service.fs" beforeDir="false" afterPath="$PROJECT_DIR$/Service.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -34,9 +33,22 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/785bd1d02ff94894b25c7946964afe33b068/36/90dbf5e9/List`1.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/017dc1e828719c219ec568a09a8a97cd5f738c96ad6ed7c1cb2ed5e549daa/array.fs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1c425811cd21ab63d240d07b714ba2e2a548062526666688f4eea2efed2d1d9/UpdateResult.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/20a02fe925bc3164f7e372fd65fe295a3b1f4bbf4546cc18bc5933347742955/Json.fs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2c8f3bf9d7e52da52533971fe2e3d4f83625ae6bc62056a7bda55c5ea6453b/prim-types.fs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2f331d466186bf8382d734c4a7d2ce226b8477e264187e7f3735dbb47973/Core.fs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4ce06f9c8947828110e816fc4388205e5d1e9487d885b35295e1614e223de32/ObjectId.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7ae1d944d557dfac4e41c4c4518ee2afb845c9a63da7bbf8c63a72d36fda393/IMongoCollection.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a370968ff94d142757269efc77d9b1ccbb52d2228d458f99d736a122b2994ce/InsertOneOptions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b34cdea969917836c37b6dc15e916d3e5954856c12dd1caf3926e4a2a3a0dfe2/AuthorizationAppBuilderExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/bb60cc559f4ae5d3faa18b2c5233bd24652845d0a4b2db16c9c644b797bd7d/IAsyncCursor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c2716d06e925cf2f0e4ab2dfda24d1eb0c3eea1df854cd913878bc53e0e0f3/HttpContextExtensions.fs" root0="SKIP_HIGHLIGHTING" />
-    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ded4e626ee4c78774ce224cb22cf94eca4aaa6b5dedcbc4bb0f4ee6b8ef41b51/FilterDefinitionBuilder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c3cbd7b5a79d1c54cf93e65a4ce67f825ec25d298eb84e2826e84d3c8976516/DateOnly.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c4bf5b7e1f6dad83b16c10e468186df52ccb21277b3e31a56c4178a97/MongoClient.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d2736625f393a7377b6830a1520cb33ccafb274e5cd8dc754c17da24d5fe6c/IAsyncCursorSource.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f4708639776589f5ac2739f6fcbfc67343b1f9dac51cc1dbfdb003eef77cc1c/Monitor.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -67,7 +79,7 @@
     ]
   }
 }</component>
-  <component name="RunManager" selected=".NET Launch Settings Profile.FinanceApp">
+  <component name="RunManager" selected="HTTP Request.FinanceDBRequests | #2">
     <configuration name="All in FinanceDBRequests" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/FinanceDBRequests.http">
       <method v="2" />
     </configuration>
@@ -182,60 +194,18 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Program.fs</url>
-          <line>22</line>
-          <properties documentPath="$PROJECT_DIR$/Program.fs" initialLine="22" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
-            <option name="multiMethodBreakpoint" value="true" />
-            <startOffsets>
-              <option value="813" />
-            </startOffsets>
-            <endOffsets>
-              <option value="850" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="12" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
           <url>file://$PROJECT_DIR$/Service.fs</url>
-          <line>59</line>
+          <line>60</line>
           <properties documentPath="$PROJECT_DIR$/Service.fs" initialLine="59" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
             <option name="multiMethodBreakpoint" value="true" />
             <startOffsets>
-              <option value="1706" />
+              <option value="1692" />
             </startOffsets>
             <endOffsets>
-              <option value="1774" />
+              <option value="1760" />
             </endOffsets>
           </properties>
           <option name="timeStamp" value="14" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/MongoDb.fs</url>
-          <line>25</line>
-          <properties documentPath="$PROJECT_DIR$/MongoDb.fs" initialLine="27" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
-            <option name="multiMethodBreakpoint" value="true" />
-            <startOffsets>
-              <option value="764" />
-            </startOffsets>
-            <endOffsets>
-              <option value="777" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="15" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/MongoDb.fs</url>
-          <line>28</line>
-          <properties documentPath="$PROJECT_DIR$/MongoDb.fs" initialLine="30" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
-            <option name="multiMethodBreakpoint" value="true" />
-            <startOffsets>
-              <option value="862" />
-            </startOffsets>
-            <endOffsets>
-              <option value="891" />
-            </endOffsets>
-          </properties>
-          <option name="timeStamp" value="16" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

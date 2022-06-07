@@ -1,10 +1,22 @@
+open System.Text.Json
+open System.Text.Json.Serialization
 open FinanceApp
 open FinanceApp.DtoTypes
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
+open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Giraffe
+
+let private treatResponse (context: HttpContext) resp : HttpHandler =
+    match resp with
+    | Ok res ->
+        context.SetStatusCode 200
+        json res
+    | Error e ->
+        context.SetStatusCode 400
+        text $"""{{ "error": "{e}"}}"""
 
 let webApp =
     choose [ GET
@@ -14,13 +26,22 @@ let webApp =
                          let! accounts = Service.handleGetAllAccountAsync ()
                          return! json accounts next context
                      }
-             POST
-             >=> route "/accounts"
+             PUT
+             >=> route "/accounts/new"
              >=> fun next context ->
                      task {
                          let! openAccountDto = context.BindJsonAsync<OpenAccountDto>()
                          let! openAccount = Service.handleOpenAccountAsync openAccountDto
-                         return! json openAccount next context
+                         let resp = treatResponse context openAccount
+                         return! resp next context
+                     }
+             >=> route "/accounts/close"
+             >=> fun next context ->
+                     task {
+                         let! closeAccountDto = context.BindJsonAsync<CloseAccountDto>()
+                         let! openAccount = Service.handleOpenAccountAsync closeAccountDto
+                         let resp = treatResponse context openAccount
+                         return! resp next context
                      } ]
 
 let configureApp (app: IApplicationBuilder) =
@@ -30,6 +51,12 @@ let configureApp (app: IApplicationBuilder) =
 let configureServices (services: IServiceCollection) =
     // Add Giraffe dependencies
     services.AddGiraffe() |> ignore
+    let jsonOptions = JsonSerializerOptions()
+    jsonOptions.Converters.Add(JsonFSharpConverter())
+    services.AddSingleton(jsonOptions) |> ignore
+
+    services.AddSingleton<Json.ISerializer, SystemTextJson.Serializer>()
+    |> ignore
 
 [<EntryPoint>]
 let main _ =

@@ -45,7 +45,7 @@ module Service =
 
     let handleGetAllAccountAsync () =
         task {
-            let! accounts = MongoDb.findAsync collection
+            let! accounts = MongoDb.findAllAsync collection
 
             return
                 accounts
@@ -53,9 +53,10 @@ module Service =
                 |> List.map convertToDto
         }
 
-    let handleOpenAccountAsync (input: OpenAccountDto) =
+    let handleOpenAccountAsync input =
         task {
             let! accounts = MongoDb.getAccountByNameAndCompanyAsync collection input.Name input.Company
+
             match accounts.IsEmpty with
             | false -> return Error "The account with this name and company already exists"
             | true ->
@@ -65,3 +66,15 @@ module Service =
                 let dto = convertToDto domain
                 return Ok dto
         }
+        
+    let handleCloseAccountAsync (input: CloseAccountDto) =
+            task {
+                let objId = ObjectId.Parse input.Id
+                let date=input.CloseDate.ToString()
+                let! inserted = MongoDb.updateCloseDateAsync collection objId date
+                match inserted with
+                | false -> return Error "The account was not updatable"
+                | true->
+                    let! account = MongoDb.findOneByIdAsync collection objId
+                    return Ok account
+            }
