@@ -66,15 +66,17 @@ module Service =
                 let dto = convertToDto domain
                 return Ok dto
         }
-        
+
     let handleCloseAccountAsync (input: CloseAccountDto) =
-            task {
-                let objId = ObjectId.Parse input.Id
-                let date=input.CloseDate.ToString()
-                let! inserted = MongoDb.updateCloseDateAsync collection objId date
-                match inserted with
-                | false -> return Error "The account was not updatable"
-                | true->
-                    let! account = MongoDb.findOneByIdAsync collection objId
-                    return Ok account
-            }
+        task {
+            let objId = ObjectId.Parse input.Id
+            let date = input.CloseDate.ToString()
+            let! inserted = MongoDb.updateCloseDateAsync collection objId date
+
+            match inserted with
+            | None -> return Error "The account was not updatable"
+            | Some value ->
+                let domain = convertToDomain value
+                let dto = convertToDto domain
+                return Ok dto
+        }

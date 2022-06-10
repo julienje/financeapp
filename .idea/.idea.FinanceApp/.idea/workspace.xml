@@ -10,8 +10,6 @@
   <component name="ChangeListManager">
     <list default="true" id="965a400e-2b37-407e-8bcd-2010aa390b1c" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/DtoTypes.fs" beforeDir="false" afterPath="$PROJECT_DIR$/DtoTypes.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FinanceApp.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/FinanceApp.fsproj" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/FinanceDBRequests.http" beforeDir="false" afterPath="$PROJECT_DIR$/FinanceDBRequests.http" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MongoDb.fs" beforeDir="false" afterPath="$PROJECT_DIR$/MongoDb.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.fs" afterDir="false" />
@@ -36,18 +34,25 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/DecompilerCache/decompiler/785bd1d02ff94894b25c7946964afe33b068/36/90dbf5e9/List`1.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/017dc1e828719c219ec568a09a8a97cd5f738c96ad6ed7c1cb2ed5e549daa/array.fs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1c425811cd21ab63d240d07b714ba2e2a548062526666688f4eea2efed2d1d9/UpdateResult.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/1d6ce91644014739f8746d5eae430c0d1d78b1d5af1a3993fa2accf555c4c/ReturnDocument.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/20a02fe925bc3164f7e372fd65fe295a3b1f4bbf4546cc18bc5933347742955/Json.fs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2c8f3bf9d7e52da52533971fe2e3d4f83625ae6bc62056a7bda55c5ea6453b/prim-types.fs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/2f331d466186bf8382d734c4a7d2ce226b8477e264187e7f3735dbb47973/Core.fs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/32388bbcf2a67be4e48562988977977f9e905c7cbebf838c7f23f8df29bd/FilterDefinition.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3ea95343b9387b73062a9b61b7538f826c54ce3529632b4472ba4494044d23/AsyncTaskMethodBuilderT.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4ce06f9c8947828110e816fc4388205e5d1e9487d885b35295e1614e223de32/ObjectId.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6a217be970b9794c15966494d96ff0b01347ef9dc0774f13a5457b09bc1a0/Builders.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7ae1d944d557dfac4e41c4c4518ee2afb845c9a63da7bbf8c63a72d36fda393/IMongoCollection.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a370968ff94d142757269efc77d9b1ccbb52d2228d458f99d736a122b2994ce/InsertOneOptions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a4af3fabc41ff23138d52fdccc851da7f4f67136fe81cdb2c1d4a448e785147/IMongoCollectionExtensions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b34cdea969917836c37b6dc15e916d3e5954856c12dd1caf3926e4a2a3a0dfe2/AuthorizationAppBuilderExtensions.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/b4c2f8486880a0a68f7235e6b1b86d688ec4d9615ffdcedf5664d290cb6c25/FindOneAndUpdateOptions.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/bb60cc559f4ae5d3faa18b2c5233bd24652845d0a4b2db16c9c644b797bd7d/IAsyncCursor.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c2716d06e925cf2f0e4ab2dfda24d1eb0c3eea1df854cd913878bc53e0e0f3/HttpContextExtensions.fs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c3cbd7b5a79d1c54cf93e65a4ce67f825ec25d298eb84e2826e84d3c8976516/DateOnly.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c4bf5b7e1f6dad83b16c10e468186df52ccb21277b3e31a56c4178a97/MongoClient.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d2736625f393a7377b6830a1520cb33ccafb274e5cd8dc754c17da24d5fe6c/IAsyncCursorSource.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ded4e626ee4c78774ce224cb22cf94eca4aaa6b5dedcbc4bb0f4ee6b8ef41b51/FilterDefinitionBuilder.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f4708639776589f5ac2739f6fcbfc67343b1f9dac51cc1dbfdb003eef77cc1c/Monitor.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -79,7 +84,7 @@
     ]
   }
 }</component>
-  <component name="RunManager" selected="HTTP Request.FinanceDBRequests | #2">
+  <component name="RunManager" selected=".NET Launch Settings Profile.FinanceApp">
     <configuration name="All in FinanceDBRequests" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/FinanceDBRequests.http">
       <method v="2" />
     </configuration>
@@ -87,6 +92,9 @@
       <method v="2" />
     </configuration>
     <configuration name="FinanceDBRequests | #2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/FinanceDBRequests.http" index="2" requestIdentifier="#2" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="FinanceDBRequests | #3" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/FinanceDBRequests.http" index="3" requestIdentifier="#3" runType="Run single request">
       <method v="2" />
     </configuration>
     <configuration name="FinanceApp" type="LaunchSettings" factoryName=".NET Launch Settings Profile">
@@ -121,8 +129,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="HTTP Request.FinanceDBRequests | #2" />
+        <item itemvalue="HTTP Request.FinanceDBRequests | #3" />
         <item itemvalue="HTTP Request.FinanceDBRequests | #1" />
+        <item itemvalue="HTTP Request.FinanceDBRequests | #2" />
         <item itemvalue="HTTP Request.All in FinanceDBRequests" />
       </list>
     </recent_temporary>
@@ -141,6 +150,7 @@
       <workItem from="1654031218450" duration="822000" />
       <workItem from="1654435308476" duration="744000" />
       <workItem from="1654443740867" duration="13381000" />
+      <workItem from="1654887862847" duration="2614000" />
     </task>
     <task id="LOCAL-00001" summary="feat: init commit">
       <created>1653683463049</created>
@@ -194,18 +204,32 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="DotNet Breakpoints">
-          <url>file://$PROJECT_DIR$/Service.fs</url>
-          <line>60</line>
-          <properties documentPath="$PROJECT_DIR$/Service.fs" initialLine="59" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
+          <url>file://$PROJECT_DIR$/MongoDb.fs</url>
+          <line>31</line>
+          <properties documentPath="C:\Users\julie\RiderProjects\financeapp\MongoDb.fs" initialLine="31" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
             <option name="multiMethodBreakpoint" value="true" />
             <startOffsets>
-              <option value="1692" />
+              <option value="977" />
             </startOffsets>
             <endOffsets>
-              <option value="1760" />
+              <option value="981" />
             </endOffsets>
           </properties>
-          <option name="timeStamp" value="14" />
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/MongoDb.fs</url>
+          <line>51</line>
+          <properties documentPath="C:\Users\julie\RiderProjects\financeapp\MongoDb.fs" initialLine="44" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
+            <option name="multiMethodBreakpoint" value="true" />
+            <startOffsets>
+              <option value="1760" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1771" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="18" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

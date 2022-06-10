@@ -29,8 +29,25 @@ module MongoDb =
 
     let updateCloseDateAsync (collection: IMongoCollection<AccountDb>) id date =
         task {
-            let filter = Builders<AccountDb>.Filter.Eq((fun a -> a._id), id)
-            let update= Builders<AccountDb>.Update.Set((fun a -> a.CloseDate), date)
-            let! resp = collection.FindOneAndUpdateAsync<AccountDb>(filter,update)
+            let idFilter =
+                Builders<AccountDb>.Filter.Eq ((fun a -> a._id), id)
+            
+            let nonClosedFilter=
+                Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
+                
+            let filter = Builders<AccountDb>.Filter.And(idFilter, nonClosedFilter)
+
+            let update =
+                Builders<AccountDb>.Update.Set ((fun a -> a.CloseDate), date)
+                
+            let updateOption = FindOneAndUpdateOptions<AccountDb,AccountDb>(ReturnDocument = ReturnDocument.After)
+            
+            let! update = collection.FindOneAndUpdateAsync<AccountDb>(filter, update,updateOption)
+
+            let resp =
+                match box update with
+                | null -> None
+                | _ -> Some update
+
             return resp
         }

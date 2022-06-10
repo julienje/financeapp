@@ -27,22 +27,25 @@ let webApp =
                          return! json accounts next context
                      }
              PUT
-             >=> route "/accounts/new"
-             >=> fun next context ->
-                     task {
-                         let! openAccountDto = context.BindJsonAsync<OpenAccountDto>()
-                         let! openAccount = Service.handleOpenAccountAsync openAccountDto
-                         let resp = treatResponse context openAccount
-                         return! resp next context
-                     }
-             >=> route "/accounts/close"
-             >=> fun next context ->
-                     task {
-                         let! closeAccountDto = context.BindJsonAsync<CloseAccountDto>()
-                         let! openAccount = Service.handleOpenAccountAsync closeAccountDto
-                         let resp = treatResponse context openAccount
-                         return! resp next context
-                     } ]
+             >=> choose [ route "/accounts/new"
+                          >=> fun next context ->
+                                  task {
+                                      let! openAccountDto = context.BindJsonAsync<OpenAccountDto>()
+                                      let! openAccount = Service.handleOpenAccountAsync openAccountDto
+                                      let resp = treatResponse context openAccount
+                                      return! resp next context
+                                  }
+                          route "/accounts/close"
+                          >=> fun next context ->
+                                  task {
+                                      let! closeAccountDto = context.BindJsonAsync<CloseAccountDto>()
+                                      let! closeAccount = Service.handleCloseAccountAsync closeAccountDto
+
+                                      let resp =
+                                          treatResponse context closeAccount
+
+                                      return! resp next context
+                                  } ] ]
 
 let configureApp (app: IApplicationBuilder) =
     // Add Giraffe to the ASP.NET Core pipeline
