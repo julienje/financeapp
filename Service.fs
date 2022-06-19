@@ -1,6 +1,5 @@
 ﻿namespace FinanceApp
 
-open System
 open FinanceApp.DbType
 open FinanceApp.DomainType
 open FinanceApp.DtoTypes
@@ -18,11 +17,11 @@ module Service =
         db.GetCollection<AccountDb>("Accounts")
 
     let convertToDto (input: Account) : AccountDto =
-        { Id = input.Id
-          Name = input.Name
-          Company = input.Company
-          OpenDate = input.OpenDate
-          CloseDate = input.CloseDate }
+        { Id = input.Id |> AccountId.value
+          Name = input.Name |> AccountName.value
+          Company = input.Company |> CompanyName.value
+          OpenDate = input.OpenDate |> OpenDate.value
+          CloseDate = input.CloseDate |> Option.map CloseDate.value  }
 
     let convertToBd (input: OpenAccountDto) : AccountDb =
         { _id = ObjectId.Empty
@@ -31,25 +30,13 @@ module Service =
           OpenDate = input.OpenDate.ToString()
           CloseDate = null }
 
-    let convertToDomain (input: AccountDb) : Account =
-        let closedDate =
-            match DateTime.TryParse input.CloseDate with
-            | true, value -> Some value
-            | _ -> None
-
-        { Account.Id = input._id.ToString()
-          Name = input.Name
-          Company = input.Company
-          OpenDate = DateTime.Parse input.OpenDate
-          CloseDate = closedDate }
-
     let handleGetAllAccountAsync () =
         task {
             let! accounts = MongoDb.findAllAsync collection
 
             return
                 accounts
-                |> List.map convertToDomain
+                |> List.map AccountDb.toAccount
                 |> List.map convertToDto
         }
 
@@ -62,7 +49,7 @@ module Service =
             | true ->
                 let forDb = convertToBd input
                 let! newEntry = MongoDb.openAccountAsync collection forDb
-                let domain = convertToDomain newEntry
+                let domain = AccountDb.toAccount newEntry
                 let dto = convertToDto domain
                 return Ok dto
         }
@@ -76,7 +63,7 @@ module Service =
             match inserted with
             | None -> return Error "The account was not updatable"
             | Some value ->
-                let domain = convertToDomain value
+                let domain = AccountDb.toAccount value
                 let dto = convertToDto domain
                 return Ok dto
         }

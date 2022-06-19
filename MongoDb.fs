@@ -31,18 +31,20 @@ module MongoDb =
         task {
             let idFilter =
                 Builders<AccountDb>.Filter.Eq ((fun a -> a._id), id)
-            
-            let nonClosedFilter=
+
+            let nonClosedFilter =
                 Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
-                
-            let filter = Builders<AccountDb>.Filter.And(idFilter, nonClosedFilter)
+
+            let filter =
+                Builders<AccountDb>.Filter.And (idFilter, nonClosedFilter)
 
             let update =
                 Builders<AccountDb>.Update.Set ((fun a -> a.CloseDate), date)
-                
-            let updateOption = FindOneAndUpdateOptions<AccountDb,AccountDb>(ReturnDocument = ReturnDocument.After)
-            
-            let! update = collection.FindOneAndUpdateAsync<AccountDb>(filter, update,updateOption)
+
+            let updateOption =
+                FindOneAndUpdateOptions<AccountDb, AccountDb>(ReturnDocument = ReturnDocument.After)
+
+            let! update = collection.FindOneAndUpdateAsync<AccountDb>(filter, update, updateOption)
 
             let resp =
                 match box update with
