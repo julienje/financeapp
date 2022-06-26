@@ -13,8 +13,10 @@
       <change beforePath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.FinanceApp/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DbType.fs" beforeDir="false" afterPath="$PROJECT_DIR$/DbType.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/DomainType.fs" beforeDir="false" afterPath="$PROJECT_DIR$/DomainType.fs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/FinanceApp.sln" beforeDir="false" afterPath="$PROJECT_DIR$/FinanceApp.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/MongoDb.fs" beforeDir="false" afterPath="$PROJECT_DIR$/MongoDb.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/DtoTypes.fs" beforeDir="false" afterPath="$PROJECT_DIR$/DtoTypes.fs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FinanceApp.fsproj" beforeDir="false" afterPath="$PROJECT_DIR$/FinanceApp.fsproj" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/FinanceDBRequests.http" beforeDir="false" afterPath="$PROJECT_DIR$/FinanceDBRequests.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Program.fs" beforeDir="false" afterPath="$PROJECT_DIR$/Program.fs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Service.fs" beforeDir="false" afterPath="$PROJECT_DIR$/Service.fs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -44,6 +46,8 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/3ea95343b9387b73062a9b61b7538f826c54ce3529632b4472ba4494044d23/AsyncTaskMethodBuilderT.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4829fcaa7d9dd7514b50e7fbfb482229f834345b92737e1dcd7b0d71fccd6c/fslib-extra-pervasives.fs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/4ce06f9c8947828110e816fc4388205e5d1e9487d885b35295e1614e223de32/ObjectId.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/575c31ecc35a636b6f962cb71d53992552941a18982aae1c8e6c16305cc3761b/ExceptionDispatchInfo.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/63bbdba3671dea211b0ae15a4da2bc2c22fb981972dc7b43f28fbff042b4/result.fs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/6a217be970b9794c15966494d96ff0b01347ef9dc0774f13a5457b09bc1a0/Builders.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/7ae1d944d557dfac4e41c4c4518ee2afb845c9a63da7bbf8c63a72d36fda393/IMongoCollection.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/a370968ff94d142757269efc77d9b1ccbb52d2228d458f99d736a122b2994ce/InsertOneOptions.cs" root0="SKIP_HIGHLIGHTING" />
@@ -58,8 +62,13 @@
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/c4bf5b7e1f6dad83b16c10e468186df52ccb21277b3e31a56c4178a97/MongoClient.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/d2736625f393a7377b6830a1520cb33ccafb274e5cd8dc754c17da24d5fe6c/IAsyncCursorSource.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/ded4e626ee4c78774ce224cb22cf94eca4aaa6b5dedcbc4bb0f4ee6b8ef41b51/FilterDefinitionBuilder.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/df71358f7b7337a1eee3a65abe6d678dd9a065e256b8cc3fd44a2949754/Object.cs" root0="SKIP_HIGHLIGHTING" />
     <setting file="file://$APPLICATION_CONFIG_DIR$/resharper-host/SourcesCache/f4708639776589f5ac2739f6fcbfc67343b1f9dac51cc1dbfdb003eef77cc1c/Monitor.CoreCLR.cs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/julie/RiderProjects/financeapp/DbType.fs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/julie/RiderProjects/financeapp/DbType.fs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/julie/RiderProjects/financeapp/DomainType.fs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/julie/RiderProjects/financeapp/DomainType.fs" root0="SKIP_HIGHLIGHTING" />
+    <setting file="mock://C:/Users/julie/RiderProjects/financeapp/Service.fs" root0="SKIP_HIGHLIGHTING" />
     <setting file="mock://C:/Users/julie/RiderProjects/financeapp/Service.fs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
@@ -154,9 +163,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="HTTP Request.FinanceDBRequests | #1" />
         <item itemvalue="HTTP Request.FinanceDBRequests | #3" />
         <item itemvalue="HTTP Request.FinanceDBRequests | #2" />
+        <item itemvalue="HTTP Request.FinanceDBRequests | #1" />
         <item itemvalue="HTTP Request.All in FinanceDBRequests" />
       </list>
     </recent_temporary>
@@ -177,7 +186,8 @@
       <workItem from="1654443740867" duration="13381000" />
       <workItem from="1654887862847" duration="2721000" />
       <workItem from="1655495657680" duration="490000" />
-      <workItem from="1655646550080" duration="7752000" />
+      <workItem from="1655646550080" duration="8112000" />
+      <workItem from="1656251021507" duration="9781000" />
     </task>
     <task id="LOCAL-00001" summary="feat: init commit">
       <created>1653683463049</created>
@@ -214,7 +224,14 @@
       <option name="project" value="LOCAL" />
       <updated>1654890589623</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="feat: rewrite the type">
+      <created>1655656086604</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1655656086604</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -241,7 +258,8 @@
     <MESSAGE value="feat_: make some mongodb test" />
     <MESSAGE value="feat: implement close account" />
     <MESSAGE value="feat: commit workspace.xml" />
-    <option name="LAST_COMMIT_MESSAGE" value="feat: commit workspace.xml" />
+    <MESSAGE value="feat: rewrite the type" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: rewrite the type" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -273,6 +291,48 @@
             </endOffsets>
           </properties>
           <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/DomainType.fs</url>
+          <line>41</line>
+          <properties documentPath="C:\Users\julie\RiderProjects\financeapp\DomainType.fs" initialLine="41" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
+            <option name="multiMethodBreakpoint" value="true" />
+            <startOffsets>
+              <option value="1236" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1270" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/Service.fs</url>
+          <line>47</line>
+          <properties documentPath="C:\Users\julie\RiderProjects\financeapp\Service.fs" initialLine="47" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
+            <option name="multiMethodBreakpoint" value="true" />
+            <startOffsets>
+              <option value="1475" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1541" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="DotNet Breakpoints">
+          <url>file://$PROJECT_DIR$/DtoTypes.fs</url>
+          <line>52</line>
+          <properties documentPath="C:\Users\julie\RiderProjects\financeapp\DtoTypes.fs" initialLine="52" containingFunctionPresentation="" isMultiMethodBreakpoint="true">
+            <option name="multiMethodBreakpoint" value="true" />
+            <startOffsets>
+              <option value="1587" />
+            </startOffsets>
+            <endOffsets>
+              <option value="1636" />
+            </endOffsets>
+          </properties>
+          <option name="timeStamp" value="21" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

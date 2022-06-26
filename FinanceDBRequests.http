@@ -5,7 +5,7 @@ PUT http://localhost:5165/accounts/new
 Content-Type: application/json
 
 {
-  "Name": "A conto3",
+  "Name": "A conto4",
   "Company": "UBS",
   "OpenDate": "2022-01-01"
 }
@@ -15,6 +15,6 @@ PUT http://localhost:5165/accounts/close
 Content-Type: application/json
 
 {
-  "Id": "62a3a01c386ca9fb9cbc69b9",
+  "Id": "62b888daa670ce2ae2860829",
   "CloseDate": "2022-01-01T00:00:00"
 }
