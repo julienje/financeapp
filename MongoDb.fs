@@ -1,55 +1,68 @@
 ﻿namespace FinanceApp
 
-open System.Threading.Tasks
 open FinanceApp.DbType
 open MongoDB.Driver
 
 module MongoDb =
 
-    let findAllAsync (collection: IMongoCollection<AccountDb>) =
-        task {
-            let! find = collection.FindAsync(Builders.Filter.Empty)
-            let! accounts = find.ToListAsync()
-            return accounts |> Seq.toList
-        }
 
-    let openAccountAsync (collection: IMongoCollection<AccountDb>) account : Task<AccountDb> =
-        task {
-            let! _ = collection.InsertOneAsync(account)
-            return account
-        }
 
-    let getAccountByNameAndCompanyAsync (collection: IMongoCollection<AccountDb>) name company =
-        task {
-            let! find = collection.FindAsync(fun a -> a.Name = name && a.Company = company)
+    let private mongo =
+        MongoClient @"mongodb://localhost:27017"
 
-            let! accounts = find.ToListAsync()
-            return accounts |> Seq.toList
-        }
+    let private db =
+        mongo.GetDatabase "financeDB"
 
-    let updateCloseDateAsync (collection: IMongoCollection<AccountDb>) id date =
-        task {
-            let idFilter =
-                Builders<AccountDb>.Filter.Eq ((fun a -> a._id), id)
+    let private collection =
+        db.GetCollection<AccountDb>("Accounts")
 
-            let nonClosedFilter =
-                Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
+    let findAllAsync: GetAllDbAccount =
+        fun () ->
+            task {
+                let! find = collection.FindAsync(Builders.Filter.Empty)
+                let! accounts = find.ToListAsync()
+                return accounts |> Seq.toList
+            }
 
-            let filter =
-                Builders<AccountDb>.Filter.And (idFilter, nonClosedFilter)
+    let openAccountAsync: OpenDbAccount =
+        fun account ->
+            task {
+                let! _ = collection.InsertOneAsync(account)
+                return account
+            }
 
-            let update =
-                Builders<AccountDb>.Update.Set ((fun a -> a.CloseDate), date)
+    let getAccountByNameAndCompanyAsync: GetDbAccountByNameAndCompany =
+        fun name company ->
+            task {
+                let! find = collection.FindAsync(fun a -> a.Name = name && a.Company = company)
+                let! accounts = find.ToListAsync()
+                return accounts |> Seq.toList
+            }
 
-            let updateOption =
-                FindOneAndUpdateOptions<AccountDb, AccountDb>(ReturnDocument = ReturnDocument.After)
+    let updateCloseDateAsync: CloseDbAccount =
+        fun id date ->
+            task {
+                let idFilter =
+                    Builders<AccountDb>.Filter.Eq ((fun a -> a._id), id)
 
-            let! update = collection.FindOneAndUpdateAsync<AccountDb>(filter, update, updateOption)
+                let nonClosedFilter =
+                    Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
 
-            let resp =
-                match box update with
-                | null -> None
-                | _ -> Some update
+                let filter =
+                    Builders<AccountDb>.Filter.And (idFilter, nonClosedFilter)
 
-            return resp
-        }
+                let update =
+                    Builders<AccountDb>.Update.Set ((fun a -> a.CloseDate), date)
+
+                let updateOption =
+                    FindOneAndUpdateOptions<AccountDb, AccountDb>(ReturnDocument = ReturnDocument.After)
+
+                let! update = collection.FindOneAndUpdateAsync<AccountDb>(filter, update, updateOption)
+
+                let resp =
+                    match box update with
+                    | null -> None
+                    | _ -> Some update
+
+                return resp
+            }

@@ -20,12 +20,13 @@ let private treatResponse (context: HttpContext) resp convertToDto : HttpHandler
         context.SetStatusCode 400
         text $"""{{ "error": "{e}"}}"""
 
+
 let webApp =
     choose [ GET
              >=> route "/accounts"
              >=> fun next context ->
                      task {
-                         let! accounts = Service.handleGetAllAccountAsync ()
+                         let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAsync
 
                          let dto =
                              accounts |> List.map AccountDto.fromDomain
@@ -41,7 +42,13 @@ let webApp =
                                       let! result =
                                           taskResult {
                                               let! toDomain = OpenAccountDto.toDomain openAccountDto
-                                              let! openAccount = Service.handleOpenAccountAsync toDomain
+
+                                              let! openAccount =
+                                                  Service.handleOpenAccountAsync
+                                                      MongoDb.getAccountByNameAndCompanyAsync
+                                                      MongoDb.openAccountAsync
+                                                      toDomain
+
                                               return openAccount
                                           }
 
@@ -58,7 +65,10 @@ let webApp =
                                       let! result =
                                           taskResult {
                                               let! toDomain = CloseAccountDto.toDomain closeAccountDto
-                                              let! closeAccount = Service.handleCloseAccountAsync toDomain
+
+                                              let! closeAccount =
+                                                  Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
+
                                               return closeAccount
                                           }
 

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
+        <LangVersion>latestmajor</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
@@ -23,6 +24,16 @@
 
     <ItemGroup>
         <Content Include="FinanceDBRequests.http" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\appsettings.Development.json" />
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceApp.runtimeconfig.json" />
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest.runtimeconfig.json" />
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\obj\FinanceAppTest.fsproj.nuget.dgspec.json" />
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\obj\project.assets.json" />
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\obj\project.packagespec.json" />
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\Properties\launchSettings.json" />
     </ItemGroup>
 
 </Project>

@@ -1,5 +1,6 @@
 ﻿namespace FinanceApp
 
+open System.Threading.Tasks
 open FinanceApp.DomainType
 open MongoDB.Bson
 
@@ -11,6 +12,11 @@ module DbType =
           Company: string
           OpenDate: string
           CloseDate: string }
+
+    type GetAllDbAccount = Unit -> Task<AccountDb list>
+    type GetDbAccountByNameAndCompany = string -> string -> Task<AccountDb list>
+    type OpenDbAccount = AccountDb -> Task<AccountDb>
+    type CloseDbAccount = ObjectId -> string -> Task<AccountDb option>
 
     module AccountDb =
         let private failOnError aResult =
