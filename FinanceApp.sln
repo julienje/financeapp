@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FinanceApp", "FinanceApp.fsproj", "{B6917B1A-0326-4293-97FD-A8A58C355892}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FinanceApp", "FinanceApp\FinanceApp.fsproj", "{B6917B1A-0326-4293-97FD-A8A58C355892}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
