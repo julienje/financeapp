@@ -6,34 +6,34 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="DomainType.fs" />
-        <Compile Include="DbType.fs" />
-        <Compile Include="MongoDb.fs" />
-        <Compile Include="Service.fs" />
-        <Compile Include="DtoTypes.fs" />
-        <Compile Include="Program.fs" />
+        <Compile Include="DomainType.fs"/>
+        <Compile Include="DbType.fs"/>
+        <Compile Include="MongoDb.fs"/>
+        <Compile Include="Service.fs"/>
+        <Compile Include="DtoTypes.fs"/>
+        <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FSharp.SystemTextJson" Version="0.17.4" />
-        <PackageReference Include="FsToolkit.ErrorHandling" Version="2.13.0" />
-        <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="2.13.0" />
-        <PackageReference Include="Giraffe" Version="6.0.0" />
-        <PackageReference Include="MongoDB.Driver" Version="2.15.1" />
+        <PackageReference Include="FSharp.SystemTextJson" Version="0.17.4"/>
+        <PackageReference Include="FsToolkit.ErrorHandling" Version="2.13.0"/>
+        <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="2.13.0"/>
+        <PackageReference Include="Giraffe" Version="6.0.0"/>
+        <PackageReference Include="MongoDB.Driver" Version="2.15.1"/>
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="FinanceDBRequests.http" />
+        <Content Include="FinanceDBRequests.http"/>
     </ItemGroup>
 
     <ItemGroup>
-        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\appsettings.Development.json" />
-        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceApp.runtimeconfig.json" />
-        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest.runtimeconfig.json" />
-        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\obj\FinanceAppTest.fsproj.nuget.dgspec.json" />
-        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\obj\project.assets.json" />
-        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\obj\project.packagespec.json" />
-        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\Properties\launchSettings.json" />
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\appsettings.Development.json"/>
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceApp.runtimeconfig.json"/>
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest.runtimeconfig.json"/>
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\obj\FinanceAppTest.fsproj.nuget.dgspec.json"/>
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\obj\project.assets.json"/>
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\obj\project.packagespec.json"/>
+        <_ContentIncludedByDefault Remove="FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\FinanceAppTest\bin\Debug\net6.0\Properties\launchSettings.json"/>
     </ItemGroup>
 
 </Project>

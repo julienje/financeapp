@@ -10,6 +10,7 @@ module Service =
     type AllAccount = GetAllDbAccount -> Task<Account list>
     type OpenAnAccount = GetDbAccountByNameAndCompany -> OpenDbAccount -> OpenAccount -> Task<Result<Account, string>>
     type CloseAnAccount = CloseDbAccount -> CloseAccount -> Task<Result<Account, string>>
+    type AddAnAccountBalance = AddAccountBalance -> Task<Result<AccountBalance, string>>
 
     let handleGetAllAccountAsync: AllAccount =
         fun getAllDbAccount ->

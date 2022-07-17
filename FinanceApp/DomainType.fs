@@ -1,13 +1,20 @@
 ﻿namespace FinanceApp
 
 open System
+open Microsoft.FSharp.Core
 
 module DomainType =
+    [<Measure>]
+    type Chf
+
     type AccountId = private AccountId of string
+    type AccountBalanceId = private AccountBalanceId of string
     type AccountName = private AccountName of string
     type CompanyName = private CompanyName of string
     type OpenDate = private OpenDate of DateTime
     type CloseDate = private CloseDate of DateTime
+    type ChfMoney = private ChfMoney of decimal<Chf>
+    type CheckDate = private CheckDate of DateTime
 
     type Account =
         { Id: AccountId
@@ -22,6 +29,17 @@ module DomainType =
           OpenDate: OpenDate }
 
     type CloseAccount = { Id: AccountId; CloseDate: CloseDate }
+
+    type AddAccountBalance =
+        { AccountId: AccountId
+          CheckDate: CheckDate
+          Amount: ChfMoney }
+
+    type AccountBalance =
+        { Id: AccountBalanceId
+          AccountId: AccountId
+          CheckDate: CheckDate
+          Amount: ChfMoney }
 
     module ConstrainedType =
         let createString fieldName ctor str =
@@ -38,7 +56,7 @@ module DomainType =
 
             resp
 
-        let createDateOption fieldName ctor (date: string) =
+        let createDateOption fieldName ctor (date) =
             if String.IsNullOrEmpty(date) then
                 Ok None
             else
@@ -48,6 +66,8 @@ module DomainType =
                     | _ -> Error($"%s{fieldName} must be a valid datetime")
 
                 resp
+
+        let createDecimal fieldName ctor amount = Ok(ctor amount)
 
     module AccountId =
         let value (AccountId str) = str
@@ -92,3 +112,21 @@ module DomainType =
         let create accountId closeDate =
             { Id = accountId
               CloseDate = closeDate }
+
+    module CheckDate =
+        let value (CheckDate date) = date
+
+        let create date =
+            ConstrainedType.createDate "CheckDate" CheckDate date
+
+    module ChfMoney =
+        let value (ChfMoney amount) = amount
+
+        let create amount =
+            ConstrainedType.createDecimal "ChfMoney" ChfMoney amount
+
+    module AccountBalanceId =
+        let value (AccountBalanceId str) = str
+
+        let create str =
+            ConstrainedType.createString "AccountBalanceId" AccountBalanceId str
