@@ -22,7 +22,12 @@ module DtoTypes =
           OpenDate: string }
 
     [<JsonFSharpConverter>]
-    type CloseAccountDto = { Id: string; CloseDate: String }
+    type CloseAccountDto = { Id: string; CloseDate: string }
+
+    [<JsonFSharpConverter>]
+    type AddBalanceDto =
+        { CheckDate: string
+          AmountInChf: decimal }
 
     module AccountDto =
         let fromDomain (input: Account) : AccountDto =
@@ -47,9 +52,18 @@ module DtoTypes =
             }
 
     module CloseAccountDto =
-        let toDomain input =
+        let toDomain (input) =
             result {
                 let! id = AccountId.create input.Id
                 let! closeDate = CloseDate.create input.CloseDate
                 return CloseAccount.create id closeDate
+            }
+
+    module AddBalanceDto =
+        let toDomain accountId (input:AddBalanceDto) =
+            result {
+                let! accountId = AccountId.create accountId
+                let! checkDate = CheckDate.create input.CheckDate
+                let! chfMoney = ChfMoney.create (input.AmountInChf * 1.0m<Chf>)
+                return AddAccountBalance.create accountId checkDate chfMoney
             }

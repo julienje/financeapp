@@ -18,3 +18,13 @@ Content-Type: application/json
   "Id": "62b888daa670ce2ae2860829",
   "CloseDate": "2022-01-01T00:00:00"
 }
+
+###
+PUT http://localhost:5165/accounts/qwer/balance/new
+Content-Type: application/json
+
+{
+  "Id": "62b888daa670ce2ae2860829",
+  "CheckDate": "2022-01-01T00:00:00",
+  "AmountInChf": 12.95
+}

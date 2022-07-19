@@ -56,7 +56,7 @@ module DomainType =
 
             resp
 
-        let createDateOption fieldName ctor (date) =
+        let createDateOption fieldName ctor date =
             if String.IsNullOrEmpty(date) then
                 Ok None
             else
@@ -112,6 +112,12 @@ module DomainType =
         let create accountId closeDate =
             { Id = accountId
               CloseDate = closeDate }
+
+    module AddAccountBalance =
+        let create accountId checkDate chfMoney =
+            { AccountId = accountId
+              CheckDate = checkDate
+              Amount = chfMoney }
 
     module CheckDate =
         let value (CheckDate date) = date

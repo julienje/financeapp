@@ -20,6 +20,17 @@ let private treatResponse (context: HttpContext) resp convertToDto : HttpHandler
         context.SetStatusCode 400
         text $"""{{ "error": "{e}"}}"""
 
+let private newBalanceHandler (accountId: string) : HttpHandler =
+    fun (next: HttpFunc) (context: HttpContext) ->
+        task {
+            let! inputDto = context.BindJsonAsync<AddBalanceDto>()
+            let! result =
+                taskResult {
+                    let! toDomain= AddBalanceDto.toDomain accountId inputDto
+                    return toDomain
+                }
+            return! json result next context
+        }
 
 let webApp =
     choose [ GET
@@ -37,19 +48,19 @@ let webApp =
              >=> choose [ route "/accounts/new"
                           >=> fun next context ->
                                   task {
-                                      let! openAccountDto = context.BindJsonAsync<OpenAccountDto>()
+                                      let! inputDto = context.BindJsonAsync<OpenAccountDto>()
 
                                       let! result =
                                           taskResult {
-                                              let! toDomain = OpenAccountDto.toDomain openAccountDto
+                                              let! toDomain = OpenAccountDto.toDomain inputDto
 
-                                              let! openAccount =
+                                              let! domain =
                                                   Service.handleOpenAccountAsync
                                                       MongoDb.getAccountByNameAndCompanyAsync
                                                       MongoDb.openAccountAsync
                                                       toDomain
 
-                                              return openAccount
+                                              return domain
                                           }
 
                                       let resp =
@@ -60,11 +71,11 @@ let webApp =
                           route "/accounts/close"
                           >=> fun next context ->
                                   task {
-                                      let! closeAccountDto = context.BindJsonAsync<CloseAccountDto>()
+                                      let! inputDto = context.BindJsonAsync<CloseAccountDto>()
 
                                       let! result =
                                           taskResult {
-                                              let! toDomain = CloseAccountDto.toDomain closeAccountDto
+                                              let! toDomain = CloseAccountDto.toDomain inputDto
 
                                               let! closeAccount =
                                                   Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
@@ -76,7 +87,8 @@ let webApp =
                                           treatResponse context result AccountDto.fromDomain
 
                                       return! resp next context
-                                  } ] ]
+                                  }
+                          routef "/accounts/%s/balance/new" newBalanceHandler ] ]
 
 let configureApp (app: IApplicationBuilder) =
     // Add Giraffe to the ASP.NET Core pipeline
