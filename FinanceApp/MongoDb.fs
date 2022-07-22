@@ -4,22 +4,19 @@ open FinanceApp.DbType
 open MongoDB.Driver
 
 module MongoDb =
-
-
-
     let private mongo =
         MongoClient @"mongodb://localhost:27017"
 
     let private db =
         mongo.GetDatabase "financeDB"
 
-    let private collection =
+    let private accountCollection =
         db.GetCollection<AccountDb>("Accounts")
 
     let findAllAsync: GetAllDbAccount =
         fun () ->
             task {
-                let! find = collection.FindAsync(Builders.Filter.Empty)
+                let! find = accountCollection.FindAsync(Builders.Filter.Empty)
                 let! accounts = find.ToListAsync()
                 return accounts |> Seq.toList
             }
@@ -27,14 +24,14 @@ module MongoDb =
     let openAccountAsync: OpenDbAccount =
         fun account ->
             task {
-                let! _ = collection.InsertOneAsync(account)
+                let! _ = accountCollection.InsertOneAsync(account)
                 return account
             }
 
     let getAccountByNameAndCompanyAsync: GetDbAccountByNameAndCompany =
         fun name company ->
             task {
-                let! find = collection.FindAsync(fun a -> a.Name = name && a.Company = company)
+                let! find = accountCollection.FindAsync(fun a -> a.Name = name && a.Company = company)
                 let! accounts = find.ToListAsync()
                 return accounts |> Seq.toList
             }
@@ -57,7 +54,7 @@ module MongoDb =
                 let updateOption =
                     FindOneAndUpdateOptions<AccountDb, AccountDb>(ReturnDocument = ReturnDocument.After)
 
-                let! update = collection.FindOneAndUpdateAsync<AccountDb>(filter, update, updateOption)
+                let! update = accountCollection.FindOneAndUpdateAsync<AccountDb>(filter, update, updateOption)
 
                 let resp =
                     match box update with

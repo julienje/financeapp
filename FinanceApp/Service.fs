@@ -46,7 +46,7 @@ module Service =
                     input.Id |> AccountId.value |> ObjectId.Parse
 
                 let date =
-                    (input.CloseDate |> CloseDate.value).ToString()
+                    input.CloseDate |> CloseDate.value |> string
 
                 let! inserted = closeDb objId date
 

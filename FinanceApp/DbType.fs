@@ -13,10 +13,19 @@ module DbType =
           OpenDate: string
           CloseDate: string }
 
+    [<CLIMutable>]
+    type BalanceAccountDb =
+        { _id: ObjectId
+          AccountId: ObjectId
+          CheckDate: string
+          AmountInChf: string }
+
     type GetAllDbAccount = Unit -> Task<AccountDb list>
     type GetDbAccountByNameAndCompany = string -> string -> Task<AccountDb list>
     type OpenDbAccount = AccountDb -> Task<AccountDb>
     type CloseDbAccount = ObjectId -> string -> Task<AccountDb option>
+    type GetDbAccount = ObjectId -> Task<AccountDb option>
+    type AddDbBalanceAccount = BalanceAccountDb -> Task<BalanceAccountDb>
 
     module AccountDb =
         let private failOnError aResult =
