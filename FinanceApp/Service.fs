@@ -56,3 +56,6 @@ module Service =
                     let domain = AccountDb.toAccount value
                     return Ok domain
             }
+
+    let handleAddBalanceAsync: AddAnAccountBalance =
+        fun input -> task { return Error "asdf" }

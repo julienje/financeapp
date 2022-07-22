@@ -24,12 +24,17 @@ let private newBalanceHandler (accountId: string) : HttpHandler =
     fun (next: HttpFunc) (context: HttpContext) ->
         task {
             let! inputDto = context.BindJsonAsync<AddBalanceDto>()
+
             let! result =
                 taskResult {
-                    let! toDomain= AddBalanceDto.toDomain accountId inputDto
-                    return toDomain
+                    let! toDomain = AddBalanceDto.toDomain accountId inputDto
+                    return! Service.handleAddBalanceAsync toDomain
                 }
-            return! json result next context
+
+            let resp =
+                treatResponse context result AccountBalanceDto.fromDomain
+
+            return! resp next context
         }
 
 let webApp =
