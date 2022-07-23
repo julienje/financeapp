@@ -10,7 +10,9 @@ module Service =
     type AllAccount = GetAllDbAccount -> Task<Account list>
     type OpenAnAccount = GetDbAccountByNameAndCompany -> OpenDbAccount -> OpenAccount -> Task<Result<Account, string>>
     type CloseAnAccount = CloseDbAccount -> CloseAccount -> Task<Result<Account, string>>
-    type AddAnAccountBalance = AddAccountBalance -> Task<Result<AccountBalance, string>>
+
+    type AddAnAccountBalance =
+        GetDbAccount -> AddDbBalanceAccount -> AddAccountBalance -> Task<Result<AccountBalance, string>>
 
     let handleGetAllAccountAsync: AllAccount =
         fun getAllDbAccount ->
@@ -58,4 +60,25 @@ module Service =
             }
 
     let handleAddBalanceAsync: AddAnAccountBalance =
-        fun input -> task { return Error "asdf" }
+        fun getDbAccount addDbBalanceAccount input ->
+            task {
+                let objId =
+                    input.AccountId
+                    |> AccountId.value
+                    |> ObjectId.Parse
+
+                let! account = getDbAccount objId
+
+                match account with
+                | None -> return Error "The account doesn't exit"
+                | Some value ->
+                    let forDb =
+                        BalanceAccountDb.fromAddAccountBalance input
+
+                    let! newEntry = addDbBalanceAccount forDb
+
+                    let domain =
+                        BalanceAccountDb.toBalanceAccount newEntry
+
+                    return Ok domain
+            }

@@ -13,6 +13,14 @@ module MongoDb =
     let private accountCollection =
         db.GetCollection<AccountDb>("Accounts")
 
+    let private balanceCollection =
+        db.GetCollection<BalanceAccountDb>("Balances")
+
+    let private handleNull element =
+        match box element with
+        | null -> None
+        | _ -> Some element
+
     let findAllAsync: GetAllDbAccount =
         fun () ->
             task {
@@ -21,7 +29,7 @@ module MongoDb =
                 return accounts |> Seq.toList
             }
 
-    let openAccountAsync: OpenDbAccount =
+    let insertAccountAsync: OpenDbAccount =
         fun account ->
             task {
                 let! _ = accountCollection.InsertOneAsync(account)
@@ -55,11 +63,20 @@ module MongoDb =
                     FindOneAndUpdateOptions<AccountDb, AccountDb>(ReturnDocument = ReturnDocument.After)
 
                 let! update = accountCollection.FindOneAndUpdateAsync<AccountDb>(filter, update, updateOption)
+                return handleNull update
+            }
 
-                let resp =
-                    match box update with
-                    | null -> None
-                    | _ -> Some update
+    let findAccountAsync: GetDbAccount =
+        fun id ->
+            task {
+                let! find = accountCollection.FindAsync(fun a -> a._id = id)
+                let! account = find.SingleAsync()
+                return handleNull account
+            }
 
-                return resp
+    let insertBalanceAsync: AddDbBalanceAccount =
+        fun balance ->
+            task {
+                let! _ = balanceCollection.InsertOneAsync(balance)
+                return balance
             }

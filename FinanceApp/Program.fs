@@ -28,7 +28,7 @@ let private newBalanceHandler (accountId: string) : HttpHandler =
             let! result =
                 taskResult {
                     let! toDomain = AddBalanceDto.toDomain accountId inputDto
-                    return! Service.handleAddBalanceAsync toDomain
+                    return! Service.handleAddBalanceAsync MongoDb.findAccountAsync MongoDb.insertBalanceAsync toDomain
                 }
 
             let resp =
@@ -62,7 +62,7 @@ let webApp =
                                               let! domain =
                                                   Service.handleOpenAccountAsync
                                                       MongoDb.getAccountByNameAndCompanyAsync
-                                                      MongoDb.openAccountAsync
+                                                      MongoDb.insertAccountAsync
                                                       toDomain
 
                                               return domain
