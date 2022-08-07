@@ -36,6 +36,8 @@ module DtoTypes =
           CheckDate: string
           AmountInChf: decimal }
 
+    type WealthDto = { AmountInChf: decimal }
+
 
     module AccountDto =
         let fromDomain (input: Account) : AccountDto =
@@ -85,3 +87,7 @@ module DtoTypes =
                 let! chfMoney = ChfMoney.create (input.AmountInChf * 1.0m<Chf>)
                 return AddAccountBalance.create accountId checkDate chfMoney
             }
+
+    module WealthDto =
+        let fromDomain (domain: Wealth) =
+            { AmountInChf = domain.Amount |> ChfMoney.value |> decimal }

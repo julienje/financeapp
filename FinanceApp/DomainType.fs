@@ -13,8 +13,15 @@ module DomainType =
     type CompanyName = private CompanyName of string
     type OpenDate = private OpenDate of DateTime
     type CloseDate = private CloseDate of DateTime
-    type ChfMoney = private ChfMoney of decimal<Chf>
+
+    type ChfMoney =
+        private
+        | ChfMoney of decimal<Chf>
+        static member (+)(left: ChfMoney, right: ChfMoney) = left + right
+        static member Zero = ChfMoney 0m<Chf>
+
     type CheckDate = private CheckDate of DateTime
+    type ExportDate = private ExportDate of DateTime
 
     type Account =
         { Id: AccountId
@@ -40,6 +47,16 @@ module DomainType =
           AccountId: AccountId
           CheckDate: CheckDate
           Amount: ChfMoney }
+
+    type WealthAccount =
+        { Amount: ChfMoney
+          AccountId: AccountId
+          CheckDate: CheckDate }
+
+    type Wealth =
+        { Amount: ChfMoney
+          Date: ExportDate
+          Details: WealthAccount list }
 
     module ConstrainedType =
         let createString fieldName ctor str =
@@ -114,7 +131,7 @@ module DomainType =
               CloseDate = closeDate }
 
     module AddAccountBalance =
-        let create accountId checkDate chfMoney =
+        let create accountId checkDate chfMoney : AddAccountBalance =
             { AccountId = accountId
               CheckDate = checkDate
               Amount = chfMoney }
@@ -131,8 +148,17 @@ module DomainType =
         let create amount =
             ConstrainedType.createDecimal "ChfMoney" ChfMoney amount
 
+
     module AccountBalanceId =
         let value (AccountBalanceId str) = str
 
         let create str =
             ConstrainedType.createString "AccountBalanceId" AccountBalanceId str
+
+    module ExportDate =
+        let value (ExportDate date) = date
+
+        let create date =
+            ConstrainedType.createDate "ExportDate" ExportDate date
+
+        let now = ExportDate DateTime.Now

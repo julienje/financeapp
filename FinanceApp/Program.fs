@@ -1,6 +1,7 @@
 open System.Text.Json
 open System.Text.Json.Serialization
 open FinanceApp
+open FinanceApp.DomainType
 open FinanceApp.DtoTypes
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
@@ -39,16 +40,31 @@ let private newBalanceHandler (accountId: string) : HttpHandler =
 
 let webApp =
     choose [ GET
-             >=> route "/accounts"
-             >=> fun next context ->
-                     task {
-                         let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAsync
+             >=> choose [ route "/accounts"
+                          >=> fun next context ->
+                                  task {
+                                      let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAsync
 
-                         let dto =
-                             accounts |> List.map AccountDto.fromDomain
+                                      let dto =
+                                          accounts |> List.map AccountDto.fromDomain
 
-                         return! json dto next context
-                     }
+                                      return! json dto next context
+                                  }
+                          route "/wealth"
+                          >=> fun next context ->
+                                  task {
+
+                                      let! wealth =
+                                          Service.handleGetWealthAsync
+                                              MongoDb.findActiveDbAccountAsync
+                                              MongoDb.findLastBalanceAccount
+                                              ExportDate.now
+
+                                      let dto =
+                                          wealth |> WealthDto.fromDomain
+
+                                      return! json dto next context
+                                  } ]
              PUT
              >=> choose [ route "/accounts/new"
                           >=> fun next context ->
@@ -93,7 +109,7 @@ let webApp =
 
                                       return! resp next context
                                   }
-                          routef "/accounts/%s/balance/new" newBalanceHandler ] ]
+                          routef "/accounts/%s/balances/new" newBalanceHandler ] ]
 
 let configureApp (app: IApplicationBuilder) =
     // Add Giraffe to the ASP.NET Core pipeline

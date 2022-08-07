@@ -26,6 +26,8 @@ module DbType =
     type CloseDbAccount = ObjectId -> string -> Task<AccountDb option>
     type GetDbAccount = ObjectId -> Task<AccountDb option>
     type AddDbBalanceAccount = BalanceAccountDb -> Task<BalanceAccountDb>
+    type GetActiveDbAccount = string -> Task<AccountDb list>
+    type GetLastBalanceAccount = ObjectId -> string -> Task<BalanceAccountDb option>
 
     let private failOnError aResult =
         match aResult with

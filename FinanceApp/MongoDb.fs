@@ -80,3 +80,29 @@ module MongoDb =
                 let! _ = balanceCollection.InsertOneAsync(balance)
                 return balance
             }
+
+    let findActiveDbAccountAsync: GetActiveDbAccount =
+        fun date ->
+            task {
+                let nonClosedFilter =
+                    Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
+
+                let closedButBefore =
+                    Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
+
+                let closedFilter =
+                    Builders<AccountDb>.Filter.Or (nonClosedFilter, closedButBefore)
+
+                let alreadyOpen =
+                    Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
+
+                let filter =
+                    Builders<AccountDb>.Filter.And (alreadyOpen, closedFilter)
+
+                let! find = accountCollection.FindAsync(filter)
+                let! accounts = find.ToListAsync()
+                return accounts |> Seq.toList
+            }
+
+    let findLastBalanceAccount: GetLastBalanceAccount =
+        fun accountId date -> task { return None }

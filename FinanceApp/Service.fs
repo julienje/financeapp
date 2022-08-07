@@ -14,6 +14,8 @@ module Service =
     type AddAnAccountBalance =
         GetDbAccount -> AddDbBalanceAccount -> AddAccountBalance -> Task<Result<AccountBalance, string>>
 
+    type ActualWealth = GetActiveDbAccount -> GetLastBalanceAccount -> ExportDate -> Task<Wealth>
+
     let handleGetAllAccountAsync: AllAccount =
         fun getAllDbAccount ->
             task {
@@ -81,4 +83,35 @@ module Service =
                         BalanceAccountDb.toBalanceAccount newEntry
 
                     return Ok domain
+            }
+
+    let handleGetWealthAsync: ActualWealth =
+        fun getActiveDbAccount getLastBalanceAccount exportDate ->
+            task {
+                let date =
+                    exportDate |> ExportDate.value |> string
+
+                let! accounts = getActiveDbAccount date
+
+                let details =
+                    accounts
+                    |> List.map (fun a -> getLastBalanceAccount a._id date)
+                    |> List.map (fun t -> t.Result)
+                    |> List.filter (fun o -> o.IsSome)
+                    |> List.map (fun o -> o.Value)
+                    |> List.map BalanceAccountDb.toBalanceAccount
+                    |> List.map (fun b ->
+                        { Amount = b.Amount
+                          CheckDate = b.CheckDate
+                          AccountId = b.AccountId })
+
+                let total =
+                    details
+                    |> List.map (fun d -> d.Amount)
+                    |> List.sum
+
+                return
+                    { Amount = total
+                      Date = exportDate
+                      Details = details }
             }

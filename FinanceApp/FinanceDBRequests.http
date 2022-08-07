@@ -20,7 +20,7 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:5165/accounts/qwer/balance/new
+PUT http://localhost:5165/accounts/62b888daa670ce2ae2860829/balances/new
 Content-Type: application/json
 
 {
@@ -28,3 +28,6 @@ Content-Type: application/json
   "CheckDate": "2022-01-01T00:00:00",
   "AmountInChf": 12.95
 }
+
+###
+GET http://localhost:5165/wealth
