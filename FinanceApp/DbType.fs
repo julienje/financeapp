@@ -1,5 +1,6 @@
 ﻿namespace FinanceApp
 
+open System
 open System.Threading.Tasks
 open FinanceApp.DomainType
 open MongoDB.Bson
@@ -10,24 +11,24 @@ module DbType =
         { _id: ObjectId
           Name: string
           Company: string
-          OpenDate: string
-          CloseDate: string }
+          OpenDate: DateTime
+          CloseDate: Nullable<DateTime> }
 
     [<CLIMutable>]
     type BalanceAccountDb =
         { _id: ObjectId
           AccountId: ObjectId
-          CheckDate: string
+          CheckDate: DateTime
           AmountInChf: decimal }
 
     type GetAllDbAccount = Unit -> Task<AccountDb list>
     type GetDbAccountByNameAndCompany = string -> string -> Task<AccountDb list>
     type OpenDbAccount = AccountDb -> Task<AccountDb>
-    type CloseDbAccount = ObjectId -> string -> Task<AccountDb option>
+    type CloseDbAccount = ObjectId -> DateTime -> Task<AccountDb option>
     type GetDbAccount = ObjectId -> Task<AccountDb option>
     type AddDbBalanceAccount = BalanceAccountDb -> Task<BalanceAccountDb>
-    type GetActiveDbAccount = string -> Task<AccountDb list>
-    type GetLastBalanceAccount = ObjectId -> string -> Task<BalanceAccountDb option>
+    type GetActiveDbAccount = DateTime -> Task<AccountDb list>
+    type GetLastBalanceAccount = ObjectId -> DateTime -> Task<BalanceAccountDb option>
 
     let private failOnError aResult =
         match aResult with
@@ -49,14 +50,11 @@ module DbType =
                 |> failOnError
 
             let openDate =
-                accountDb.OpenDate
-                |> OpenDate.create
-                |> failOnError
+                accountDb.OpenDate |> OpenDate.createFromDate
 
             let closeDate =
                 accountDb.CloseDate
-                |> CloseDate.createOption
-                |> failOnError
+                |> CloseDate.createFromNullableDate
 
             { Id = accountId
               Name = accountName
@@ -68,10 +66,8 @@ module DbType =
             { _id = ObjectId.Empty
               Name = openAccount.Name |> AccountName.value
               Company = openAccount.Company |> CompanyName.value
-              OpenDate =
-                (openAccount.OpenDate |> OpenDate.value)
-                    .ToString()
-              CloseDate = null }
+              OpenDate = openAccount.OpenDate |> OpenDate.value
+              CloseDate = Nullable() }
 
     module BalanceAccountDb =
         let fromAddAccountBalance (addAccountBalance: AddAccountBalance) : BalanceAccountDb =
@@ -83,7 +79,6 @@ module DbType =
               CheckDate =
                 addAccountBalance.CheckDate
                 |> CheckDate.value
-                |> string
               AmountInChf =
                 addAccountBalance.Amount
                 |> ChfMoney.value
@@ -102,8 +97,7 @@ module DbType =
 
             let checkDate =
                 balanceAccount.CheckDate
-                |> CheckDate.create
-                |> failOnError
+                |> CheckDate.createFromDate
 
             let amount =
                 (balanceAccount.AmountInChf * 1.0m<Chf>)

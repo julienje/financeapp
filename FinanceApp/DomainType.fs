@@ -107,8 +107,10 @@ module DomainType =
     module OpenDate =
         let value (OpenDate date) = date
 
-        let create date =
+        let createFromString date =
             ConstrainedType.createDate "OpenDate" OpenDate date
+
+        let createFromDate date = OpenDate date
 
     module CloseDate =
         let value (CloseDate date) = date
@@ -118,6 +120,11 @@ module DomainType =
 
         let create date =
             ConstrainedType.createDate "CloseDate" CloseDate date
+
+        let createFromNullableDate (date: Nullable<DateTime>) =
+            match date.HasValue with
+            | true -> date.Value |> CloseDate |> Some
+            | false -> None
 
     module OpenAccount =
         let create accountName companyName openDate =
@@ -139,8 +146,10 @@ module DomainType =
     module CheckDate =
         let value (CheckDate date) = date
 
-        let create date =
+        let createFromString date =
             ConstrainedType.createDate "CheckDate" CheckDate date
+        let createFromDate date =
+            CheckDate date
 
     module ChfMoney =
         let value (ChfMoney amount) = amount

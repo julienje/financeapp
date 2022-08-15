@@ -50,7 +50,7 @@ module Service =
                     input.Id |> AccountId.value |> ObjectId.Parse
 
                 let date =
-                    input.CloseDate |> CloseDate.value |> string
+                    input.CloseDate |> CloseDate.value
 
                 let! inserted = closeDb objId date
 
@@ -89,7 +89,7 @@ module Service =
         fun getActiveDbAccount getLastBalanceAccount exportDate ->
             task {
                 let date =
-                    exportDate |> ExportDate.value |> string
+                    exportDate |> ExportDate.value
 
                 let! accounts = getActiveDbAccount date
 

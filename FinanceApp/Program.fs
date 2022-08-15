@@ -60,8 +60,7 @@ let webApp =
                                               MongoDb.findLastBalanceAccount
                                               ExportDate.now
 
-                                      let dto =
-                                          wealth |> WealthDto.fromDomain
+                                      let dto = wealth |> WealthDto.fromDomain
 
                                       return! json dto next context
                                   } ]

@@ -1,5 +1,6 @@
 ﻿namespace FinanceApp
 
+open System
 open FinanceApp.DbType
 open MongoDB.Driver
 
@@ -51,13 +52,13 @@ module MongoDb =
                     Builders<AccountDb>.Filter.Eq ((fun a -> a._id), id)
 
                 let nonClosedFilter =
-                    Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
+                    Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), Nullable())
 
                 let filter =
                     Builders<AccountDb>.Filter.And (idFilter, nonClosedFilter)
 
                 let update =
-                    Builders<AccountDb>.Update.Set ((fun a -> a.CloseDate), date)
+                    Builders<AccountDb>.Update.Set ((fun a -> a.CloseDate), Nullable date)
 
                 let updateOption =
                     FindOneAndUpdateOptions<AccountDb, AccountDb>(ReturnDocument = ReturnDocument.After)
@@ -85,16 +86,16 @@ module MongoDb =
         fun date ->
             task {
                 let nonClosedFilter =
-                    Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
+                    Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), Nullable())
 
                 let closedButBefore =
-                    Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
+                    Builders<AccountDb>.Filter.Gte ((fun a -> a.CloseDate), Nullable date)
 
                 let closedFilter =
                     Builders<AccountDb>.Filter.Or (nonClosedFilter, closedButBefore)
 
                 let alreadyOpen =
-                    Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), null)
+                    Builders<AccountDb>.Filter.Lte ((fun a -> a.OpenDate), date)
 
                 let filter =
                     Builders<AccountDb>.Filter.And (alreadyOpen, closedFilter)

@@ -63,7 +63,7 @@ module DtoTypes =
             result {
                 let! nameResult = AccountName.create input.Name
                 let! companyResult = CompanyName.create input.Company
-                let! openDateResult = OpenDate.create input.OpenDate
+                let! openDateResult = OpenDate.createFromString input.OpenDate
 
                 let domain =
                     OpenAccount.create nameResult companyResult openDateResult
@@ -83,7 +83,7 @@ module DtoTypes =
         let toDomain accountId (input: AddBalanceDto) =
             result {
                 let! accountId = AccountId.create accountId
-                let! checkDate = CheckDate.create input.CheckDate
+                let! checkDate = CheckDate.createFromString input.CheckDate
                 let! chfMoney = ChfMoney.create (input.AmountInChf * 1.0m<Chf>)
                 return AddAccountBalance.create accountId checkDate chfMoney
             }

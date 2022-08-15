@@ -5,7 +5,7 @@ PUT http://localhost:5165/accounts/new
 Content-Type: application/json
 
 {
-  "Name": "A conto4",
+  "Name": "A conto 5",
   "Company": "UBS",
   "OpenDate": "2022-01-01"
 }
@@ -20,11 +20,10 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:5165/accounts/62b888daa670ce2ae2860829/balances/new
+PUT http://localhost:5165/accounts/62fa8f70003b24f3cecb567f/balances/new
 Content-Type: application/json
 
 {
-  "Id": "62b888daa670ce2ae2860829",
   "CheckDate": "2022-01-01T00:00:00",
   "AmountInChf": 12.95
 }
