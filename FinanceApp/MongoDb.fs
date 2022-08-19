@@ -106,4 +106,15 @@ module MongoDb =
             }
 
     let findLastBalanceAccount: GetLastBalanceAccount =
-        fun accountId date -> task { return None }
+        fun accountId date -> task {
+                let before =
+                    Builders<BalanceAccountDb>.Filter.Lte ((fun a -> a.CheckDate), date)
+                let sort = Builders<BalanceAccountDb>.Sort.Descending("CheckDate")
+                let options = FindOptions<BalanceAccountDb>(Sort = sort)
+
+                let! find = balanceCollection.FindAsync(before, options)
+  
+                let! accounts = find.ToListAsync()
+                //return accounts |> Seq.toList
+                return None
+        }
