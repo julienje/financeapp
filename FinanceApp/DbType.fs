@@ -76,9 +76,7 @@ module DbType =
                 addAccountBalance.AccountId
                 |> AccountId.value
                 |> ObjectId.Parse
-              CheckDate =
-                addAccountBalance.CheckDate
-                |> CheckDate.value
+              CheckDate = addAccountBalance.CheckDate |> CheckDate.value
               AmountInChf =
                 addAccountBalance.Amount
                 |> ChfMoney.value

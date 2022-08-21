@@ -17,7 +17,9 @@ module DomainType =
     type ChfMoney =
         private
         | ChfMoney of decimal<Chf>
-        static member (+)(left: ChfMoney, right: ChfMoney) = left + right
+        static member (+)(ChfMoney left, ChfMoney right) =
+            ChfMoney (left + right)
+
         static member Zero = ChfMoney 0m<Chf>
 
     type CheckDate = private CheckDate of DateTime
@@ -148,8 +150,8 @@ module DomainType =
 
         let createFromString date =
             ConstrainedType.createDate "CheckDate" CheckDate date
-        let createFromDate date =
-            CheckDate date
+
+        let createFromDate date = CheckDate date
 
     module ChfMoney =
         let value (ChfMoney amount) = amount

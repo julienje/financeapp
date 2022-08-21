@@ -88,8 +88,7 @@ module Service =
     let handleGetWealthAsync: ActualWealth =
         fun getActiveDbAccount getLastBalanceAccount exportDate ->
             task {
-                let date =
-                    exportDate |> ExportDate.value
+                let date = exportDate |> ExportDate.value
 
                 let! accounts = getActiveDbAccount date
 
