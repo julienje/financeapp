@@ -15,12 +15,12 @@ PUT http://localhost:5165/accounts/close
 Content-Type: application/json
 
 {
-  "Id": "62b888daa670ce2ae2860829",
-  "CloseDate": "2022-01-01T00:00:00"
+  "Id": "631c42462559f9c5ba696a84",
+  "CloseDate": "2022-01-02T00:00:00"
 }
 
 ###
-PUT http://localhost:5165/accounts/62fa8f70003b24f3cecb567f/balances/new
+PUT http://localhost:5165/accounts/631c42462559f9c5ba696a84/balances/new
 Content-Type: application/json
 
 {
