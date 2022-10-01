@@ -1,3 +1,5 @@
+module FinanceApp.App
+
 open System.Text.Json
 open System.Text.Json.Serialization
 open FinanceApp

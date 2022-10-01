@@ -17,8 +17,7 @@ module DomainType =
     type ChfMoney =
         private
         | ChfMoney of decimal<Chf>
-        static member (+)(ChfMoney left, ChfMoney right) =
-            ChfMoney (left + right)
+        static member (+)(ChfMoney left, ChfMoney right) = ChfMoney(left + right)
 
         static member Zero = ChfMoney 0m<Chf>
 
