@@ -50,12 +50,12 @@ let shouldContain (expected: string) (actual: string) = Assert.True(actual.Conta
 // ---------------------------------
 
 [<Fact>]
-let ``Route / returns "Hello world, from Giraffe!"`` () =
+let ``Route /accounts/new get account`` () =
     use server = new TestServer(createHost ())
     use client = server.CreateClient()
 
     client
-    |> httpGet "/"
+    |> httpGet "/accounts"
     |> ensureSuccess
     |> readText
-    |> shouldContain "Hello world, from Giraffe!"
+    |> shouldEqual "Hello world, from Giraffe!"

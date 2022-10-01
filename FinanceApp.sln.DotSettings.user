@@ -4,6 +4,6 @@
 &lt;/AssemblyExplorer&gt;</s:String>
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=a960c572_002D100f_002D420f_002D87eb_002Df92c7b567c53/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Route / returns &amp;quot;Hello world, from Giraffe!&amp;quot;" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;xUnit::9AD4CB37-A849-4FA7-A085-EF5543C57DDA::net6.0::Tests.Route / returns "Hello world, from Giraffe!"&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::9AD4CB37-A849-4FA7-A085-EF5543C57DDA::net6.0::Tests.Route /accounts/new create a new account&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
