@@ -6,7 +6,10 @@ open MongoDB.Driver
 
 
 let private mongo =
-    MongoClient @"mongodb://localhost:27017"
+    let connectionString =
+        Environment.GetEnvironmentVariable "CONNECTION_STRING"
+
+    MongoClient connectionString
 
 let private db =
     mongo.GetDatabase "financeDB"

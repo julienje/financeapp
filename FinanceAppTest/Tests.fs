@@ -4,6 +4,9 @@ open System
 open System.IO
 open System.Net
 open System.Net.Http
+open DotNet.Testcontainers.Builders
+open DotNet.Testcontainers.Configurations
+open DotNet.Testcontainers.Containers
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.TestHost
@@ -48,6 +51,31 @@ let shouldContain (expected: string) (actual: string) = Assert.True(actual.Conta
 // ---------------------------------
 // Tests
 // ---------------------------------
+
+type MongoDbFixture() =
+    let config =
+            new MongoDbTestcontainerConfiguration(Database = "db", Username = null, Password = null)
+    let myContainer =
+            TestcontainersBuilder<MongoDbTestcontainer>()
+                .WithDatabase(config)
+                .Build()
+
+    interface IDisposable with
+        member _.Dispose() =
+            //CLEAN UP TEST DATA OR WHATEVER YOU NEED TO CLEANUP YOUR TESTS
+            ()
+
+
+
+// Tests wit test container
+
+type TestContainerTest() =
+    [<Fact>]
+    member _.``Can create a start node``() =
+        //DO THE TEST STUFF
+        "INPUT" |> shouldEqual "RESULT"
+
+    interface IClassFixture<MongoDbFixture>
 
 [<Fact>]
 let ``Route /accounts/new get account`` () =
