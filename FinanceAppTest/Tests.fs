@@ -61,9 +61,8 @@ type MongoDbFixture() =
                 .Build()
 
     interface IDisposable with
-        member _.Dispose() =
-            //CLEAN UP TEST DATA OR WHATEVER YOU NEED TO CLEANUP YOUR TESTS
-            ()
+        member this.Dispose() =
+            config.Dispose();
 
 
 
