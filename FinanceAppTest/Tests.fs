@@ -54,35 +54,40 @@ let shouldContain (expected: string) (actual: string) = Assert.True(actual.Conta
 
 type MongoDbFixture() =
     let config =
-            new MongoDbTestcontainerConfiguration(Database = "db", Username = null, Password = null)
+            new MongoDbTestcontainerConfiguration(Database = "db", Username = "unitest", Password = "1234")
     let myContainer =
             TestcontainersBuilder<MongoDbTestcontainer>()
                 .WithDatabase(config)
                 .Build()
+    do
+        printf "Passed here"
+    member this.MyContainer = myContainer
 
     interface IDisposable with
         member this.Dispose() =
-            config.Dispose();
+            config.Dispose()
+            
+    interface IAsyncLifetime with
+        member this.DisposeAsync() = this.MyContainer.DisposeAsync().AsTask();
+        member this.InitializeAsync() = this.MyContainer.StartAsync();
+        
 
 
 
 // Tests wit test container
 
-type TestContainerTest() =
+type TestContainerTest(mongoDb: MongoDbFixture) =
+    do
+        Environment.SetEnvironmentVariable("CONNECTION_STRING",mongoDb.MyContainer.ConnectionString)
+    
     [<Fact>]
-    member _.``Can create a start node``() =
-        //DO THE TEST STUFF
-        "INPUT" |> shouldEqual "RESULT"
+    member this.``Route /accounts/new get account`` () =
+        use server = new TestServer(createHost ())
+        use client = server.CreateClient()
+        client
+        |> httpGet "/accounts"
+        |> ensureSuccess
+        |> readText
+        |> shouldEqual "[]"
 
     interface IClassFixture<MongoDbFixture>
-
-[<Fact>]
-let ``Route /accounts/new get account`` () =
-    use server = new TestServer(createHost ())
-    use client = server.CreateClient()
-
-    client
-    |> httpGet "/accounts"
-    |> ensureSuccess
-    |> readText
-    |> shouldEqual "Hello world, from Giraffe!"
