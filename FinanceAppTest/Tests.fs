@@ -14,11 +14,12 @@ open Microsoft.AspNetCore.TestHost
 open Microsoft.Extensions.DependencyInjection
 open Xunit
 
-let newAccountPayload = """{
-  "Name": "A conto 5",
+let newAccountPayload name = $"""
+{{
+  "Name": "{name}",
   "Company": "UBS",
   "OpenDate": "2022-01-01"
-}"""
+}}"""
 
 let newBalancePayload amount = $"""
 {{
@@ -120,15 +121,29 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> readText
         |> shouldEqual "[]"
         
-        let newAccountId = (client
-        |> httpPut "/accounts/new" newAccountPayload
+        let newAccountA = (client
+        |> httpPut "/accounts/new" (newAccountPayload "AccountA")
+        |> ensureSuccess
+        |> readText
+        |> shouldHaveId)
+        
+        let newAccountb = (client
+        |> httpPut "/accounts/new" (newAccountPayload "AccountB")
         |> ensureSuccess
         |> readText
         |> shouldHaveId)
         
         let amountA = 12.0m
+        let amountB = 15.5m
         client
-        |> httpPut $"/accounts/{newAccountId}/balances/new" (newBalancePayload amountA)
+        |> httpPut $"/accounts/{newAccountA}/balances/new" (newBalancePayload amountA)
+        |> ensureSuccess
+        |> readText
+        |> shouldHaveId
+        |> ignore
+        
+        client
+        |> httpPut $"/accounts/{newAccountb}/balances/new" (newBalancePayload amountB)
         |> ensureSuccess
         |> readText
         |> shouldHaveId
@@ -138,7 +153,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> httpGet "wealth"
         |> ensureSuccess
         |> readText
-        |> shouldPropertyHasValue "AmountInChf" amountA
+        |> shouldPropertyHasValue "AmountInChf" (amountA+amountB)
         
         ()
         
