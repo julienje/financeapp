@@ -4,6 +4,7 @@ open System
 open System.IO
 open System.Net
 open System.Net.Http
+open System.Text.Json.Nodes
 open DotNet.Testcontainers.Builders
 open DotNet.Testcontainers.Configurations
 open DotNet.Testcontainers.Containers
@@ -13,9 +14,21 @@ open Microsoft.AspNetCore.TestHost
 open Microsoft.Extensions.DependencyInjection
 open Xunit
 
+let newAccountPayload = """{
+  "Name": "A conto 5",
+  "Company": "UBS",
+  "OpenDate": "2022-01-01"
+}"""
+
+let newBalancePayload amount = $"""
+{{
+  "CheckDate": "{DateTime.UtcNow}",
+  "AmountInChf": {amount}
+}}
+"""
 
 // ---------------------------------
-// Helper functions (extend as you need)
+// Helper functions
 // ---------------------------------
 
 let createHost () =
@@ -28,6 +41,13 @@ let runTask task =
     task |> Async.AwaitTask |> Async.RunSynchronously
 
 let httpGet (path: string) (client: HttpClient) = path |> client.GetAsync |> runTask
+
+let httpPost (path: string) (payload: string) (client: HttpClient) =
+    use content = new StringContent(payload)
+    client.PostAsync(path,content) |> runTask
+let httpPut (path: string) (payload: string) (client: HttpClient) =
+    use content = new StringContent(payload)
+    client.PutAsync(path,content) |> runTask
 
 let isStatus (code: HttpStatusCode) (response: HttpResponseMessage) =
     Assert.Equal(code, response.StatusCode)
@@ -47,6 +67,16 @@ let readText (response: HttpResponseMessage) =
 let shouldEqual expected actual = Assert.Equal(expected, actual)
 
 let shouldContain (expected: string) (actual: string) = Assert.True(actual.Contains expected)
+
+let shouldHaveId (actual:String): String =
+    Assert.True(actual.Contains "Id")
+    let parsed = actual |> JsonObject.Parse
+    parsed["Id"].GetValue()
+
+let shouldPropertyHasValue (property: String) expected (payload:String) =
+    let parsed = payload |> JsonObject.Parse
+    let result = parsed[property].GetValue<Decimal>()
+    Assert.Equal(expected,result)
 
 // ---------------------------------
 // Tests
@@ -81,7 +111,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         Environment.SetEnvironmentVariable("CONNECTION_STRING",mongoDb.MyContainer.ConnectionString)
     
     [<Fact>]
-    member this.``Route /accounts/new get account`` () =
+    member this.``Smoke test`` () =
         use server = new TestServer(createHost ())
         use client = server.CreateClient()
         client
@@ -89,5 +119,29 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> ensureSuccess
         |> readText
         |> shouldEqual "[]"
+        
+        let newAccountId = (client
+        |> httpPut "/accounts/new" newAccountPayload
+        |> ensureSuccess
+        |> readText
+        |> shouldHaveId)
+        
+        let amountA = 12.0m
+        client
+        |> httpPut $"/accounts/{newAccountId}/balances/new" (newBalancePayload amountA)
+        |> ensureSuccess
+        |> readText
+        |> shouldHaveId
+        |> ignore
+        
+        client
+        |> httpGet "wealth"
+        |> ensureSuccess
+        |> readText
+        |> shouldPropertyHasValue "AmountInChf" amountA
+        
+        ()
+        
+        
 
     interface IClassFixture<MongoDbFixture>
