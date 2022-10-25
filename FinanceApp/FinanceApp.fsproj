@@ -19,7 +19,7 @@
         <PackageReference Include="FsToolkit.ErrorHandling" Version="2.13.0"/>
         <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="2.13.0"/>
         <PackageReference Include="Giraffe" Version="6.0.0"/>
-        <PackageReference Include="MongoDB.Driver" Version="2.15.1"/>
+        <PackageReference Include="MongoDB.Driver" Version="2.18.0"/>
     </ItemGroup>
 
     <ItemGroup>
