@@ -24,7 +24,7 @@ PUT http://localhost:5165/accounts/631c42462559f9c5ba696a84/balances/new
 Content-Type: application/json
 
 {
-  "CheckDate": "2022-01-01T00:00:00",
+  "CheckDate": "2022-10-27T00:00:00",
   "AmountInChf": 12.95
 }
 
