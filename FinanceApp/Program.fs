@@ -6,6 +6,7 @@ open FinanceApp
 open FinanceApp.DomainType
 open FinanceApp.DtoTypes
 open Microsoft.AspNetCore.Builder
+open Microsoft.AspNetCore.Cors.Infrastructure
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Hosting
@@ -112,18 +113,27 @@ let webApp =
                                   }
                           routef "/accounts/%s/balances/new" newBalanceHandler ] ]
 
+let configureCors (builder: CorsPolicyBuilder) =
+    builder
+        .AllowAnyOrigin()
+        .AllowAnyMethod()
+        .AllowAnyHeader()
+    |> ignore
+
 let configureApp (app: IApplicationBuilder) =
     // Add Giraffe to the ASP.NET Core pipeline
-    app.UseGiraffe webApp
+    app.UseCors(configureCors).UseGiraffe webApp
 
 let configureServices (services: IServiceCollection) =
     // Add Giraffe dependencies
-    services.AddGiraffe() |> ignore
     let jsonOptions = JsonSerializerOptions()
     jsonOptions.Converters.Add(JsonFSharpConverter())
-    services.AddSingleton(jsonOptions) |> ignore
 
-    services.AddSingleton<Json.ISerializer, SystemTextJson.Serializer>()
+    services
+        .AddGiraffe()
+        .AddSingleton(jsonOptions)
+        .AddCors()
+        .AddSingleton<Json.ISerializer, SystemTextJson.Serializer>()
     |> ignore
 
 [<EntryPoint>]

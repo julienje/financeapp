@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Tests.fs" />
+        <Compile Include="Tests.fs"/>
     </ItemGroup>
 
     <ItemGroup>
@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FinanceApp\FinanceApp.fsproj" />
+        <ProjectReference Include="..\FinanceApp\FinanceApp.fsproj"/>
     </ItemGroup>
 
 </Project>

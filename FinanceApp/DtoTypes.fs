@@ -37,13 +37,15 @@ type AccountBalanceDto =
 
 [<JsonFSharpConverter>]
 type WealthAccountDto =
-    {AmountInChf: decimal
-     AccountId: string
-     CheckDate: string}
+    { AmountInChf: decimal
+      AccountId: string
+      CheckDate: string }
+
 [<JsonFSharpConverter>]
-type WealthDto = { AmountInChf: decimal
-                   ExportDate: string
-                   Details: WealthAccountDto list}
+type WealthDto =
+    { AmountInChf: decimal
+      ExportDate: string
+      Details: WealthAccountDto list }
 
 
 module AccountDto =
@@ -94,14 +96,17 @@ module AddBalanceDto =
             let! chfMoney = ChfMoney.create (input.AmountInChf * 1.0m<Chf>)
             return AddAccountBalance.create accountId checkDate chfMoney
         }
+
 module WealthAccountDto =
-    let fromDomain(domain: WealthAccount) : WealthAccountDto=
-        {AmountInChf = domain.Amount |> ChfMoney.value |> decimal
-         AccountId = domain.AccountId |> AccountId.value
-         CheckDate = domain.CheckDate |> CheckDate.value |> string
-         }
+    let fromDomain (domain: WealthAccount) : WealthAccountDto =
+        { AmountInChf = domain.Amount |> ChfMoney.value |> decimal
+          AccountId = domain.AccountId |> AccountId.value
+          CheckDate = domain.CheckDate |> CheckDate.value |> string }
+
 module WealthDto =
     let fromDomain (domain: Wealth) =
         { AmountInChf = domain.Amount |> ChfMoney.value |> decimal
           ExportDate = domain.Date |> ExportDate.value |> string
-          Details = domain.Details |> List.map WealthAccountDto.fromDomain }
+          Details =
+            domain.Details
+            |> List.map WealthAccountDto.fromDomain }
