@@ -39,6 +39,8 @@ type AccountBalanceDto =
 type WealthAccountDto =
     { AmountInChf: decimal
       AccountId: string
+      AccountName: string
+      AccountCompany: string
       CheckDate: string }
 
 [<JsonFSharpConverter>]
@@ -100,7 +102,9 @@ module AddBalanceDto =
 module WealthAccountDto =
     let fromDomain (domain: WealthAccount) : WealthAccountDto =
         { AmountInChf = domain.Amount |> ChfMoney.value |> decimal
-          AccountId = domain.AccountId |> AccountId.value
+          AccountId = domain.Account.Id |> AccountId.value
+          AccountName = domain.Account.Name |> AccountName.value
+          AccountCompany = domain.Account.Company |> CompanyName.value
           CheckDate = domain.CheckDate |> CheckDate.value |> string }
 
 module WealthDto =

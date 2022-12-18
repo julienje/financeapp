@@ -89,6 +89,12 @@ let handleGetWealthAsync: ActualWealth =
             let date = exportDate |> ExportDate.value
 
             let! accounts = getActiveDbAccount date
+            
+            let accountsById = 
+                accounts
+                |>List.map AccountDb.toAccount
+                |>List.map (fun a-> a.Id, a)
+                |> Map.ofSeq
 
             let details =
                 accounts
@@ -100,7 +106,7 @@ let handleGetWealthAsync: ActualWealth =
                 |> List.map (fun b ->
                     { Amount = b.Amount
                       CheckDate = b.CheckDate
-                      AccountId = b.AccountId })
+                      Account = accountsById[b.AccountId]})
 
             let total =
                 details

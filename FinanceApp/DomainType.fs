@@ -50,7 +50,7 @@ type AccountBalance =
 
 type WealthAccount =
     { Amount: ChfMoney
-      AccountId: AccountId
+      Account: Account
       CheckDate: CheckDate }
 
 type Wealth =
