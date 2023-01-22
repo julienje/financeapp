@@ -15,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="FSharp.SystemTextJson" Version="1.0.7"/>
+        <PackageReference Include="FSharp.SystemTextJson" Version="1.1.23"/>
         <PackageReference Include="FsToolkit.ErrorHandling" Version="4.2.1"/>
         <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.2.1"/>
         <PackageReference Include="Giraffe" Version="6.0.0"/>
