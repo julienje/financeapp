@@ -6,19 +6,15 @@ open MongoDB.Driver
 
 
 let private mongo =
-    let connectionString =
-        Environment.GetEnvironmentVariable "CONNECTION_STRING"
+    let connectionString = Environment.GetEnvironmentVariable "CONNECTION_STRING"
 
     MongoClient connectionString
 
-let private db =
-    mongo.GetDatabase "financeDB"
+let private db = mongo.GetDatabase "financeDB"
 
-let private accountCollection =
-    db.GetCollection<AccountDb>("Accounts")
+let private accountCollection = db.GetCollection<AccountDb>("Accounts")
 
-let private balanceCollection =
-    db.GetCollection<BalanceAccountDb>("Balances")
+let private balanceCollection = db.GetCollection<BalanceAccountDb>("Balances")
 
 let private handleNull element =
     match box element with
@@ -51,17 +47,14 @@ let getAccountByNameAndCompanyAsync: GetDbAccountByNameAndCompany =
 let updateCloseDateAsync: CloseDbAccount =
     fun id date ->
         task {
-            let idFilter =
-                Builders<AccountDb>.Filter.Eq ((fun a -> a._id), id)
+            let idFilter = Builders<AccountDb>.Filter.Eq ((fun a -> a._id), id)
 
             let nonClosedFilter =
                 Builders<AccountDb>.Filter.Eq ((fun a -> a.CloseDate), Nullable())
 
-            let filter =
-                Builders<AccountDb>.Filter.And (idFilter, nonClosedFilter)
+            let filter = Builders<AccountDb>.Filter.And (idFilter, nonClosedFilter)
 
-            let update =
-                Builders<AccountDb>.Update.Set ((fun a -> a.CloseDate), Nullable date)
+            let update = Builders<AccountDb>.Update.Set ((fun a -> a.CloseDate), Nullable date)
 
             let updateOption =
                 FindOneAndUpdateOptions<AccountDb, AccountDb>(ReturnDocument = ReturnDocument.After)
@@ -94,14 +87,11 @@ let findActiveDbAccountAsync: GetActiveDbAccount =
             let closedButBefore =
                 Builders<AccountDb>.Filter.Gte ((fun a -> a.CloseDate), Nullable date)
 
-            let closedFilter =
-                Builders<AccountDb>.Filter.Or (nonClosedFilter, closedButBefore)
+            let closedFilter = Builders<AccountDb>.Filter.Or (nonClosedFilter, closedButBefore)
 
-            let alreadyOpen =
-                Builders<AccountDb>.Filter.Lte ((fun a -> a.OpenDate), date)
+            let alreadyOpen = Builders<AccountDb>.Filter.Lte ((fun a -> a.OpenDate), date)
 
-            let filter =
-                Builders<AccountDb>.Filter.And (alreadyOpen, closedFilter)
+            let filter = Builders<AccountDb>.Filter.And (alreadyOpen, closedFilter)
 
             let! find = accountCollection.FindAsync(filter)
             let! accounts = find.ToListAsync()
@@ -111,20 +101,16 @@ let findActiveDbAccountAsync: GetActiveDbAccount =
 let findLastBalanceAccount: GetLastBalanceAccount =
     fun accountId date ->
         task {
-            let before =
-                Builders<BalanceAccountDb>.Filter.Lte ((fun a -> a.CheckDate), date)
+            let before = Builders<BalanceAccountDb>.Filter.Lte ((fun a -> a.CheckDate), date)
 
             let account =
                 Builders<BalanceAccountDb>.Filter.Eq ((fun a -> a.AccountId), accountId)
 
-            let filter =
-                Builders<BalanceAccountDb>.Filter.And (before, account)
+            let filter = Builders<BalanceAccountDb>.Filter.And (before, account)
 
-            let sort =
-                Builders<BalanceAccountDb>.Sort.Descending ("CheckDate")
+            let sort = Builders<BalanceAccountDb>.Sort.Descending ("CheckDate")
 
-            let options =
-                FindOptions<BalanceAccountDb>(Sort = sort)
+            let options = FindOptions<BalanceAccountDb>(Sort = sort)
 
             let! find = balanceCollection.FindAsync(filter, options)
 

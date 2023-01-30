@@ -5,6 +5,7 @@ open System.Text.Json.Serialization
 open FinanceApp
 open FinanceApp.DomainType
 open FinanceApp.DtoTypes
+open Microsoft.AspNetCore.Authentication.JwtBearer
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Cors.Infrastructure
 open Microsoft.AspNetCore.Hosting
@@ -13,8 +14,9 @@ open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Giraffe
 open FsToolkit.ErrorHandling
+open Microsoft.Identity.Web
 
-let private treatResponse (context: HttpContext) resp convertToDto : HttpHandler =
+let treatResponse (context: HttpContext) resp convertToDto : HttpHandler =
     match resp with
     | Ok res ->
         context.SetStatusCode 200
@@ -24,7 +26,7 @@ let private treatResponse (context: HttpContext) resp convertToDto : HttpHandler
         context.SetStatusCode 400
         text $"""{{ "error": "{e}"}}"""
 
-let private newBalanceHandler (accountId: string) : HttpHandler =
+let newBalanceHandler (accountId: string) : HttpHandler =
     fun (next: HttpFunc) (context: HttpContext) ->
         task {
             let! inputDto = context.BindJsonAsync<AddBalanceDto>()
@@ -35,94 +37,102 @@ let private newBalanceHandler (accountId: string) : HttpHandler =
                     return! Service.handleAddBalanceAsync MongoDb.findAccountAsync MongoDb.insertBalanceAsync toDomain
                 }
 
-            let resp =
-                treatResponse context result AccountBalanceDto.fromDomain
+            let resp = treatResponse context result AccountBalanceDto.fromDomain
 
             return! resp next context
         }
 
+let notLoggedIn = RequestErrors.UNAUTHORIZED "Bearer" "JJ" "You must be logged in."
+
+let mustBeLoggedIn = requiresAuthentication notLoggedIn
+
 let webApp =
-    choose [ GET
-             >=> choose [ route "/accounts"
-                          >=> fun next context ->
-                                  task {
-                                      let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAsync
+    mustBeLoggedIn
+    >=> choose
+            [ GET
+              >=> choose
+                      [ route "/accounts"
+                        >=> fun next context ->
+                                task {
+                                    let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAsync
 
-                                      let dto =
-                                          accounts |> List.map AccountDto.fromDomain
+                                    let dto = accounts |> List.map AccountDto.fromDomain
 
-                                      return! json dto next context
-                                  }
-                          route "/wealth"
-                          >=> fun next context ->
-                                  task {
+                                    return! json dto next context
+                                }
+                        route "/wealth"
+                        >=> fun next context ->
+                                task {
 
-                                      let! wealth =
-                                          Service.handleGetWealthAsync
-                                              MongoDb.findActiveDbAccountAsync
-                                              MongoDb.findLastBalanceAccount
-                                              ExportDate.now
+                                    let! wealth =
+                                        Service.handleGetWealthAsync
+                                            MongoDb.findActiveDbAccountAsync
+                                            MongoDb.findLastBalanceAccount
+                                            ExportDate.now
 
-                                      let dto = wealth |> WealthDto.fromDomain
+                                    let dto = wealth |> WealthDto.fromDomain
 
-                                      return! json dto next context
-                                  } ]
-             PUT
-             >=> choose [ route "/accounts/new"
-                          >=> fun next context ->
-                                  task {
-                                      let! inputDto = context.BindJsonAsync<OpenAccountDto>()
+                                    return! json dto next context
+                                } ]
+              PUT
+              >=> choose
+                      [ route "/accounts/new"
+                        >=> fun next context ->
+                                task {
+                                    let! inputDto = context.BindJsonAsync<OpenAccountDto>()
 
-                                      let! result =
-                                          taskResult {
-                                              let! toDomain = OpenAccountDto.toDomain inputDto
+                                    let! result =
+                                        taskResult {
+                                            let! toDomain = OpenAccountDto.toDomain inputDto
 
-                                              let! domain =
-                                                  Service.handleOpenAccountAsync
-                                                      MongoDb.getAccountByNameAndCompanyAsync
-                                                      MongoDb.insertAccountAsync
-                                                      toDomain
+                                            let! domain =
+                                                Service.handleOpenAccountAsync
+                                                    MongoDb.getAccountByNameAndCompanyAsync
+                                                    MongoDb.insertAccountAsync
+                                                    toDomain
 
-                                              return domain
-                                          }
+                                            return domain
+                                        }
 
-                                      let resp =
-                                          treatResponse context result AccountDto.fromDomain
+                                    let resp = treatResponse context result AccountDto.fromDomain
 
-                                      return! resp next context
-                                  }
-                          route "/accounts/close"
-                          >=> fun next context ->
-                                  task {
-                                      let! inputDto = context.BindJsonAsync<CloseAccountDto>()
+                                    return! resp next context
+                                }
+                        route "/accounts/close"
+                        >=> fun next context ->
+                                task {
+                                    let! inputDto = context.BindJsonAsync<CloseAccountDto>()
 
-                                      let! result =
-                                          taskResult {
-                                              let! toDomain = CloseAccountDto.toDomain inputDto
+                                    let! result =
+                                        taskResult {
+                                            let! toDomain = CloseAccountDto.toDomain inputDto
 
-                                              let! closeAccount =
-                                                  Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
+                                            let! closeAccount =
+                                                Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
 
-                                              return closeAccount
-                                          }
+                                            return closeAccount
+                                        }
 
-                                      let resp =
-                                          treatResponse context result AccountDto.fromDomain
+                                    let resp = treatResponse context result AccountDto.fromDomain
 
-                                      return! resp next context
-                                  }
-                          routef "/accounts/%s/balances/new" newBalanceHandler ] ]
+                                    return! resp next context
+                                }
+                        routef "/accounts/%s/balances/new" newBalanceHandler ] ]
 
 let configureCors (builder: CorsPolicyBuilder) =
-    builder
-        .AllowAnyOrigin()
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-    |> ignore
+    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
 
 let configureApp (app: IApplicationBuilder) =
     // Add Giraffe to the ASP.NET Core pipeline
     app.UseCors(configureCors).UseGiraffe webApp
+
+let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
+    option.Instance <- "https://login.microsoftonline.com/0829ce3c-dd9d-45a5-a7e4-b8fb69179085"
+    option.ClientId <- "0829ce3c-dd9d-45a5-a7e4-b8fb69179085"
+    option.TenantId <- "1cfe66e3-db51-4082-93ad-0814bff72abf"
+
+let configureBearer (_: JwtBearerOptions) = ()
+
 
 let configureServices (services: IServiceCollection) =
     // Add Giraffe dependencies
@@ -134,6 +144,10 @@ let configureServices (services: IServiceCollection) =
         .AddSingleton(jsonOptions)
         .AddCors()
         .AddSingleton<Json.ISerializer, SystemTextJson.Serializer>()
+        .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddMicrosoftIdentityWebApi(configureBearer, configureMicrosoftAccount, JwtBearerDefaults.AuthenticationScheme, true )
+        .EnableTokenAcquisitionToCallDownstreamApi(fun x-> ())
+        .AddInMemoryTokenCaches()
     |> ignore
 
 [<EntryPoint>]

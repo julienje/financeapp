@@ -80,8 +80,7 @@ let shouldHaveId (actual: String) : String =
 let shouldPropertyHasValue (property: String) expected (payload: String) =
     let parsed = payload |> JsonObject.Parse
 
-    let result =
-        parsed[ property ].GetValue<Decimal>()
+    let result = parsed[ property ].GetValue<Decimal>()
 
     Assert.Equal(expected, result)
 
@@ -94,9 +93,7 @@ type MongoDbFixture() =
         new MongoDbTestcontainerConfiguration(Database = "db", Username = "unitest", Password = "1234")
 
     let myContainer =
-        TestcontainersBuilder<MongoDbTestcontainer>()
-            .WithDatabase(config)
-            .Build()
+        TestcontainersBuilder<MongoDbTestcontainer>().WithDatabase(config).Build()
 
     do printf "Passed here"
     member this.MyContainer = myContainer
@@ -123,11 +120,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         use server = new TestServer(createHost ())
         use client = server.CreateClient()
 
-        client
-        |> httpGet "/accounts"
-        |> ensureSuccess
-        |> readText
-        |> shouldEqual "[]"
+        client |> httpGet "/accounts" |> ensureSuccess |> readText |> shouldEqual "[]"
 
         let newAccountA =
             (client
