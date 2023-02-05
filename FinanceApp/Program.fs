@@ -10,6 +10,7 @@ open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Cors.Infrastructure
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
+open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Giraffe
@@ -46,7 +47,8 @@ let newBalanceHandler (accountId: string) : HttpHandler =
 
 // let notLoggedIn = RequestErrors.UNAUTHORIZED "Bearer" "JJ" "You must be logged in."
 
-let mustBeLoggedIn = requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
+let mustBeLoggedIn =
+    requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
 
 let webApp =
     mustBeLoggedIn
@@ -125,29 +127,26 @@ let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
 
 let configureApp (app: IApplicationBuilder) =
-    app.UseCors(configureCors).UseGiraffe webApp
+    app.UseCors(configureCors).UseAuthentication().UseGiraffe webApp
 
 let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
     option.Instance <- "https://login.microsoftonline.com"
     option.ClientId <- "1cfe66e3-db51-4082-93ad-0814bff72abf"
     option.TenantId <- "0829ce3c-dd9d-45a5-a7e4-b8fb69179085"
-    option.Scope.Add("api://1cfe66e3-db51-4082-93ad-0814bff72abf/default")
 
 let configureBearer (_: JwtBearerOptions) = ()
 
-let configureLogging (builder : ILoggingBuilder) =
+let configureLogging (builder: ILoggingBuilder) =
     // Set a logging filter (optional)
-    let filter (_ : LogLevel) = true
-    
+    let filter (_: LogLevel) = true
     IdentityModelEventSource.ShowPII <- true
     printf $"pii is %b{IdentityModelEventSource.ShowPII}"
-
     // Configure the logging factory
-    builder.AddFilter(filter) // Optional filter
-           .AddConsole()      // Set up the Console logger
-           .AddDebug()        // Set up the Debug logger
-
-           // Add additional loggers if wanted...
+    builder
+        .AddFilter(filter) // Optional filter
+        .AddConsole() // Set up the Console logger
+        .AddDebug() // Set up the Debug logger
+    // Add additional loggers if wanted...
     |> ignore
 
 
@@ -155,15 +154,19 @@ let configureServices (services: IServiceCollection) =
     // Add Giraffe dependencies
     let jsonOptions = JsonSerializerOptions()
     jsonOptions.Converters.Add(JsonFSharpConverter())
-
     services
         .AddGiraffe()
         .AddSingleton(jsonOptions)
         .AddCors()
         .AddSingleton<Json.ISerializer, SystemTextJson.Serializer>()
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApi(configureBearer, configureMicrosoftAccount, JwtBearerDefaults.AuthenticationScheme, true )
-        .EnableTokenAcquisitionToCallDownstreamApi(fun x-> ())
+        .AddMicrosoftIdentityWebApi(
+            configureBearer,
+            configureMicrosoftAccount,
+            JwtBearerDefaults.AuthenticationScheme,
+            true
+        )
+        .EnableTokenAcquisitionToCallDownstreamApi(fun x -> ())
         .AddInMemoryTokenCaches()
     |> ignore
 
