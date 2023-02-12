@@ -140,7 +140,6 @@ let configureLogging (builder: ILoggingBuilder) =
     // Set a logging filter (optional)
     let filter (_: LogLevel) = true
     IdentityModelEventSource.ShowPII <- true
-    printf $"pii is %b{IdentityModelEventSource.ShowPII}"
     // Configure the logging factory
     builder
         .AddFilter(filter) // Optional filter
@@ -154,20 +153,22 @@ let configureServices (services: IServiceCollection) =
     // Add Giraffe dependencies
     let jsonOptions = JsonSerializerOptions()
     jsonOptions.Converters.Add(JsonFSharpConverter())
+
     services
         .AddGiraffe()
         .AddSingleton(jsonOptions)
         .AddCors()
         .AddSingleton<Json.ISerializer, SystemTextJson.Serializer>()
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApi(
+        .AddMicrosoftIdentityWebApi(configureBearer, configureMicrosoftAccount)
+    (*.AddMicrosoftIdentityWebApi(
             configureBearer,
             configureMicrosoftAccount,
             JwtBearerDefaults.AuthenticationScheme,
             true
         )
         .EnableTokenAcquisitionToCallDownstreamApi(fun x -> ())
-        .AddInMemoryTokenCaches()
+        .AddInMemoryTokenCaches()*)
     |> ignore
 
 [<EntryPoint>]
@@ -175,10 +176,8 @@ let main _ =
     Host
         .CreateDefaultBuilder()
         .ConfigureWebHostDefaults(fun webHostBuilder ->
-            webHostBuilder
-                .Configure(configureApp)
-                .ConfigureServices(configureServices)
-                .ConfigureLogging(configureLogging)
+            webHostBuilder.Configure(configureApp).ConfigureServices(configureServices)
+            (*.ConfigureLogging(configureLogging)*)
             |> ignore)
         .Build()
         .Run()
