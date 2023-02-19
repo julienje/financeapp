@@ -15,9 +15,7 @@ open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Giraffe
 open FsToolkit.ErrorHandling
-open Microsoft.Extensions.Logging
 open Microsoft.Identity.Web
-open Microsoft.IdentityModel.Logging
 
 let treatResponse (context: HttpContext) resp convertToDto : HttpHandler =
     match resp with
@@ -44,8 +42,6 @@ let newBalanceHandler (accountId: string) : HttpHandler =
 
             return! resp next context
         }
-
-// let notLoggedIn = RequestErrors.UNAUTHORIZED "Bearer" "JJ" "You must be logged in."
 
 let mustBeLoggedIn =
     requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
@@ -127,27 +123,13 @@ let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
 
 let configureApp (app: IApplicationBuilder) =
+    // let env = app.ApplicationServices.GetService<IHostEnvironment>()
     app.UseCors(configureCors).UseAuthentication().UseGiraffe webApp
 
 let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
     option.Instance <- "https://login.microsoftonline.com"
     option.ClientId <- "1cfe66e3-db51-4082-93ad-0814bff72abf"
     option.TenantId <- "0829ce3c-dd9d-45a5-a7e4-b8fb69179085"
-
-let configureBearer (_: JwtBearerOptions) = ()
-
-let configureLogging (builder: ILoggingBuilder) =
-    // Set a logging filter (optional)
-    let filter (_: LogLevel) = true
-    IdentityModelEventSource.ShowPII <- true
-    // Configure the logging factory
-    builder
-        .AddFilter(filter) // Optional filter
-        .AddConsole() // Set up the Console logger
-        .AddDebug() // Set up the Debug logger
-    // Add additional loggers if wanted...
-    |> ignore
-
 
 let configureServices (services: IServiceCollection) =
     // Add Giraffe dependencies
@@ -160,15 +142,7 @@ let configureServices (services: IServiceCollection) =
         .AddCors()
         .AddSingleton<Json.ISerializer, SystemTextJson.Serializer>()
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-        .AddMicrosoftIdentityWebApi(configureBearer, configureMicrosoftAccount)
-    (*.AddMicrosoftIdentityWebApi(
-            configureBearer,
-            configureMicrosoftAccount,
-            JwtBearerDefaults.AuthenticationScheme,
-            true
-        )
-        .EnableTokenAcquisitionToCallDownstreamApi(fun x -> ())
-        .AddInMemoryTokenCaches()*)
+        .AddMicrosoftIdentityWebApi((fun o -> ()), configureMicrosoftAccount)
     |> ignore
 
 [<EntryPoint>]
@@ -177,7 +151,6 @@ let main _ =
         .CreateDefaultBuilder()
         .ConfigureWebHostDefaults(fun webHostBuilder ->
             webHostBuilder.Configure(configureApp).ConfigureServices(configureServices)
-            (*.ConfigureLogging(configureLogging)*)
             |> ignore)
         .Build()
         .Run()
