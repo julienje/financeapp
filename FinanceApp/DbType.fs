@@ -36,24 +36,15 @@ let private failOnError aResult =
 
 module AccountDb =
     let toAccount (accountDb: AccountDb) : Account =
-        let accountName =
-            AccountName.create accountDb.Name |> failOnError
+        let accountName = AccountName.create accountDb.Name |> failOnError
 
-        let accountId =
-            accountDb._id.ToString()
-            |> AccountId.create
-            |> failOnError
+        let accountId = accountDb._id.ToString() |> AccountId.create |> failOnError
 
-        let companyName =
-            CompanyName.create accountDb.Company
-            |> failOnError
+        let companyName = CompanyName.create accountDb.Company |> failOnError
 
-        let openDate =
-            accountDb.OpenDate |> OpenDate.createFromDate
+        let openDate = accountDb.OpenDate |> OpenDate.createFromDate
 
-        let closeDate =
-            accountDb.CloseDate
-            |> CloseDate.createFromNullableDate
+        let closeDate = accountDb.CloseDate |> CloseDate.createFromNullableDate
 
         { Id = accountId
           Name = accountName
@@ -71,35 +62,20 @@ module AccountDb =
 module BalanceAccountDb =
     let fromAddAccountBalance (addAccountBalance: AddAccountBalance) : BalanceAccountDb =
         { _id = ObjectId.Empty
-          AccountId =
-            addAccountBalance.AccountId
-            |> AccountId.value
-            |> ObjectId.Parse
+          AccountId = addAccountBalance.AccountId |> AccountId.value |> ObjectId.Parse
           CheckDate = addAccountBalance.CheckDate |> CheckDate.value
-          AmountInChf =
-            addAccountBalance.Amount
-            |> ChfMoney.value
-            |> decimal }
+          AmountInChf = addAccountBalance.Amount |> ChfMoney.value |> decimal }
 
     let toBalanceAccount (balanceAccount: BalanceAccountDb) =
-        let id =
-            balanceAccount._id.ToString()
-            |> AccountBalanceId.create
-            |> failOnError
+        let id = balanceAccount._id.ToString() |> AccountBalanceId.create |> failOnError
 
         let accountId =
-            balanceAccount.AccountId.ToString()
-            |> AccountId.create
-            |> failOnError
+            balanceAccount.AccountId.ToString() |> AccountId.create |> failOnError
 
-        let checkDate =
-            balanceAccount.CheckDate
-            |> CheckDate.createFromDate
+        let checkDate = balanceAccount.CheckDate |> CheckDate.createFromDate
 
         let amount =
-            (balanceAccount.AmountInChf * 1.0m<Chf>)
-            |> ChfMoney.create
-            |> failOnError
+            (balanceAccount.AmountInChf * 1.0m<Chf>) |> ChfMoney.create |> failOnError
 
         { Id = id
           AccountId = accountId

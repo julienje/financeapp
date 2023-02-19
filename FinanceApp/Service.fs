@@ -24,11 +24,9 @@ let handleGetAllAccountAsync: AllAccount =
 let handleOpenAccountAsync: OpenAnAccount =
     fun getDbAccount openDbAccount input ->
         task {
-            let accountName =
-                input.Name |> AccountName.value
+            let accountName = input.Name |> AccountName.value
 
-            let inputCompany =
-                input.Company |> CompanyName.value
+            let inputCompany = input.Company |> CompanyName.value
 
             let! accounts = getDbAccount accountName inputCompany
 
@@ -44,11 +42,9 @@ let handleOpenAccountAsync: OpenAnAccount =
 let handleCloseAccountAsync: CloseAnAccount =
     fun closeDb input ->
         task {
-            let objId =
-                input.Id |> AccountId.value |> ObjectId.Parse
+            let objId = input.Id |> AccountId.value |> ObjectId.Parse
 
-            let date =
-                input.CloseDate |> CloseDate.value
+            let date = input.CloseDate |> CloseDate.value
 
             let! inserted = closeDb objId date
 
@@ -62,23 +58,18 @@ let handleCloseAccountAsync: CloseAnAccount =
 let handleAddBalanceAsync: AddAnAccountBalance =
     fun getDbAccount addDbBalanceAccount input ->
         task {
-            let objId =
-                input.AccountId
-                |> AccountId.value
-                |> ObjectId.Parse
+            let objId = input.AccountId |> AccountId.value |> ObjectId.Parse
 
             let! account = getDbAccount objId
 
             match account with
             | None -> return Error "The account doesn't exit"
             | Some value ->
-                let forDb =
-                    BalanceAccountDb.fromAddAccountBalance input
+                let forDb = BalanceAccountDb.fromAddAccountBalance input
 
                 let! newEntry = addDbBalanceAccount forDb
 
-                let domain =
-                    BalanceAccountDb.toBalanceAccount newEntry
+                let domain = BalanceAccountDb.toBalanceAccount newEntry
 
                 return Ok domain
         }
@@ -89,11 +80,11 @@ let handleGetWealthAsync: ActualWealth =
             let date = exportDate |> ExportDate.value
 
             let! accounts = getActiveDbAccount date
-            
-            let accountsById = 
+
+            let accountsById =
                 accounts
-                |>List.map AccountDb.toAccount
-                |>List.map (fun a-> a.Id, a)
+                |> List.map AccountDb.toAccount
+                |> List.map (fun a -> a.Id, a)
                 |> Map.ofSeq
 
             let details =
@@ -106,12 +97,9 @@ let handleGetWealthAsync: ActualWealth =
                 |> List.map (fun b ->
                     { Amount = b.Amount
                       CheckDate = b.CheckDate
-                      Account = accountsById[b.AccountId]})
+                      Account = accountsById[b.AccountId] })
 
-            let total =
-                details
-                |> List.map (fun d -> d.Amount)
-                |> List.sum
+            let total = details |> List.map (fun d -> d.Amount) |> List.sum
 
             return
                 { Amount = total

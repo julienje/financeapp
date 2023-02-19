@@ -56,10 +56,7 @@ module AccountDto =
           Name = input.Name |> AccountName.value
           Company = input.Company |> CompanyName.value
           OpenDate = input.OpenDate |> OpenDate.value |> string
-          CloseDate =
-            input.CloseDate
-            |> Option.map CloseDate.value
-            |> Option.map string }
+          CloseDate = input.CloseDate |> Option.map CloseDate.value |> Option.map string }
 
 module AccountBalanceDto =
     let fromDomain (input: AccountBalance) : AccountBalanceDto =
@@ -76,8 +73,7 @@ module OpenAccountDto =
             let! companyResult = CompanyName.create input.Company
             let! openDateResult = OpenDate.createFromString input.OpenDate
 
-            let domain =
-                OpenAccount.create nameResult companyResult openDateResult
+            let domain = OpenAccount.create nameResult companyResult openDateResult
 
             return domain
         }
@@ -111,6 +107,4 @@ module WealthDto =
     let fromDomain (domain: Wealth) =
         { AmountInChf = domain.Amount |> ChfMoney.value |> decimal
           ExportDate = domain.Date |> ExportDate.value |> string
-          Details =
-            domain.Details
-            |> List.map WealthAccountDto.fromDomain }
+          Details = domain.Details |> List.map WealthAccountDto.fromDomain }
