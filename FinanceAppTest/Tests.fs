@@ -7,13 +7,11 @@ open System.Net.Http
 open System.Security.Claims
 open System.Text.Json.Nodes
 open System.Threading.Tasks
-open DotNet.Testcontainers.Builders
-open DotNet.Testcontainers.Configurations
-open DotNet.Testcontainers.Containers
 open Microsoft.AspNetCore.Authentication
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.TestHost
 open Microsoft.Extensions.DependencyInjection
+open Testcontainers.MongoDb
 open Xunit
 
 let newAccountPayload name =
@@ -109,30 +107,24 @@ let shouldPropertyHasValue (property: String) expected (payload: String) =
     Assert.Equal(expected, result)
 
 type MongoDbFixture() =
-    let config =
-        new MongoDbTestcontainerConfiguration(Database = "db", Username = "unitest", Password = "1234")
 
     let myContainer =
-        TestcontainersBuilder<MongoDbTestcontainer>().WithDatabase(config).Build()
+        MongoDbBuilder()
+            .WithUsername("unitest")
+            .WithPassword("1234")
+            .Build()
 
     member this.MyContainer = myContainer
-
-    interface IDisposable with
-        member this.Dispose() = config.Dispose()
 
     interface IAsyncLifetime with
         member this.DisposeAsync() =
             this.MyContainer.DisposeAsync().AsTask()
-
         member this.InitializeAsync() = this.MyContainer.StartAsync()
-
-
-
 
 // Tests wit test container
 
 type TestContainerTest(mongoDb: MongoDbFixture) =
-    do Environment.SetEnvironmentVariable("CONNECTION_STRING", mongoDb.MyContainer.ConnectionString)
+    do Environment.SetEnvironmentVariable("CONNECTION_STRING", mongoDb.MyContainer.GetConnectionString())
 
     [<Fact>]
     member this.``Smoke test``() =
