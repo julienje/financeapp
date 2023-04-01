@@ -17,7 +17,7 @@
     <ItemGroup>
         <PackageReference Include="FSharp.SystemTextJson" Version="1.1.23"/>
         <PackageReference Include="FsToolkit.ErrorHandling" Version="4.4.0"/>
-        <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.4.0"/>
+        <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.5.0"/>
         <PackageReference Include="Giraffe" Version="6.0.0"/>
         <PackageReference Include="Microsoft.Identity.Web" Version="2.7.0"/>
         <PackageReference Include="MongoDB.Driver" Version="2.19.1"/>
