@@ -20,7 +20,7 @@ jobs:
     steps:
 
       # Checkout the repo
-      - uses: actions/checkout@master
+      - uses: actions/checkout@v3
       
       # Setup .NET Core SDK
       - name: Setup .NET Core
