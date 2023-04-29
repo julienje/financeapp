@@ -8,15 +8,15 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Tests.fs"/>
+        <Compile Include="Tests.fs" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.5"/>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0"/>
-        <PackageReference Include="Testcontainers" Version="3.0.0"/>
-        <PackageReference Include="Testcontainers.MongoDb" Version="3.0.0"/>
-        <PackageReference Include="xunit" Version="2.4.2"/>
+        <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="7.0.5" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.5.0" />
+        <PackageReference Include="Testcontainers" Version="3.1.0" />
+        <PackageReference Include="Testcontainers.MongoDb" Version="3.1.0" />
+        <PackageReference Include="xunit" Version="2.4.2" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
@@ -28,7 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\FinanceApp\FinanceApp.fsproj"/>
+        <ProjectReference Include="..\FinanceApp\FinanceApp.fsproj" />
     </ItemGroup>
 
 </Project>
