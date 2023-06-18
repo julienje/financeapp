@@ -169,6 +169,12 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> ensureSuccess
         |> readText
         |> shouldPropertyHasValue "AmountInChf" (amountA + amountB)
+        
+        client
+        |> httpGet "wealth?date=2021-06-01"
+        |> ensureSuccess
+        |> readText
+        |> shouldPropertyHasValue "AmountInChf" (0)
 
         ()
 
