@@ -1,12 +1,13 @@
 GET http://localhost:5165/accounts
-Authorization:  Bearer eyJ0eXAiOiJKV1QiLCJub25jZSI6InNfNGJ2dElTRHpfVGE4M0ZYZF8xMm5nWHpoUVd3cjEtUzQ0OWtWYjZYdkUiLCJhbGciOiJSUzI1NiIsIng1dCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyIsImtpZCI6Ii1LSTNROW5OUjdiUm9meG1lWm9YcWJIWkdldyJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC8wODI5Y2UzYy1kZDlkLTQ1YTUtYTdlNC1iOGZiNjkxNzkwODUvIiwiaWF0IjoxNjc0NTAxMjA5LCJuYmYiOjE2NzQ1MDEyMDksImV4cCI6MTY3NDUwNTUyMSwiYWNjdCI6MCwiYWNyIjoiMSIsImFpbyI6IkFXUUFtLzhUQUFBQWRFOURiblNYUXZGcGlsQjNwSVI4bTV0THNDN0ZGQmlnb1VrL2xJNWxZT1UwQkpERTFibFZ5b1E3SEN5a0lzQ2M1OFdjbUFLalZpQ3NIaC93VUczZDFuSkRXMm40UDZzcWVtbGxwWTVvV1l4UlhncG5MYzd6ZXBKL29GNFlrMWxFIiwiYWx0c2VjaWQiOiIxOmxpdmUuY29tOjAwMDE2MjExNjFEMzE5NzEiLCJhbXIiOlsicHdkIl0sImFwcF9kaXNwbGF5bmFtZSI6ImZpbmFuY2UiLCJhcHBpZCI6IjFjZmU2NmUzLWRiNTEtNDA4Mi05M2FkLTA4MTRiZmY3MmFiZiIsImFwcGlkYWNyIjoiMCIsImVtYWlsIjoianVsaWVuLmplYW5uZXJldEBvdXRsb29rLmNvbSIsImZhbWlseV9uYW1lIjoiSmVhbm5lcmV0IiwiZ2l2ZW5fbmFtZSI6Ikp1bGllbiIsImlkcCI6ImxpdmUuY29tIiwiaWR0eXAiOiJ1c2VyIiwiaXBhZGRyIjoiMzEuMTY0LjExMC4xMCIsIm5hbWUiOiJKdWxpZW4gSmVhbm5lcmV0Iiwib2lkIjoiZDI5ZDgwNWEtM2MyNy00ZTMzLWIzNDQtZmQyZTdiMDAyN2EyIiwicGxhdGYiOiIzIiwicHVpZCI6IjEwMDNCRkZEQTU5M0VDREEiLCJyaCI6IjAuQVRBQVBNNHBDSjNkcFVXbjVMajdhUmVRaFFNQUFBQUFBQUFBd0FBQUFBQUFBQUF3QVBBLiIsInNjcCI6Ik1haWwuUmVhZCBVc2VyLlJlYWQgcHJvZmlsZSBvcGVuaWQgZW1haWwiLCJzaWduaW5fc3RhdGUiOlsia21zaSJdLCJzdWIiOiJlOS1kUzNIVllaODY3NzF5NGtGQTc2V2lrYU1tLWoyVFpxQkp6TS1iT1c4IiwidGVuYW50X3JlZ2lvbl9zY29wZSI6IkVVIiwidGlkIjoiMDgyOWNlM2MtZGQ5ZC00NWE1LWE3ZTQtYjhmYjY5MTc5MDg1IiwidW5pcXVlX25hbWUiOiJsaXZlLmNvbSNqdWxpZW4uamVhbm5lcmV0QG91dGxvb2suY29tIiwidXRpIjoiYmpNTlI3N0hkMHFoXzdBTEthSWhBQSIsInZlciI6IjEuMCIsIndpZHMiOlsiNjJlOTAzOTQtNjlmNS00MjM3LTkxOTAtMDEyMTc3MTQ1ZTEwIiwiYjc5ZmJmNGQtM2VmOS00Njg5LTgxNDMtNzZiMTk0ZTg1NTA5Il0sInhtc19zdCI6eyJzdWIiOiJ1cW9NQldzemk5VUFxUmtOQ25HVXNZZE1KZkNMYUR3XzlkWThSMjdEWS13In0sInhtc190Y2R0IjoxNTA4Njk2NDY0LCJ4bXNfdGRiciI6IkVVIn0.sfOsRtG14F-vlVP5XT8WN9xtMzze2bFNXmOBrMV2z3j8TvOUx4mXJT6l4ZKb7-EQk6Ek8Ix5BCKIuZEoZp_GgjlBc9azSQYe719W4F8Yc7iwpu4XsE50tdu3Gi3dqdwMN1FvyEPDyY9bI7zRbVA8DWLQ3EK2Jcelk4gbnoJtw7VIbfO7z7nsCK5UPM7x8QUWBu2rDpFYx15trjyV54-fdOPZZ1Od_YyL7R0SwqH3yYeFPW_NuhuvnoQrNRcSdMmGRtffNEPxknLv_wEDPuUZuF4BX_2HPZsaZspBmdg2r6f-E--iQDPXsYhBhConJPpRhTNCs28w8rNMkezqMp9shg
+Authorization: Bearer {{token}}
 
 ###
 PUT http://localhost:5165/accounts/new
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
-  "Name": "A conto 8",
+  "Name": "A conto 9",
   "Company": "UBS",
   "OpenDate": "2022-01-01"
 }
@@ -14,6 +15,7 @@ Content-Type: application/json
 ###
 PUT http://localhost:5165/accounts/close
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "Id": "631c42462559f9c5ba696a84",
@@ -21,8 +23,9 @@ Content-Type: application/json
 }
 
 ###
-PUT http://localhost:5165/accounts/63c40d4b0f64e0e791571fe1/balances/new
+PUT http://localhost:5165/accounts/648f43152c325d63225546a1/balances/new
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "CheckDate": "2022-10-27T00:00:00",
@@ -31,3 +34,8 @@ Content-Type: application/json
 
 ###
 GET http://localhost:5165/wealth
+Authorization: Bearer {{token}}
+
+###
+GET http://localhost:5165/wealth?date=2021-06-01
+Authorization: Bearer {{token}}

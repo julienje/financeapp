@@ -49,75 +49,82 @@ let mustBeLoggedIn =
 let webApp =
     mustBeLoggedIn
     >=> choose
-            [ GET
-              >=> choose
-                      [ route "/accounts"
-                        >=> fun next context ->
-                                task {
-                                    let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAsync
+        [ GET
+          >=> choose
+              [ route "/accounts"
+                >=> fun next context ->
+                    task {
+                        let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAsync
 
-                                    let dto = accounts |> List.map AccountDto.fromDomain
+                        let dto = accounts |> List.map AccountDto.fromDomain
 
-                                    return! json dto next context
-                                }
-                        route "/wealth"
-                        >=> fun next context ->
-                                task {
+                        return! json dto next context
+                    }
+                route "/wealth"
+                >=> fun next context ->
+                    task {
+                        let! result =
+                            taskResult {
+                                let! date =
+                                    match context.TryGetQueryStringValue "date" with
+                                    | None -> Ok(ExportDate.now)
+                                    | Some q -> ExportDate.create q
 
-                                    let! wealth =
-                                        Service.handleGetWealthAsync
-                                            MongoDb.findActiveDbAccountAsync
-                                            MongoDb.findLastBalanceAccount
-                                            ExportDate.now
+                                let! wealth =
+                                    Service.handleGetWealthAsync
+                                        MongoDb.findActiveDbAccountAsync
+                                        MongoDb.findLastBalanceAccount
+                                        date
 
-                                    let dto = wealth |> WealthDto.fromDomain
+                                return wealth
+                            }
+                        let resp = treatResponse context result WealthDto.fromDomain
+                        return! resp next context
+                    } ]
+          PUT
+          >=> choose
+              [ route "/accounts/new"
+                >=> fun next context ->
+                    task {
+                        let! inputDto = context.BindJsonAsync<OpenAccountDto>()
 
-                                    return! json dto next context
-                                } ]
-              PUT
-              >=> choose
-                      [ route "/accounts/new"
-                        >=> fun next context ->
-                                task {
-                                    let! inputDto = context.BindJsonAsync<OpenAccountDto>()
+                        let! result =
+                            taskResult {
+                                let! toDomain = OpenAccountDto.toDomain inputDto
 
-                                    let! result =
-                                        taskResult {
-                                            let! toDomain = OpenAccountDto.toDomain inputDto
+                                let! domain =
+                                    Service.handleOpenAccountAsync
+                                        MongoDb.getAccountByNameAndCompanyAsync
+                                        MongoDb.insertAccountAsync
+                                        toDomain
 
-                                            let! domain =
-                                                Service.handleOpenAccountAsync
-                                                    MongoDb.getAccountByNameAndCompanyAsync
-                                                    MongoDb.insertAccountAsync
-                                                    toDomain
+                                return domain
+                            }
 
-                                            return domain
-                                        }
+                        let resp = treatResponse context result AccountDto.fromDomain
 
-                                    let resp = treatResponse context result AccountDto.fromDomain
+                        return! resp next context
+                    }
+                route "/accounts/close"
+                >=> fun next context ->
+                    task {
+                        let! inputDto = context.BindJsonAsync<CloseAccountDto>()
 
-                                    return! resp next context
-                                }
-                        route "/accounts/close"
-                        >=> fun next context ->
-                                task {
-                                    let! inputDto = context.BindJsonAsync<CloseAccountDto>()
+                        let! result =
+                            taskResult {
+                                let! toDomain = CloseAccountDto.toDomain inputDto
 
-                                    let! result =
-                                        taskResult {
-                                            let! toDomain = CloseAccountDto.toDomain inputDto
+                                let! closeAccount =
+                                    Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
 
-                                            let! closeAccount =
-                                                Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
+                                return closeAccount
+                            }
 
-                                            return closeAccount
-                                        }
+                        let resp = treatResponse context result AccountDto.fromDomain
 
-                                    let resp = treatResponse context result AccountDto.fromDomain
-
-                                    return! resp next context
-                                }
-                        routef "/accounts/%s/balances/new" newBalanceHandler ] ]
+                        return! resp next context
+                    }
+                routef "/accounts/%s/balances/new" newBalanceHandler ] ]
 
 let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
