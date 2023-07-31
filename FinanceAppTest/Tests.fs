@@ -90,7 +90,7 @@ let ensureSuccess (response: HttpResponseMessage) =
 let readText (response: HttpResponseMessage) =
     response.Content.ReadAsStringAsync() |> runTask
 
-let shouldEqual expected actual = Assert.Equal(expected, actual)
+let shouldEqual (expected: string) (actual: string) = Assert.Equal(expected, actual)
 
 let shouldContain (expected: string) (actual: string) = Assert.True(actual.Contains expected)
 
