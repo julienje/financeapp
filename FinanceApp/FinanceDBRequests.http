@@ -7,7 +7,7 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "Name": "A conto 9",
+  "Name": "A conto 10",
   "Company": "UBS",
   "OpenDate": "2022-01-01"
 }
@@ -39,3 +39,4 @@ Authorization: Bearer {{token}}
 ###
 GET http://localhost:5165/wealth?date=2021-06-01
 Authorization: Bearer {{token}}
+
