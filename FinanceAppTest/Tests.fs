@@ -67,6 +67,8 @@ let runTask task =
 
 let httpGet (path: string) (client: HttpClient) = path |> client.GetAsync |> runTask
 
+let httpDelete (path: string) (client: HttpClient) = path |> client.DeleteAsync |> runTask
+
 let httpPost (path: string) (payload: string) (client: HttpClient) =
     use content = new StringContent(payload)
     client.PostAsync(path, content) |> runTask
@@ -153,12 +155,11 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         let amountA = 12.0m
         let amountB = 15.5m
 
-        client
+        let balanceAccountA=(client
         |> httpPut $"/accounts/{newAccountA}/balances/new" (newBalancePayload amountA)
         |> ensureSuccess
         |> readText
-        |> shouldHaveId
-        |> ignore
+        |> shouldHaveId)
 
         client
         |> httpPut $"/accounts/{newAccountB}/balances/new" (newBalancePayload amountB)
@@ -184,6 +185,19 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> ensureSuccess
         |> readText
         |> shouldJsonArrayLengthBe 1
+
+
+        client
+        |> httpDelete $"/balances/{balanceAccountA}"
+        |> ensureSuccess
+        |> readText
+        |> ignore
+
+        client
+        |> httpGet $"/accounts/{newAccountA}/balances"
+        |> ensureSuccess
+        |> readText
+        |> shouldJsonArrayLengthBe 0
 
         ()
 
