@@ -101,9 +101,12 @@ let shouldHaveId (actual: String) : String =
 
 let shouldPropertyHasValue (property: String) expected (payload: String) =
     let parsed = payload |> JsonObject.Parse
-
     let result = parsed[ property ].GetValue<Decimal>()
+    Assert.Equal(expected, result)
 
+let shouldJsonArrayLengthBe expected (payload: String) =
+    let parsed = payload |> JsonObject.Parse
+    let result = parsed.AsArray().Count
     Assert.Equal(expected, result)
 
 type MongoDbFixture() =
@@ -140,7 +143,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
              |> readText
              |> shouldHaveId)
 
-        let newAccountb =
+        let newAccountB =
             (client
              |> httpPut "/accounts/new" (newAccountPayload "AccountB")
              |> ensureSuccess
@@ -158,7 +161,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> ignore
 
         client
-        |> httpPut $"/accounts/{newAccountb}/balances/new" (newBalancePayload amountB)
+        |> httpPut $"/accounts/{newAccountB}/balances/new" (newBalancePayload amountB)
         |> ensureSuccess
         |> readText
         |> shouldHaveId
@@ -175,6 +178,12 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> ensureSuccess
         |> readText
         |> shouldPropertyHasValue "AmountInChf" (0)
+
+        client
+        |> httpGet $"/accounts/{newAccountA}/balances"
+        |> ensureSuccess
+        |> readText
+        |> shouldJsonArrayLengthBe 1
 
         ()
 

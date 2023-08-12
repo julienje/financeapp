@@ -40,3 +40,7 @@ Authorization: Bearer {{token}}
 GET http://localhost:5165/wealth?date=2021-06-01
 Authorization: Bearer {{token}}
 
+###
+GET http://localhost:5165/accounts/64a573c6d14cd2d5915bee95/balances
+Authorization: Bearer {{token}}
+

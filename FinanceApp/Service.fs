@@ -14,6 +14,8 @@ type AddAnAccountBalance =
 
 type ActualWealth = GetActiveDbAccount -> GetLastBalanceAccount -> ExportDate -> Task<Wealth>
 
+type AllBalanceForAnAccount = GetDbAccount -> GetAllDbBalancesForAnAccount -> AccountId -> Task<Result<AccountBalance list, string>>
+
 let handleGetAllAccountAsync: AllAccount =
     fun getAllDbAccount ->
         task {
@@ -105,4 +107,16 @@ let handleGetWealthAsync: ActualWealth =
                 { Amount = total
                   Date = exportDate
                   Details = details }
+        }
+let handleGetAllBalanceForAnAccountAsync: AllBalanceForAnAccount =
+    fun getDbAccount getAllDbBalancesForAnAccount accountId ->
+        task {
+            let objId = accountId |> AccountId.value |> ObjectId.Parse
+            let! account = getDbAccount objId
+            match account with
+            | None -> return Error "The account doesn't exit"
+            | Some value ->
+                let! forDb = getAllDbBalancesForAnAccount value._id
+                let domain = forDb |> List.map BalanceAccountDb.toBalanceAccount
+                return Ok domain
         }

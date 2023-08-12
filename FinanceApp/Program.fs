@@ -27,6 +27,9 @@ let treatResponse (context: HttpContext) resp convertToDto : HttpHandler =
         context.SetStatusCode 400
         text $"""{{ "error": "{e}"}}"""
 
+let convertList convertToDto list =
+    list |> List.map convertToDto
+
 let newBalanceHandler (accountId: string) : HttpHandler =
     fun (next: HttpFunc) (context: HttpContext) ->
         task {
@@ -40,6 +43,18 @@ let newBalanceHandler (accountId: string) : HttpHandler =
 
             let resp = treatResponse context result AccountBalanceDto.fromDomain
 
+            return! resp next context
+        }
+
+let balancesAccountHandler (accountId: string) : HttpHandler =
+    fun (next: HttpFunc) (context: HttpContext) ->
+        task {
+            let! result =
+                taskResult {
+                    let! accountIdDomain = AccountId.create accountId
+                    return! Service.handleGetAllBalanceForAnAccountAsync MongoDb.findAccountAsync MongoDb.findAllBalancesForAnAccount accountIdDomain
+                }
+            let resp = treatResponse context result (convertList AccountBalanceDto.fromDomain)
             return! resp next context
         }
 
@@ -73,14 +88,15 @@ let webApp =
                                 let! wealth =
                                     Service.handleGetWealthAsync
                                         MongoDb.findActiveDbAccountAsync
-                                        MongoDb.findLastBalanceAccount
+                                        MongoDb.findLastBalanceAccountAsync
                                         date
 
                                 return wealth
                             }
                         let resp = treatResponse context result WealthDto.fromDomain
                         return! resp next context
-                    } ]
+                    }
+                routef "/accounts/%s/balances" balancesAccountHandler]
           PUT
           >=> choose
               [ route "/accounts/new"
