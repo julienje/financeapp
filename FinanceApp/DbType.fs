@@ -28,6 +28,7 @@ type GetDbAccount = ObjectId -> Task<AccountDb option>
 type AddDbBalanceAccount = BalanceAccountDb -> Task<BalanceAccountDb>
 type GetActiveDbAccount = DateTime -> Task<AccountDb list>
 type GetLastBalanceAccount = ObjectId -> DateTime -> Task<BalanceAccountDb option>
+type GetAllDbBalancesForAnAccount = ObjectId -> Task<BalanceAccountDb list>
 
 let private failOnError aResult =
     match aResult with
