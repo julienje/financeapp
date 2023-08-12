@@ -1,5 +1,6 @@
 ﻿module FinanceApp.Service
 
+open System
 open System.Threading.Tasks
 open FinanceApp.DbType
 open FinanceApp.DomainType
@@ -15,6 +16,8 @@ type AddAnAccountBalance =
 type ActualWealth = GetActiveDbAccount -> GetLastBalanceAccount -> ExportDate -> Task<Wealth>
 
 type AllBalanceForAnAccount = GetDbAccount -> GetAllDbBalancesForAnAccount -> AccountId -> Task<Result<AccountBalance list, string>>
+
+type DeleteBalance= DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
 let handleGetAllAccountAsync: AllAccount =
     fun getAllDbAccount ->
@@ -66,7 +69,7 @@ let handleAddBalanceAsync: AddAnAccountBalance =
 
             match account with
             | None -> return Error "The account doesn't exit"
-            | Some value ->
+            | Some _ ->
                 let forDb = BalanceAccountDb.fromAddAccountBalance input
 
                 let! newEntry = addDbBalanceAccount forDb
@@ -119,4 +122,12 @@ let handleGetAllBalanceForAnAccountAsync: AllBalanceForAnAccount =
                 let! forDb = getAllDbBalancesForAnAccount value._id
                 let domain = forDb |> List.map BalanceAccountDb.toBalanceAccount
                 return Ok domain
+        }
+
+let handleDeleteBalanceAsync: DeleteBalance =
+    fun deleteDbAccount balanceId ->
+        task {
+            let objId = balanceId |> AccountBalanceId.value |> ObjectId.Parse
+            let! deleted = deleteDbAccount objId
+            return deleted > 0
         }

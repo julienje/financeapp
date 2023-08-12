@@ -125,7 +125,7 @@ let findLastBalanceAccountAsync: GetLastBalanceAccount =
             return resp
         }
 
-let findAllBalancesForAnAccount: GetAllDbBalancesForAnAccount =
+let findAllBalancesForAnAccountAsync: GetAllDbBalancesForAnAccount =
     fun accountId ->
         task {
             let sort = Builders<BalanceAccountDb>.Sort.Descending ("CheckDate")
@@ -133,4 +133,11 @@ let findAllBalancesForAnAccount: GetAllDbBalancesForAnAccount =
             let! find = balanceCollection.FindAsync((fun a -> a.AccountId = accountId), options)
             let! balances = find.ToListAsync()
             return balances |> Seq.toList
+        }
+
+let deleteBalanceAsync: DeleteDbBalance =
+    fun balanceId ->
+        task {
+            let! find = balanceCollection.DeleteOneAsync (fun a -> a._id = balanceId)
+            return find.DeletedCount
         }

@@ -17,12 +17,21 @@ open Giraffe
 open FsToolkit.ErrorHandling
 open Microsoft.Identity.Web
 
-let treatResponse (context: HttpContext) resp convertToDto : HttpHandler =
+let treatDtoResponse (context: HttpContext) resp convertToDto : HttpHandler =
     match resp with
     | Ok res ->
         context.SetStatusCode 200
         let dto = convertToDto res
         json dto
+    | Error e ->
+        context.SetStatusCode 400
+        text $"""{{ "error": "{e}"}}"""
+
+let treatResultResponse (context: HttpContext) resp : HttpHandler =
+    match resp with
+    | Ok res ->
+        context.SetStatusCode 200
+        text ""
     | Error e ->
         context.SetStatusCode 400
         text $"""{{ "error": "{e}"}}"""
@@ -41,20 +50,32 @@ let newBalanceHandler (accountId: string) : HttpHandler =
                     return! Service.handleAddBalanceAsync MongoDb.findAccountAsync MongoDb.insertBalanceAsync toDomain
                 }
 
-            let resp = treatResponse context result AccountBalanceDto.fromDomain
+            let resp = treatDtoResponse context result AccountBalanceDto.fromDomain
 
             return! resp next context
         }
 
-let balancesAccountHandler (accountId: string) : HttpHandler =
+let getBalancesAccountHandler (accountId: string) : HttpHandler =
     fun (next: HttpFunc) (context: HttpContext) ->
         task {
             let! result =
                 taskResult {
                     let! accountIdDomain = AccountId.create accountId
-                    return! Service.handleGetAllBalanceForAnAccountAsync MongoDb.findAccountAsync MongoDb.findAllBalancesForAnAccount accountIdDomain
+                    return! Service.handleGetAllBalanceForAnAccountAsync MongoDb.findAccountAsync MongoDb.findAllBalancesForAnAccountAsync accountIdDomain
                 }
-            let resp = treatResponse context result (convertList AccountBalanceDto.fromDomain)
+            let resp = treatDtoResponse context result (convertList AccountBalanceDto.fromDomain)
+            return! resp next context
+        }
+
+let deleteBalancesAccountHandler (balanceId: string) : HttpHandler =
+    fun (next: HttpFunc) (context: HttpContext) ->
+        task {
+            let! result =
+                taskResult {
+                    let! idDomain = AccountBalanceId.create balanceId
+                    return! Service.handleDeleteBalanceAsync MongoDb.deleteBalanceAsync idDomain
+                }
+            let resp = treatResultResponse context result
             return! resp next context
         }
 
@@ -93,10 +114,10 @@ let webApp =
 
                                 return wealth
                             }
-                        let resp = treatResponse context result WealthDto.fromDomain
+                        let resp = treatDtoResponse context result WealthDto.fromDomain
                         return! resp next context
                     }
-                routef "/accounts/%s/balances" balancesAccountHandler]
+                routef "/accounts/%s/balances" getBalancesAccountHandler]
           PUT
           >=> choose
               [ route "/accounts/new"
@@ -117,7 +138,7 @@ let webApp =
                                 return domain
                             }
 
-                        let resp = treatResponse context result AccountDto.fromDomain
+                        let resp = treatDtoResponse context result AccountDto.fromDomain
 
                         return! resp next context
                     }
@@ -136,11 +157,15 @@ let webApp =
                                 return closeAccount
                             }
 
-                        let resp = treatResponse context result AccountDto.fromDomain
+                        let resp = treatDtoResponse context result AccountDto.fromDomain
 
                         return! resp next context
                     }
-                routef "/accounts/%s/balances/new" newBalanceHandler ] ]
+                routef "/accounts/%s/balances/new" newBalanceHandler ]
+          DELETE
+          >=> choose
+              [ routef "/balances/%s" deleteBalancesAccountHandler]
+        ]
 
 let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
