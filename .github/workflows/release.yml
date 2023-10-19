@@ -37,7 +37,7 @@ jobs:
       
       # Deploy to Azure Web apps
       - name: 'Run Azure webapp deploy action using publish profile credentials'
-        uses: azure/webapps-deploy@4bca689e4c7129e55923ea9c45401b22dc6aa96f # v2
+        uses: azure/webapps-deploy@145a0687697df1d8a28909569f6e5d86213041f9 # v3
         with:
           app-name: ${{ env.AZURE_WEBAPP_NAME }} # Replace with your app name
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_BF9780755669495394BE1757A5692910 }} # Define secret variable in repository settings as per action documentation
