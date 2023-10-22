@@ -15,25 +15,28 @@ type AddAnAccountBalance =
 
 type ActualWealth = GetActiveDbAccount -> GetLastBalanceAccount -> ExportDate -> Task<Wealth>
 
-type AllBalanceForAnAccount = GetDbAccount -> GetAllDbBalancesForAnAccount -> AccountId -> Task<Result<AccountBalance list, string>>
+type AllBalanceForAnAccount =
+    GetDbAccount -> GetAllDbBalancesForAnAccount -> AccountId -> Task<Result<AccountBalance list, string>>
 
-type DeleteBalance= DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
+type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
 type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend>
 
-let handleGetTrendsAsync : GetTrend =
+let handleGetTrendsAsync: GetTrend =
     fun getAllDbAccount getAllDbBalances ->
         task {
-            let! accounts = getAllDbAccount()
-            let! balances = getAllDbBalances()
-            let tempCurrent = {
-                Amount= ChfMoney.Zero
-                Date= ExportDate.now
-            }
-            return {
-              Current= tempCurrent
-              Differences= []
-              }
+            let! accounts = getAllDbAccount ()
+            let! balances = getAllDbBalances ()
+
+            let balancesByMonth = balances |> List.groupBy (fun x-> x.CheckDate.Month.ToString()+ "."+x.CheckDate.Year.ToString())
+
+            let tempCurrent =
+                { Amount = ChfMoney.Zero
+                  Date = ExportDate.now }
+
+            return
+                { Current = tempCurrent
+                  Differences = [] }
         }
 
 let handleGetAllAccountAsync: AllAccount =
@@ -128,11 +131,13 @@ let handleGetWealthAsync: ActualWealth =
                   Date = exportDate
                   Details = details }
         }
+
 let handleGetAllBalanceForAnAccountAsync: AllBalanceForAnAccount =
     fun getDbAccount getAllDbBalancesForAnAccount accountId ->
         task {
             let objId = accountId |> AccountId.value |> ObjectId.Parse
             let! account = getDbAccount objId
+
             match account with
             | None -> return Error "The account doesn't exit"
             | Some value ->

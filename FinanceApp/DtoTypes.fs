@@ -49,9 +49,8 @@ type WealthDto =
       ExportDate: string
       Details: WealthAccountDto list }
 
-module Utility=
-    let convertDateTime (input: DateTime) : string =
-        input.ToString("o")
+module Utility =
+    let convertDateTime (input: DateTime) : string = input.ToString("o")
 
 module AccountDto =
     let fromDomain (input: Account) : AccountDto =
@@ -59,7 +58,10 @@ module AccountDto =
           Name = input.Name |> AccountName.value
           Company = input.Company |> CompanyName.value
           OpenDate = input.OpenDate |> OpenDate.value |> Utility.convertDateTime
-          CloseDate = input.CloseDate |> Option.map CloseDate.value |> Option.map Utility.convertDateTime }
+          CloseDate =
+            input.CloseDate
+            |> Option.map CloseDate.value
+            |> Option.map Utility.convertDateTime }
 
 module AccountBalanceDto =
     let fromDomain (input: AccountBalance) : AccountBalanceDto =
@@ -111,8 +113,6 @@ module WealthDto =
         { AmountInChf = domain.Amount |> ChfMoney.value |> decimal
           ExportDate = domain.Date |> ExportDate.value |> Utility.convertDateTime
           Details = domain.Details |> List.map WealthAccountDto.fromDomain }
-module TrendDto=
-    let fromDomain(domain: Trend)=
-        {
-          Id= "asdf"
-          CloseDate= "asdf" }
+
+module TrendDto =
+    let fromDomain (domain: Trend) = { Id = "asdf"; CloseDate = "asdf" }

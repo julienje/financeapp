@@ -39,15 +39,15 @@ let scheme = "TestScheme"
 type TestAuthHandler(options, logger, encoder, clock) =
 
     inherit AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder, clock)
-    with
-        override this.HandleAuthenticateAsync() =
-            let aClaim = Claim(ClaimTypes.Name, "Test user")
-            let claims = [| aClaim |]
-            let identity = ClaimsIdentity(claims, "Test")
-            let principal = ClaimsPrincipal(identity)
-            let ticket = AuthenticationTicket(principal, scheme)
-            let result = AuthenticateResult.Success(ticket)
-            Task.FromResult(result)
+
+    override this.HandleAuthenticateAsync() =
+        let aClaim = Claim(ClaimTypes.Name, "Test user")
+        let claims = [| aClaim |]
+        let identity = ClaimsIdentity(claims, "Test")
+        let principal = ClaimsPrincipal(identity)
+        let ticket = AuthenticationTicket(principal, scheme)
+        let result = AuthenticateResult.Success(ticket)
+        Task.FromResult(result)
 
 let configureTestServices (services: IServiceCollection) =
     services
@@ -99,11 +99,11 @@ let shouldContain (expected: string) (actual: string) = Assert.True(actual.Conta
 let shouldHaveId (actual: String) : String =
     Assert.True(actual.Contains "Id")
     let parsed = actual |> JsonObject.Parse
-    parsed[ "Id" ].GetValue()
+    parsed["Id"].GetValue()
 
 let shouldPropertyHasValue (property: String) expected (payload: String) =
     let parsed = payload |> JsonObject.Parse
-    let result = parsed[ property ].GetValue<Decimal>()
+    let result = parsed[property].GetValue<Decimal>()
     Assert.Equal(expected, result)
 
 let shouldJsonArrayLengthBe expected (payload: String) =
@@ -114,16 +114,14 @@ let shouldJsonArrayLengthBe expected (payload: String) =
 type MongoDbFixture() =
 
     let myContainer =
-        MongoDbBuilder()
-            .WithUsername("unitest")
-            .WithPassword("1234")
-            .Build()
+        MongoDbBuilder().WithUsername("unitest").WithPassword("1234").Build()
 
     member this.MyContainer = myContainer
 
     interface IAsyncLifetime with
         member this.DisposeAsync() =
             this.MyContainer.DisposeAsync().AsTask()
+
         member this.InitializeAsync() = this.MyContainer.StartAsync()
 
 // Tests wit test container
@@ -155,11 +153,12 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         let amountA = 12.0m
         let amountB = 15.5m
 
-        let balanceAccountA=(client
-        |> httpPut $"/accounts/{newAccountA}/balances/new" (newBalancePayload amountA)
-        |> ensureSuccess
-        |> readText
-        |> shouldHaveId)
+        let balanceAccountA =
+            (client
+             |> httpPut $"/accounts/{newAccountA}/balances/new" (newBalancePayload amountA)
+             |> ensureSuccess
+             |> readText
+             |> shouldHaveId)
 
         client
         |> httpPut $"/accounts/{newAccountB}/balances/new" (newBalancePayload amountB)
@@ -173,7 +172,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> ensureSuccess
         |> readText
         |> shouldPropertyHasValue "AmountInChf" (amountA + amountB)
-        
+
         client
         |> httpGet "wealth?date=2021-06-01"
         |> ensureSuccess
