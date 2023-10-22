@@ -59,6 +59,12 @@ type Wealth =
       Date: ExportDate
       Details: WealthAccount list }
 
+type DatedAmount = { Amount: ChfMoney; Date: ExportDate }
+
+type Trend =
+    { Current: DatedAmount
+      Differences: DatedAmount list }
+
 module ConstrainedType =
     let createString fieldName ctor str =
         if String.IsNullOrEmpty(str) then

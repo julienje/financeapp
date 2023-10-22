@@ -90,7 +90,7 @@ let webApp =
               [ route "/accounts"
                 >=> fun next context ->
                     task {
-                        let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAsync
+                        let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAccountsAsync
 
                         let dto = accounts |> List.map AccountDto.fromDomain
 
@@ -116,6 +116,13 @@ let webApp =
                             }
                         let resp = treatDtoResponse context result WealthDto.fromDomain
                         return! resp next context
+                    }
+                route "/wealth"
+                >=> fun next context ->
+                    task {
+                        let! trend = Service.handleGetTrendsAsync MongoDb.findAllAccountsAsync MongoDb.getAllBalancesAsync
+                        let dto = trend |> TrendDto.fromDomain
+                        return! json dto next context
                     }
                 routef "/accounts/%s/balances" getBalancesAccountHandler]
           PUT

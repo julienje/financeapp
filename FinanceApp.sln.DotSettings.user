@@ -5,6 +5,8 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=009b29bb_002Dbcdc_002D4d4b_002D81e7_002D4d3e4b14a04b/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="TestContainerTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;xUnit::9AD4CB37-A849-4FA7-A085-EF5543C57DDA::net7.0::Tests&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::9AD4CB37-A849-4FA7-A085-EF5543C57DDA::net7.0::FinanceAppTest.ServiceTests&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::9AD4CB37-A849-4FA7-A085-EF5543C57DDA::net7.0::ServiceTests.My test&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	

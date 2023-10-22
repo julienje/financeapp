@@ -21,7 +21,7 @@ let private handleNull element =
     | null -> None
     | _ -> Some element
 
-let findAllAsync: GetAllDbAccount =
+let findAllAccountsAsync: GetAllDbAccount =
     fun () ->
         task {
             let! find = accountCollection.FindAsync(Builders.Filter.Empty)
@@ -108,7 +108,7 @@ let findLastBalanceAccountAsync: GetLastBalanceAccount =
 
             let filter = Builders<BalanceAccountDb>.Filter.And (before, account)
 
-            let sort = Builders<BalanceAccountDb>.Sort.Descending ("CheckDate")
+            let sort = Builders<BalanceAccountDb>.Sort.Descending "CheckDate"
 
             let options = FindOptions<BalanceAccountDb>(Sort = sort)
 
@@ -128,7 +128,7 @@ let findLastBalanceAccountAsync: GetLastBalanceAccount =
 let findAllBalancesForAnAccountAsync: GetAllDbBalancesForAnAccount =
     fun accountId ->
         task {
-            let sort = Builders<BalanceAccountDb>.Sort.Descending ("CheckDate")
+            let sort = Builders<BalanceAccountDb>.Sort.Descending "CheckDate"
             let options = FindOptions<BalanceAccountDb>(Sort = sort)
             let! find = balanceCollection.FindAsync((fun a -> a.AccountId = accountId), options)
             let! balances = find.ToListAsync()
@@ -140,4 +140,11 @@ let deleteBalanceAsync: DeleteDbBalance =
         task {
             let! find = balanceCollection.DeleteOneAsync (fun a -> a._id = balanceId)
             return find.DeletedCount
+        }
+let getAllBalancesAsync: GetAllDbBalances =
+    fun () ->
+        task {
+            let! find = balanceCollection.FindAsync(Builders.Filter.Empty)
+            let! balances = find.ToListAsync()
+            return balances |> Seq.toList
         }

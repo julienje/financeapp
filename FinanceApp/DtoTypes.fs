@@ -49,20 +49,23 @@ type WealthDto =
       ExportDate: string
       Details: WealthAccountDto list }
 
+module Utility=
+    let convertDateTime (input: DateTime) : string =
+        input.ToString("o")
 
 module AccountDto =
     let fromDomain (input: Account) : AccountDto =
         { Id = input.Id |> AccountId.value
           Name = input.Name |> AccountName.value
           Company = input.Company |> CompanyName.value
-          OpenDate = input.OpenDate |> OpenDate.value |> string
-          CloseDate = input.CloseDate |> Option.map CloseDate.value |> Option.map string }
+          OpenDate = input.OpenDate |> OpenDate.value |> Utility.convertDateTime
+          CloseDate = input.CloseDate |> Option.map CloseDate.value |> Option.map Utility.convertDateTime }
 
 module AccountBalanceDto =
     let fromDomain (input: AccountBalance) : AccountBalanceDto =
         { Id = input.Id |> AccountBalanceId.value
           AccountId = input.AccountId |> AccountId.value
-          CheckDate = input.CheckDate |> CheckDate.value |> string
+          CheckDate = input.CheckDate |> CheckDate.value |> Utility.convertDateTime
           AmountInChf = input.Amount |> ChfMoney.value |> decimal }
 
 module OpenAccountDto =
@@ -101,10 +104,15 @@ module WealthAccountDto =
           AccountId = domain.Account.Id |> AccountId.value
           AccountName = domain.Account.Name |> AccountName.value
           AccountCompany = domain.Account.Company |> CompanyName.value
-          CheckDate = domain.CheckDate |> CheckDate.value |> string }
+          CheckDate = domain.CheckDate |> CheckDate.value |> Utility.convertDateTime }
 
 module WealthDto =
     let fromDomain (domain: Wealth) =
         { AmountInChf = domain.Amount |> ChfMoney.value |> decimal
-          ExportDate = domain.Date |> ExportDate.value |> string
+          ExportDate = domain.Date |> ExportDate.value |> Utility.convertDateTime
           Details = domain.Details |> List.map WealthAccountDto.fromDomain }
+module TrendDto=
+    let fromDomain(domain: Trend)=
+        {
+          Id= "asdf"
+          CloseDate= "asdf" }

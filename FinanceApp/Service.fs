@@ -19,6 +19,23 @@ type AllBalanceForAnAccount = GetDbAccount -> GetAllDbBalancesForAnAccount -> Ac
 
 type DeleteBalance= DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
+type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend>
+
+let handleGetTrendsAsync : GetTrend =
+    fun getAllDbAccount getAllDbBalances ->
+        task {
+            let! accounts = getAllDbAccount()
+            let! balances = getAllDbBalances()
+            let tempCurrent = {
+                Amount= ChfMoney.Zero
+                Date= ExportDate.now
+            }
+            return {
+              Current= tempCurrent
+              Differences= []
+              }
+        }
+
 let handleGetAllAccountAsync: AllAccount =
     fun getAllDbAccount ->
         task {
