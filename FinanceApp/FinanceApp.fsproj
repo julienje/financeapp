@@ -16,11 +16,11 @@
 
     <ItemGroup>
         <PackageReference Include="FSharp.SystemTextJson" Version="1.2.42" />
-        <PackageReference Include="FsToolkit.ErrorHandling" Version="4.9.0" />
-        <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.9.0" />
+        <PackageReference Include="FsToolkit.ErrorHandling" Version="4.10.0" />
+        <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.10.0" />
         <PackageReference Include="Giraffe" Version="6.2.0" />
-        <PackageReference Include="Microsoft.Identity.Web" Version="2.14.0" />
-        <PackageReference Include="MongoDB.Driver" Version="2.21.0" />
+        <PackageReference Include="Microsoft.Identity.Web" Version="2.15.3" />
+        <PackageReference Include="MongoDB.Driver" Version="2.22.0" />
         <PackageReference Update="FSharp.Core" Version="7.0.400" />
     </ItemGroup>
 
