@@ -56,8 +56,8 @@ let mockedAllBalances: GetAllDbBalances =
                   createBalance (accountAId, dateToDateTime "2023-05-27", AmountA)
                   createBalance (accountBId, dateToDateTime "2023-05-27", AmountA)
 
+                  //Account B is closed
                   createBalance (accountAId, dateToDateTime "2023-06-27", AmountA)
-
                   createBalance (accountAId, dateToDateTime "2023-07-27", AmountC) ]
         }
 
@@ -67,11 +67,11 @@ let ``Get Trends works correctly`` () =
     let resp = respAsync.Result
     Assert.Equal(dateToDateTime "2023-07-27", ExportDate.value resp.Current.Date)
     Assert.Equal(AmountC, ChfMoney.value resp.Current.Amount)
-    Assert.Equal(6, resp.Differences.Length)
-    let a = resp.Differences.Head
-    let b = resp.Differences.Tail.Head
-    let c= resp.Differences.Tail.Tail.Tail.Head
-    let d= resp.Differences.Tail.Tail.Tail.Tail.Head
-    let e= resp.Differences.Tail.Tail.Tail.Tail.Tail.Head
-    let f= resp.Differences.Tail.Tail.Tail.Tail.Tail.Tail.Head
-    Assert.
+    Assert.Equal(6, Seq.length resp.Differences)
+    let a = resp.Differences |> Seq.item 0
+    let b = resp.Differences |> Seq.item 1
+    let c= resp.Differences |> Seq.item 2
+    let d= resp.Differences |> Seq.item 3
+    let e= resp.Differences |> Seq.item 4
+    let f= resp.Differences |> Seq.item 5
+    Assert.Equal(dateToDateTime "2023-01-27",ExportDate.value a.Date)

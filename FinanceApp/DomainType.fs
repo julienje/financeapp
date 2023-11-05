@@ -57,13 +57,13 @@ type WealthAccount =
 type Wealth =
     { Amount: ChfMoney
       Date: ExportDate
-      Details: WealthAccount list }
+      Details: WealthAccount seq }
 
 type DatedAmount = { Amount: ChfMoney; Date: ExportDate }
 
 type Trend =
     { Current: DatedAmount
-      Differences: DatedAmount list }
+      Differences: DatedAmount seq }
 
 module ConstrainedType =
     let createString fieldName ctor str =

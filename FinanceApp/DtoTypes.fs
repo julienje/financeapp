@@ -47,7 +47,7 @@ type WealthAccountDto =
 type WealthDto =
     { AmountInChf: decimal
       ExportDate: string
-      Details: WealthAccountDto list }
+      Details: WealthAccountDto seq }
 
 module Utility =
     let convertDateTime (input: DateTime) : string = input.ToString("o")
@@ -112,7 +112,7 @@ module WealthDto =
     let fromDomain (domain: Wealth) =
         { AmountInChf = domain.Amount |> ChfMoney.value |> decimal
           ExportDate = domain.Date |> ExportDate.value |> Utility.convertDateTime
-          Details = domain.Details |> List.map WealthAccountDto.fromDomain }
+          Details = domain.Details |> Seq.map WealthAccountDto.fromDomain }
 
 module TrendDto =
     let fromDomain (domain: Trend) = { Id = "asdf"; CloseDate = "asdf" }

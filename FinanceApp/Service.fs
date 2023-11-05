@@ -6,7 +6,7 @@ open FinanceApp.DbType
 open FinanceApp.DomainType
 open MongoDB.Bson
 
-type AllAccount = GetAllDbAccount -> Task<Account list>
+type AllAccount = GetAllDbAccount -> Task<Account seq>
 type OpenAnAccount = GetDbAccountByNameAndCompany -> OpenDbAccount -> OpenAccount -> Task<Result<Account, string>>
 type CloseAnAccount = CloseDbAccount -> CloseAccount -> Task<Result<Account, string>>
 
@@ -16,7 +16,7 @@ type AddAnAccountBalance =
 type ActualWealth = GetActiveDbAccount -> GetLastBalanceAccount -> ExportDate -> Task<Wealth>
 
 type AllBalanceForAnAccount =
-    GetDbAccount -> GetAllDbBalancesForAnAccount -> AccountId -> Task<Result<AccountBalance list, string>>
+    GetDbAccount -> GetAllDbBalancesForAnAccount -> AccountId -> Task<Result<AccountBalance seq, string>>
 
 type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
@@ -28,7 +28,10 @@ let handleGetTrendsAsync: GetTrend =
             let! accounts = getAllDbAccount ()
             let! balances = getAllDbBalances ()
 
-            let balancesByMonth = balances |> List.groupBy (fun x-> x.CheckDate.Month.ToString()+ "."+x.CheckDate.Year.ToString())
+            let balancesByMonth =
+                balances
+                |> Seq.groupBy (fun x -> x.CheckDate.Year.ToString() + "." + x.CheckDate.Month.ToString())
+                |> Seq.sortBy fst
 
             let tempCurrent =
                 { Amount = ChfMoney.Zero
@@ -43,7 +46,7 @@ let handleGetAllAccountAsync: AllAccount =
     fun getAllDbAccount ->
         task {
             let! accounts = getAllDbAccount ()
-            return accounts |> List.map AccountDb.toAccount
+            return accounts |> Seq.map AccountDb.toAccount
         }
 
 let handleOpenAccountAsync: OpenAnAccount =
@@ -55,7 +58,7 @@ let handleOpenAccountAsync: OpenAnAccount =
 
             let! accounts = getDbAccount accountName inputCompany
 
-            match accounts.IsEmpty with
+            match Seq.isEmpty accounts with
             | false -> return Error "The account with this name and company already exists"
             | true ->
                 let forDb = AccountDb.fromOpenAccount input
@@ -108,23 +111,23 @@ let handleGetWealthAsync: ActualWealth =
 
             let accountsById =
                 accounts
-                |> List.map AccountDb.toAccount
-                |> List.map (fun a -> a.Id, a)
+                |> Seq.map AccountDb.toAccount
+                |> Seq.map (fun a -> a.Id, a)
                 |> Map.ofSeq
 
             let details =
                 accounts
-                |> List.map (fun a -> getLastBalanceAccount a._id date)
-                |> List.map (fun t -> t.Result)
-                |> List.filter (fun o -> o.IsSome)
-                |> List.map (fun o -> o.Value)
-                |> List.map BalanceAccountDb.toBalanceAccount
-                |> List.map (fun b ->
+                |> Seq.map (fun a -> getLastBalanceAccount a._id date)
+                |> Seq.map (fun t -> t.Result)
+                |> Seq.filter (fun o -> o.IsSome)
+                |> Seq.map (fun o -> o.Value)
+                |> Seq.map BalanceAccountDb.toBalanceAccount
+                |> Seq.map (fun b ->
                     { Amount = b.Amount
                       CheckDate = b.CheckDate
                       Account = accountsById[b.AccountId] })
 
-            let total = details |> List.map (fun d -> d.Amount) |> List.sum
+            let total = details |> Seq.map (fun d -> d.Amount) |> Seq.sum
 
             return
                 { Amount = total
@@ -142,7 +145,7 @@ let handleGetAllBalanceForAnAccountAsync: AllBalanceForAnAccount =
             | None -> return Error "The account doesn't exit"
             | Some value ->
                 let! forDb = getAllDbBalancesForAnAccount value._id
-                let domain = forDb |> List.map BalanceAccountDb.toBalanceAccount
+                let domain = forDb |> Seq.map BalanceAccountDb.toBalanceAccount
                 return Ok domain
         }
 

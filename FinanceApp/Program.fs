@@ -36,7 +36,7 @@ let treatResultResponse (context: HttpContext) resp : HttpHandler =
         context.SetStatusCode 400
         text $"""{{ "error": "{e}"}}"""
 
-let convertList convertToDto list = list |> List.map convertToDto
+let convertSeq convertToDto seq = seq |> Seq.map convertToDto
 
 let newBalanceHandler (accountId: string) : HttpHandler =
     fun (next: HttpFunc) (context: HttpContext) ->
@@ -69,7 +69,7 @@ let getBalancesAccountHandler (accountId: string) : HttpHandler =
                 }
 
             let resp =
-                treatDtoResponse context result (convertList AccountBalanceDto.fromDomain)
+                treatDtoResponse context result (convertSeq AccountBalanceDto.fromDomain)
 
             return! resp next context
         }
@@ -100,7 +100,7 @@ let webApp =
                     task {
                         let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAccountsAsync
 
-                        let dto = accounts |> List.map AccountDto.fromDomain
+                        let dto = accounts |> Seq.map AccountDto.fromDomain
 
                         return! json dto next context
                     }
