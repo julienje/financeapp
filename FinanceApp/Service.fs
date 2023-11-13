@@ -22,16 +22,40 @@ type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
 type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend>
 
+let formatMyDate (value: DateTime) =
+    $"%d{value.Year}.%02d{value.Month}"
+
 let handleGetTrendsAsync: GetTrend =
     fun getAllDbAccount getAllDbBalances ->
         task {
             let! accounts = getAllDbAccount ()
             let! balances = getAllDbBalances ()
 
+            //For every account add the close date a 0 wealth
+            //Get (or generate?) every moment that we want to check
+            //For every moment and for every account sum the wealth
+
+            let balancesByAccount =
+                balances
+                |> Seq.groupBy (fun x-> x.AccountId.ToString())
+                |> Map.ofSeq
+
+            accounts
+            |> Seq.filter (fun x-> x.CloseDate.HasValue)
+            |> Seq.iter (fun x-> balancesByAccount.TryGetValue x )
+
+
+
+            let months = balances
+
             let balancesByMonth =
                 balances
                 |> Seq.groupBy (fun x -> x.CheckDate.Year.ToString() + "." + x.CheckDate.Month.ToString())
                 |> Seq.sortBy fst
+
+            let balancesPerAccount=
+                balances
+                |> Seq.groupBy (fun x -> x.AccountId)
 
             let tempCurrent =
                 { Amount = ChfMoney.Zero

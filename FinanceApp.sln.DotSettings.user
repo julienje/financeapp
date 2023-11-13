@@ -5,6 +5,7 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=60b69ce6_002D15f7_002D4169_002Db364_002Df2822fd018ac/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Get Trends works correctly" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;
   &lt;TestAncestor&gt;
     &lt;TestId&gt;xUnit::9AD4CB37-A849-4FA7-A085-EF5543C57DDA::net7.0::ServiceTests.Get Trends works correctly&lt;/TestId&gt;
+    &lt;TestId&gt;xUnit::9AD4CB37-A849-4FA7-A085-EF5543C57DDA::net7.0::ServiceTests.Check the format of the date&lt;/TestId&gt;
   &lt;/TestAncestor&gt;
 &lt;/SessionState&gt;</s:String>
 	
