@@ -7,6 +7,10 @@
     {
       "matchSourceUrls": ["https://github.com/testcontainers/testcontainers-dotnet"],
       "groupName": "Test containers dotnet"
+    },
+    {
+      "matchSourceUrls": ["https://github.com/demystifyfp/FsToolkit.ErrorHandling"],
+      "groupName": "FsToolkit ErrorHandling"
     }
   ]
 }
