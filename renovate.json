@@ -11,6 +11,18 @@
     {
       "matchSourceUrls": ["https://github.com/demystifyfp/FsToolkit.ErrorHandling"],
       "groupName": "FsToolkit ErrorHandling"
+    },
+    {
+      "matchSourceUrls": [
+      "https://github.com/dotnet/aspnetcore",
+      "https://github.com/dotnet/efcore",
+      "https://github.com/dotnet/extensions",
+      "https://github.com/dotnet/maui",
+      "https://github.com/dotnet/runtime",
+      "https://github.com/dotnet/sdk",
+      "https://github.com/dotnet/fsharp"
+    ],
+      "groupName": "Extended dotnet"
     }
   ]
 }
