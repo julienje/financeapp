@@ -22,8 +22,7 @@ type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
 type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend>
 
-let formatMyDate (value: DateTime) =
-    $"%d{value.Year}.%02d{value.Month}"
+let formatMyDate (value: DateTime) = $"%d{value.Year}.%02d{value.Month}"
 
 let handleGetTrendsAsync: GetTrend =
     fun getAllDbAccount getAllDbBalances ->
@@ -36,13 +35,23 @@ let handleGetTrendsAsync: GetTrend =
             //For every moment and for every account sum the wealth
 
             let balancesByAccount =
-                balances
-                |> Seq.groupBy (fun x-> x.AccountId.ToString())
-                |> Map.ofSeq
+                balances |> Seq.groupBy (fun x -> x.AccountId.ToString()) |> Map.ofSeq
 
             accounts
-            |> Seq.filter (fun x-> x.CloseDate.HasValue)
-            |> Seq.iter (fun x-> balancesByAccount.TryGetValue x )
+            |> Seq.filter (fun x -> x.CloseDate.HasValue)
+            |> Seq.iter (fun x ->
+                let id = x._id.ToString()
+                let balances = Map.tryFind id balancesByAccount
+
+                let endFakeAccount =
+                    { _id = ObjectId.Empty
+                      AccountId = x._id
+                      CheckDate = x.CloseDate.Value
+                      AmountInChf = 0.0m }
+
+                let temp =Seq.append balances.Value [endFakeAccount]
+                ()
+                )
 
 
 
@@ -53,9 +62,7 @@ let handleGetTrendsAsync: GetTrend =
                 |> Seq.groupBy (fun x -> x.CheckDate.Year.ToString() + "." + x.CheckDate.Month.ToString())
                 |> Seq.sortBy fst
 
-            let balancesPerAccount=
-                balances
-                |> Seq.groupBy (fun x -> x.AccountId)
+            let balancesPerAccount = balances |> Seq.groupBy (fun x -> x.AccountId)
 
             let tempCurrent =
                 { Amount = ChfMoney.Zero
