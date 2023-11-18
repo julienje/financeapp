@@ -30,39 +30,39 @@ let handleGetTrendsAsync: GetTrend =
             let! accounts = getAllDbAccount ()
             let! balances = getAllDbBalances ()
 
-            //For every account add the close date a 0 wealth
+            //For every account add the close date a 0 wealth done
             //Get (or generate?) every moment that we want to check
             //For every moment and for every account sum the wealth
 
             let balancesByAccount =
                 balances |> Seq.groupBy (fun x -> x.AccountId.ToString()) |> Map.ofSeq
 
-            accounts
-            |> Seq.filter (fun x -> x.CloseDate.HasValue)
-            |> Seq.iter (fun x ->
-                let id = x._id.ToString()
-                let balances = Map.tryFind id balancesByAccount
+            let balanceWithCloseDate =
+                accounts
+                |> Seq.filter (fun x -> x.CloseDate.HasValue)
+                |> Seq.fold (fun acc x ->
+                    let id = x._id.ToString()
+                    let balances = Map.tryFind id acc
 
-                let endFakeAccount =
-                    { _id = ObjectId.Empty
-                      AccountId = x._id
-                      CheckDate = x.CloseDate.Value
-                      AmountInChf = 0.0m }
+                    let endFakeAccount =
+                        { _id = ObjectId.Empty
+                          AccountId = x._id
+                          CheckDate = x.CloseDate.Value
+                          AmountInChf = 0.0m }
 
-                let temp =Seq.append balances.Value [endFakeAccount]
-                ()
-                )
+                    let temp =Seq.append balances.Value [endFakeAccount]
+                    Map.add id temp acc ) balancesByAccount
 
-
-
-            let months = balances
-
-            let balancesByMonth =
+            let months =
                 balances
-                |> Seq.groupBy (fun x -> x.CheckDate.Year.ToString() + "." + x.CheckDate.Month.ToString())
-                |> Seq.sortBy fst
+                |> Seq.map (fun x -> x.CheckDate.Year.ToString() + "." + x.CheckDate.Month.ToString())
+                |> Seq.distinct
 
-            let balancesPerAccount = balances |> Seq.groupBy (fun x -> x.AccountId)
+            let asdf =
+                months
+
+
+
 
             let tempCurrent =
                 { Amount = ChfMoney.Zero
