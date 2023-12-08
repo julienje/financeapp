@@ -115,4 +115,4 @@ module WealthDto =
           Details = domain.Details |> Seq.map WealthAccountDto.fromDomain }
 
 module TrendDto =
-    let fromDomain (domain: Trend) = { Id = "asdf"; CloseDate = "asdf" }
+    let fromDomain (domain: DatedAmount seq) = { Id = "asdf"; CloseDate = "asdf" }

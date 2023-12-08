@@ -20,7 +20,12 @@ type AllBalanceForAnAccount =
 
 type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
-type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend>
+type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<DatedAmount seq>
+
+let private failOnError aResult =
+    match aResult with
+    | Ok success -> success
+    | Error error -> failwithf $"%A{error}"
 
 let handleGetTrendsAsync: GetTrend =
     fun getAllDbAccount getAllDbBalances ->
@@ -28,15 +33,15 @@ let handleGetTrendsAsync: GetTrend =
             let! accounts = getAllDbAccount ()
             let! balances = getAllDbBalances ()
 
-            //For every account add the close date a 0 wealth done
+
 
 
             let balancesByAccount =
-                balances |> Seq.groupBy (fun x -> x.AccountId.ToString()) |> Map.ofSeq
+                balances |> Seq.groupBy (_.AccountId.ToString()) |> Map.ofSeq
 
             let balanceWithCloseDate =
                 accounts
-                |> Seq.filter (fun x -> x.CloseDate.HasValue)
+                |> Seq.filter (_.CloseDate.HasValue)
                 |> Seq.fold
                     (fun acc x ->
                         let id = x._id.ToString()
@@ -52,42 +57,34 @@ let handleGetTrendsAsync: GetTrend =
                         Map.add id temp acc)
                     balancesByAccount
 
-            //Get (or generate?) every moment that we want to check
-
             let months =
                 balances
-                |> Seq.map (fun b-> b.CheckDate)
+                |> Seq.map (_.CheckDate)
                 |> Seq.sort
                 |> Seq.distinctBy (fun x -> x.Year.ToString() + "." + x.Month.ToString())
 
-
-            //For every moment and for every account sum the wealth
-            let asdf =
+            return
                 months
                 |> Seq.map (fun targetDate ->
-                    accounts
-                    |> Seq.map (fun y ->
-                        let accountId = y._id.ToString()
-                        let balances = balanceWithCloseDate.TryFind accountId
+                    let sum =
+                        accounts
+                        |> Seq.map (fun y ->
+                            let accountId = y._id.ToString()
 
-                        match balances with
-                        | Some x ->
-                            let b =
+                            balanceWithCloseDate
+                            |> Map.tryFind accountId
+                            |> Option.map (fun x ->
                                 x
                                 |> Seq.sortBy (fun b -> b.CheckDate)
-                                |> Seq.findBack (fun balance -> balance.CheckDate <= targetDate)
+                                |> Seq.tryFindBack (fun balance -> balance.CheckDate <= targetDate)
+                                |> Option.map (fun b -> b.AmountInChf))
+                            |> Option.flatten
+                            |> Option.defaultValue 0.0m)
+                        |> Seq.sum
 
-                            b.AmountInChf
-                        | None -> 0.0m)
-                    |> Seq.sum)
-
-            let tempCurrent =
-                { Amount = ChfMoney.Zero
-                  Date = ExportDate.now }
-
-            return
-                { Current = tempCurrent
-                  Differences = [] }
+                    let amount = (sum * 1.0m<Chf>) |> ChfMoney.create |> failOnError
+                    let myDate = targetDate.ToString() |> ExportDate.create |> failOnError
+                    { Amount = amount; Date = myDate })
         }
 
 let handleGetAllAccountAsync: AllAccount =

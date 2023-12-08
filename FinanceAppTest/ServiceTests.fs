@@ -65,13 +65,25 @@ let mockedAllBalances: GetAllDbBalances =
 let ``Get Trends works correctly`` () =
     let respAsync = Service.handleGetTrendsAsync mockedAllAccounts mockedAllBalances
     let resp = respAsync.Result
-    Assert.Equal(dateToDateTime "2023-07-27", ExportDate.value resp.Current.Date)
-    Assert.Equal(AmountC, ChfMoney.value resp.Current.Amount)
-    Assert.Equal(6, Seq.length resp.Differences)
-    let a = resp.Differences |> Seq.item 0
-    let b = resp.Differences |> Seq.item 1
-    let c= resp.Differences |> Seq.item 2
-    let d= resp.Differences |> Seq.item 3
-    let e= resp.Differences |> Seq.item 4
-    let f= resp.Differences |> Seq.item 5
+    Assert.Equal(7, Seq.length resp)
+    let a = resp |> Seq.item 0
+    let b = resp |> Seq.item 1
+    let c= resp |> Seq.item 2
+    let d= resp |> Seq.item 3
+    let e= resp |> Seq.item 4
+    let f= resp |> Seq.item 5
+    let g= resp |> Seq.item 6
     Assert.Equal(dateToDateTime "2023-01-27",ExportDate.value a.Date)
+    Assert.Equal(AmountA, ChfMoney.value a.Amount)
+    Assert.Equal(dateToDateTime "2023-02-27",ExportDate.value b.Date)
+    Assert.Equal(AmountA + AmountB, ChfMoney.value b.Amount)
+    Assert.Equal(dateToDateTime "2023-03-27",ExportDate.value c.Date)
+    Assert.Equal(AmountA+AmountC, ChfMoney.value c.Amount)
+    Assert.Equal(dateToDateTime "2023-04-27",ExportDate.value d.Date)
+    Assert.Equal(AmountC+AmountC, ChfMoney.value d.Amount)
+    Assert.Equal(dateToDateTime "2023-05-27",ExportDate.value e.Date)
+    Assert.Equal(AmountA+AmountA, ChfMoney.value e.Amount)
+    Assert.Equal(dateToDateTime "2023-06-27",ExportDate.value f.Date)
+    Assert.Equal(AmountA, ChfMoney.value f.Amount)
+    Assert.Equal(dateToDateTime "2023-07-27",ExportDate.value g.Date)
+    Assert.Equal(AmountC, ChfMoney.value g.Amount)
