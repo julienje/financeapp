@@ -33,9 +33,6 @@ let handleGetTrendsAsync: GetTrend =
             let! accounts = getAllDbAccount ()
             let! balances = getAllDbBalances ()
 
-
-
-
             let balancesByAccount =
                 balances
                 |> Seq.map (fun x ->
@@ -65,8 +62,9 @@ let handleGetTrendsAsync: GetTrend =
             let months =
                 balances
                 |> Seq.map (fun x -> CheckDate.value x.CheckDate)
-                |> Seq.sort
+                |> Seq.sortDescending
                 |> Seq.distinctBy (fun x -> x.Year.ToString() + "." + x.Month.ToString())
+                |> Seq.sort
 
             return
                 months

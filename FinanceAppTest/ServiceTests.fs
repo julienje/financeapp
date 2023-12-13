@@ -4,7 +4,6 @@ open System
 open FinanceApp
 open FinanceApp.DbType
 open FinanceApp.DomainType
-open MongoDB.Bson
 open Xunit
 
 let accountAId = "000000000000000000000001"
@@ -37,7 +36,6 @@ let dateToDateTime date = DateTime.Parse(date + " 12:00:00")
 let mockedAllAccounts: GetAllDbAccount =
     fun () ->
         task {
-            let closeDate = dateToDateTime "2023-06-01"
             let accountA = createAccount (accountAId, "A", "")
             let accountB = createAccount (accountBId, "B", "2023-06-01")
             return [ accountA; accountB ]

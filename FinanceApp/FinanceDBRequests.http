@@ -43,4 +43,6 @@ Authorization: Bearer {{token}}
 ###
 GET http://localhost:5165/accounts/64a573c6d14cd2d5915bee95/balances
 Authorization: Bearer {{token}}
-
+###
+GET http://localhost:5165/trend
+Authorization: Bearer {{token}}

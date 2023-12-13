@@ -126,7 +126,7 @@ let webApp =
                         let resp = treatDtoResponse context result WealthDto.fromDomain
                         return! resp next context
                     }
-                route "/wealth"
+                route "/trend"
                 >=> fun next context ->
                     task {
                         let! trend =
