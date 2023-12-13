@@ -37,21 +37,26 @@ let handleGetTrendsAsync: GetTrend =
 
 
             let balancesByAccount =
-                balances |> Seq.groupBy (_.AccountId.ToString()) |> Map.ofSeq
+                balances
+                |> Seq.map (fun x ->
+                    {| AccountId = x.AccountId
+                       CheckDate = CheckDate.value x.CheckDate
+                       Amount = x.Amount |})
+                |> Seq.groupBy (_.AccountId)
+                |> Map.ofSeq
 
             let balanceWithCloseDate =
                 accounts
-                |> Seq.filter (_.CloseDate.HasValue)
+                |> Seq.filter (fun x -> Option.isSome x.CloseDate)
                 |> Seq.fold
                     (fun acc x ->
-                        let id = x._id.ToString()
+                        let id = x.Id
                         let balances = Map.tryFind id acc
 
                         let endFakeAccount =
-                            { _id = ObjectId.Empty
-                              AccountId = x._id
-                              CheckDate = x.CloseDate.Value
-                              AmountInChf = 0.0m }
+                            {| AccountId = x.Id
+                               CheckDate = CloseDate.value x.CloseDate.Value
+                               Amount = ChfMoney.Zero |}
 
                         let temp = Seq.append balances.Value [ endFakeAccount ]
                         Map.add id temp acc)
@@ -59,7 +64,7 @@ let handleGetTrendsAsync: GetTrend =
 
             let months =
                 balances
-                |> Seq.map (_.CheckDate)
+                |> Seq.map (fun x -> CheckDate.value x.CheckDate)
                 |> Seq.sort
                 |> Seq.distinctBy (fun x -> x.Year.ToString() + "." + x.Month.ToString())
 
@@ -69,7 +74,7 @@ let handleGetTrendsAsync: GetTrend =
                     let sum =
                         accounts
                         |> Seq.map (fun y ->
-                            let accountId = y._id.ToString()
+                            let accountId = y.Id
 
                             balanceWithCloseDate
                             |> Map.tryFind accountId
@@ -77,22 +82,17 @@ let handleGetTrendsAsync: GetTrend =
                                 x
                                 |> Seq.sortBy (fun b -> b.CheckDate)
                                 |> Seq.tryFindBack (fun balance -> balance.CheckDate <= targetDate)
-                                |> Option.map (fun b -> b.AmountInChf))
+                                |> Option.map (fun b -> b.Amount))
                             |> Option.flatten
-                            |> Option.defaultValue 0.0m)
+                            |> Option.defaultValue ChfMoney.Zero)
                         |> Seq.sum
 
-                    let amount = (sum * 1.0m<Chf>) |> ChfMoney.create |> failOnError
                     let myDate = targetDate.ToString() |> ExportDate.create |> failOnError
-                    { Amount = amount; Date = myDate })
+                    { Amount = sum; Date = myDate })
         }
 
 let handleGetAllAccountAsync: AllAccount =
-    fun getAllDbAccount ->
-        task {
-            let! accounts = getAllDbAccount ()
-            return accounts |> Seq.map AccountDb.toAccount
-        }
+    fun getAllDbAccount -> task { return! getAllDbAccount () }
 
 let handleOpenAccountAsync: OpenAnAccount =
     fun getDbAccount openDbAccount input ->
@@ -108,8 +108,7 @@ let handleOpenAccountAsync: OpenAnAccount =
             | true ->
                 let forDb = AccountDb.fromOpenAccount input
                 let! newEntry = openDbAccount forDb
-                let domain = AccountDb.toAccount newEntry
-                return Ok domain
+                return Ok newEntry
         }
 
 let handleCloseAccountAsync: CloseAnAccount =
@@ -123,9 +122,7 @@ let handleCloseAccountAsync: CloseAnAccount =
 
             match inserted with
             | None -> return Error "The account was not updatable"
-            | Some value ->
-                let domain = AccountDb.toAccount value
-                return Ok domain
+            | Some value -> return Ok value
         }
 
 let handleAddBalanceAsync: AddAnAccountBalance =
@@ -142,9 +139,7 @@ let handleAddBalanceAsync: AddAnAccountBalance =
 
                 let! newEntry = addDbBalanceAccount forDb
 
-                let domain = BalanceAccountDb.toBalanceAccount newEntry
-
-                return Ok domain
+                return Ok newEntry
         }
 
 let handleGetWealthAsync: ActualWealth =
@@ -156,23 +151,22 @@ let handleGetWealthAsync: ActualWealth =
 
             let accountsById =
                 accounts
-                |> Seq.map AccountDb.toAccount
                 |> Seq.map (fun a -> a.Id, a)
                 |> Map.ofSeq
 
             let details =
                 accounts
-                |> Seq.map (fun a -> getLastBalanceAccount a._id date)
-                |> Seq.map (fun t -> t.Result)
-                |> Seq.filter (fun o -> o.IsSome)
-                |> Seq.map (fun o -> o.Value)
-                |> Seq.map BalanceAccountDb.toBalanceAccount
+                |> Seq.map (fun a-> a.Id |> AccountId.value|> ObjectId.Parse)
+                |> Seq.map (fun a -> getLastBalanceAccount a date)
+                |> Seq.map (_.Result)
+                |> Seq.filter (_.IsSome)
+                |> Seq.map (_.Value)
                 |> Seq.map (fun b ->
                     { Amount = b.Amount
                       CheckDate = b.CheckDate
                       Account = accountsById[b.AccountId] })
 
-            let total = details |> Seq.map (fun d -> d.Amount) |> Seq.sum
+            let total = details |> Seq.map (_.Amount) |> Seq.sum
 
             return
                 { Amount = total
@@ -189,9 +183,8 @@ let handleGetAllBalanceForAnAccountAsync: AllBalanceForAnAccount =
             match account with
             | None -> return Error "The account doesn't exit"
             | Some value ->
-                let! forDb = getAllDbBalancesForAnAccount value._id
-                let domain = forDb |> Seq.map BalanceAccountDb.toBalanceAccount
-                return Ok domain
+                let! forDb = getAllDbBalancesForAnAccount objId
+                return Ok forDb
         }
 
 let handleDeleteBalanceAsync: DeleteBalance =

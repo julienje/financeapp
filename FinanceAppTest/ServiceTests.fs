@@ -14,18 +14,23 @@ let AmountA = 12.5M<Chf>
 let AmountB = 27.52M<Chf>
 let AmountC = 57.67M<Chf>
 
+let private failOnError aResult =
+    match aResult with
+    | Ok success -> success
+    | Error error -> failwithf $"%A{error}"
+
 let createAccount (id, name, closeDate) =
-    { _id = ObjectId.Parse(id)
-      Name = name
-      Company = "My Company"
-      OpenDate = DateTime.MinValue
-      CloseDate = closeDate }
+    { Id = id |> AccountId.create |> failOnError
+      Name = name |> AccountName.create |> failOnError
+      Company = "My Company" |> CompanyName.create |> failOnError
+      OpenDate = DateTime.MinValue |> OpenDate.createFromDate
+      CloseDate = closeDate |> CloseDate.createOption |>failOnError }
 
 let createBalance (accountId, datetime, amount) =
-    { _id = ObjectId.GenerateNewId()
-      AccountId =ObjectId.Parse(accountId)
-      CheckDate = datetime
-      AmountInChf = decimal amount }
+    { Id = Guid.NewGuid().ToString() |> AccountBalanceId.create |> failOnError
+      AccountId= accountId |> AccountId.create |> failOnError
+      CheckDate= datetime |> CheckDate.createFromDate
+      Amount= amount |> ChfMoney.create |> failOnError }
 
 let dateToDateTime date = DateTime.Parse(date + " 12:00:00")
 
@@ -33,8 +38,8 @@ let mockedAllAccounts: GetAllDbAccount =
     fun () ->
         task {
             let closeDate = dateToDateTime "2023-06-01"
-            let accountA = createAccount (accountAId, "A", Nullable())
-            let accountB = createAccount (accountBId, "B", Nullable closeDate)
+            let accountA = createAccount (accountAId, "A", "")
+            let accountB = createAccount (accountBId, "B", "2023-06-01")
             return [ accountA; accountB ]
         }
 

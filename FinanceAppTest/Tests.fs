@@ -36,9 +36,9 @@ let newBalancePayload amount =
 
 let scheme = "TestScheme"
 
-type TestAuthHandler(options, logger, encoder, clock) =
+type TestAuthHandler(options, logger, encoder) =
 
-    inherit AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder, clock)
+    inherit AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 
     override this.HandleAuthenticateAsync() =
         let aClaim = Claim(ClaimTypes.Name, "Test user")
@@ -177,7 +177,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> httpGet "wealth?date=2021-06-01"
         |> ensureSuccess
         |> readText
-        |> shouldPropertyHasValue "AmountInChf" (0)
+        |> shouldPropertyHasValue "AmountInChf" (0.0m)
 
         client
         |> httpGet $"/accounts/{newAccountA}/balances"

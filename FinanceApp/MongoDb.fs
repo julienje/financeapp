@@ -16,30 +16,32 @@ let private accountCollection = db.GetCollection<AccountDb>("Accounts")
 
 let private balanceCollection = db.GetCollection<BalanceAccountDb>("Balances")
 
-let private handleNull element =
+let private handleNull element transform =
     match box element with
     | null -> None
-    | _ -> Some element
+    | _ -> Some (element |> transform)
 
 let findAllAccountsAsync: GetAllDbAccount =
     fun () ->
         task {
             let! find = accountCollection.FindAsync(Builders.Filter.Empty)
-            return find.ToEnumerable()
+            let! result = find.ToListAsync()
+            return result |> Seq.map AccountDb.toAccount
         }
 
 let insertAccountAsync: OpenDbAccount =
     fun account ->
         task {
             let! _ = accountCollection.InsertOneAsync(account)
-            return account
+            return account |> AccountDb.toAccount
         }
 
 let getAccountByNameAndCompanyAsync: GetDbAccountByNameAndCompany =
     fun name company ->
         task {
             let! find = accountCollection.FindAsync(fun a -> a.Name = name && a.Company = company)
-            return find.ToEnumerable()
+            let! result = find.ToListAsync()
+            return result |> Seq.map AccountDb.toAccount
         }
 
 let updateCloseDateAsync: CloseDbAccount =
@@ -58,7 +60,7 @@ let updateCloseDateAsync: CloseDbAccount =
                 FindOneAndUpdateOptions<AccountDb, AccountDb>(ReturnDocument = ReturnDocument.After)
 
             let! update = accountCollection.FindOneAndUpdateAsync<AccountDb>(filter, update, updateOption)
-            return handleNull update
+            return handleNull update AccountDb.toAccount
         }
 
 let findAccountAsync: GetDbAccount =
@@ -66,14 +68,14 @@ let findAccountAsync: GetDbAccount =
         task {
             let! find = accountCollection.FindAsync(fun a -> a._id = id)
             let! account = find.SingleOrDefaultAsync()
-            return handleNull account
+            return handleNull account AccountDb.toAccount
         }
 
 let insertBalanceAsync: AddDbBalanceAccount =
     fun balance ->
         task {
             let! _ = balanceCollection.InsertOneAsync(balance)
-            return balance
+            return balance |> BalanceAccountDb.toBalanceAccount
         }
 
 let findActiveDbAccountAsync: GetActiveDbAccount =
@@ -92,7 +94,8 @@ let findActiveDbAccountAsync: GetActiveDbAccount =
             let filter = Builders<AccountDb>.Filter.And(alreadyOpen, closedFilter)
 
             let! find = accountCollection.FindAsync(filter)
-            return find.ToEnumerable()
+            let! result = find.ToListAsync()
+            return result |> Seq.map AccountDb.toAccount
         }
 
 let findLastBalanceAccountAsync: GetLastBalanceAccount =
@@ -110,16 +113,11 @@ let findLastBalanceAccountAsync: GetLastBalanceAccount =
             let options = FindOptions<BalanceAccountDb>(Sort = sort)
 
             let! find = balanceCollection.FindAsync(filter, options)
+            let! result = find.ToListAsync()
 
-            let! balances = find.ToListAsync()
-            let balancesList = balances |> Seq.toList
+            let balancesList = result |> Seq.map BalanceAccountDb.toBalanceAccount
 
-            let resp =
-                match balancesList with
-                | [] -> None
-                | head :: _ -> Some head
-
-            return resp
+            return balancesList |> Seq.tryHead
         }
 
 let findAllBalancesForAnAccountAsync: GetAllDbBalancesForAnAccount =
@@ -128,7 +126,8 @@ let findAllBalancesForAnAccountAsync: GetAllDbBalancesForAnAccount =
             let sort = Builders<BalanceAccountDb>.Sort.Descending "CheckDate"
             let options = FindOptions<BalanceAccountDb>(Sort = sort)
             let! find = balanceCollection.FindAsync((fun a -> a.AccountId = accountId), options)
-            return find.ToEnumerable()
+            let! result = find.ToListAsync()
+            return result |> Seq.map BalanceAccountDb.toBalanceAccount
         }
 
 let deleteBalanceAsync: DeleteDbBalance =
@@ -142,5 +141,6 @@ let getAllBalancesAsync: GetAllDbBalances =
     fun () ->
         task {
             let! find = balanceCollection.FindAsync(Builders.Filter.Empty)
-            return find.ToEnumerable()
+            let! result = find.ToListAsync()
+            return result |> Seq.map BalanceAccountDb.toBalanceAccount
         }
