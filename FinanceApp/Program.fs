@@ -36,8 +36,7 @@ let treatResultResponse (context: HttpContext) resp : HttpHandler =
         context.SetStatusCode 400
         text $"""{{ "error": "{e}"}}"""
 
-let convertList convertToDto list =
-    list |> List.map convertToDto
+let convertSeq convertToDto seq = seq |> Seq.map convertToDto
 
 let newBalanceHandler (accountId: string) : HttpHandler =
     fun (next: HttpFunc) (context: HttpContext) ->
@@ -61,9 +60,17 @@ let getBalancesAccountHandler (accountId: string) : HttpHandler =
             let! result =
                 taskResult {
                     let! accountIdDomain = AccountId.create accountId
-                    return! Service.handleGetAllBalanceForAnAccountAsync MongoDb.findAccountAsync MongoDb.findAllBalancesForAnAccountAsync accountIdDomain
+
+                    return!
+                        Service.handleGetAllBalanceForAnAccountAsync
+                            MongoDb.findAccountAsync
+                            MongoDb.findAllBalancesForAnAccountAsync
+                            accountIdDomain
                 }
-            let resp = treatDtoResponse context result (convertList AccountBalanceDto.fromDomain)
+
+            let resp =
+                treatDtoResponse context result (convertSeq AccountBalanceDto.fromDomain)
+
             return! resp next context
         }
 
@@ -75,6 +82,7 @@ let deleteBalancesAccountHandler (balanceId: string) : HttpHandler =
                     let! idDomain = AccountBalanceId.create balanceId
                     return! Service.handleDeleteBalanceAsync MongoDb.deleteBalanceAsync idDomain
                 }
+
             let resp = treatResultResponse context result
             return! resp next context
         }
@@ -90,9 +98,9 @@ let webApp =
               [ route "/accounts"
                 >=> fun next context ->
                     task {
-                        let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAsync
+                        let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAccountsAsync
 
-                        let dto = accounts |> List.map AccountDto.fromDomain
+                        let dto = accounts |> Seq.map AccountDto.fromDomain
 
                         return! json dto next context
                     }
@@ -114,10 +122,20 @@ let webApp =
 
                                 return wealth
                             }
+
                         let resp = treatDtoResponse context result WealthDto.fromDomain
                         return! resp next context
                     }
-                routef "/accounts/%s/balances" getBalancesAccountHandler]
+                route "/trend"
+                >=> fun next context ->
+                    task {
+                        let! trend =
+                            Service.handleGetTrendsAsync MongoDb.findAllAccountsAsync MongoDb.getAllBalancesAsync
+
+                        let dto = trend |> TrendDto.fromDomain
+                        return! json dto next context
+                    }
+                routef "/accounts/%s/balances" getBalancesAccountHandler ]
           PUT
           >=> choose
               [ route "/accounts/new"
@@ -162,10 +180,7 @@ let webApp =
                         return! resp next context
                     }
                 routef "/accounts/%s/balances/new" newBalanceHandler ]
-          DELETE
-          >=> choose
-              [ routef "/balances/%s" deleteBalancesAccountHandler]
-        ]
+          DELETE >=> choose [ routef "/balances/%s" deleteBalancesAccountHandler ] ]
 
 let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
