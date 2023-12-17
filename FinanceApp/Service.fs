@@ -95,28 +95,19 @@ let handleGetAllAccountAsync: AllAccount =
 let handleOpenAccountAsync: OpenAnAccount =
     fun getDbAccount openDbAccount input ->
         task {
-            let accountName = input.Name |> AccountName.value
-
-            let inputCompany = input.Company |> CompanyName.value
-
-            let! accounts = getDbAccount accountName inputCompany
+            let! accounts = getDbAccount input.Name input.Company
 
             match Seq.isEmpty accounts with
             | false -> return Error "The account with this name and company already exists"
             | true ->
-                let forDb = AccountDb.fromOpenAccount input
-                let! newEntry = openDbAccount forDb
+                let! newEntry = openDbAccount input
                 return Ok newEntry
         }
 
 let handleCloseAccountAsync: CloseAnAccount =
     fun closeDb input ->
         task {
-            let objId = input.Id |> AccountId.value |> ObjectId.Parse
-
-            let date = input.CloseDate |> CloseDate.value
-
-            let! inserted = closeDb objId date
+            let! inserted = closeDb input
 
             match inserted with
             | None -> return Error "The account was not updatable"
@@ -126,26 +117,19 @@ let handleCloseAccountAsync: CloseAnAccount =
 let handleAddBalanceAsync: AddAnAccountBalance =
     fun getDbAccount addDbBalanceAccount input ->
         task {
-            let objId = input.AccountId |> AccountId.value |> ObjectId.Parse
-
-            let! account = getDbAccount objId
+            let! account = getDbAccount input.AccountId
 
             match account with
             | None -> return Error "The account doesn't exit"
             | Some _ ->
-                let forDb = BalanceAccountDb.fromAddAccountBalance input
-
-                let! newEntry = addDbBalanceAccount forDb
-
+                let! newEntry = addDbBalanceAccount input
                 return Ok newEntry
         }
 
 let handleGetWealthAsync: ActualWealth =
     fun getActiveDbAccount getLastBalanceAccount exportDate ->
         task {
-            let date = exportDate |> ExportDate.value
-
-            let! accounts = getActiveDbAccount date
+            let! accounts = getActiveDbAccount exportDate
 
             let accountsById =
                 accounts
@@ -154,8 +138,8 @@ let handleGetWealthAsync: ActualWealth =
 
             let details =
                 accounts
-                |> Seq.map (fun a-> a.Id |> AccountId.value|> ObjectId.Parse)
-                |> Seq.map (fun a -> getLastBalanceAccount a date)
+                |> Seq.map (_.Id)
+                |> Seq.map (fun a -> getLastBalanceAccount a exportDate)
                 |> Seq.map (_.Result)
                 |> Seq.filter (_.IsSome)
                 |> Seq.map (_.Value)
@@ -175,20 +159,18 @@ let handleGetWealthAsync: ActualWealth =
 let handleGetAllBalanceForAnAccountAsync: AllBalanceForAnAccount =
     fun getDbAccount getAllDbBalancesForAnAccount accountId ->
         task {
-            let objId = accountId |> AccountId.value |> ObjectId.Parse
-            let! account = getDbAccount objId
+            let! account = getDbAccount accountId
 
             match account with
             | None -> return Error "The account doesn't exit"
             | Some value ->
-                let! forDb = getAllDbBalancesForAnAccount objId
+                let! forDb = getAllDbBalancesForAnAccount accountId
                 return Ok forDb
         }
 
 let handleDeleteBalanceAsync: DeleteBalance =
     fun deleteDbAccount balanceId ->
         task {
-            let objId = balanceId |> AccountBalanceId.value |> ObjectId.Parse
-            let! deleted = deleteDbAccount objId
+            let! deleted = deleteDbAccount balanceId
             return deleted > 0
         }

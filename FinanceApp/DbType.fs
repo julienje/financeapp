@@ -21,16 +21,16 @@ type BalanceAccountDb =
       AmountInChf: decimal }
 
 type GetAllDbAccount = Unit -> Task<Account seq>
-type GetDbAccountByNameAndCompany = string -> string -> Task<Account seq>
-type OpenDbAccount = AccountDb -> Task<Account>
-type CloseDbAccount = ObjectId -> DateTime -> Task<Account option>
-type GetDbAccount = ObjectId -> Task<Account option>
-type AddDbBalanceAccount = BalanceAccountDb -> Task<AccountBalance>
-type GetActiveDbAccount = DateTime -> Task<Account seq>
-type GetLastBalanceAccount = ObjectId -> DateTime -> Task<AccountBalance option>
-type GetAllDbBalancesForAnAccount = ObjectId -> Task<AccountBalance seq>
+type GetDbAccountByNameAndCompany = AccountName -> CompanyName -> Task<Account seq>
+type OpenDbAccount = OpenAccount -> Task<Account>
+type CloseDbAccount = CloseAccount -> Task<Account option>
+type GetDbAccount = AccountId -> Task<Account option>
+type AddDbBalanceAccount = AddAccountBalance -> Task<AccountBalance>
+type GetActiveDbAccount = ExportDate -> Task<Account seq>
+type GetLastBalanceAccount = AccountId -> ExportDate -> Task<AccountBalance option>
+type GetAllDbBalancesForAnAccount = AccountId -> Task<AccountBalance seq>
 type GetAllDbBalances = Unit -> Task<AccountBalance seq>
-type DeleteDbBalance = ObjectId -> Task<int64>
+type DeleteDbBalance = AccountBalanceId -> Task<int64>
 
 let private failOnError aResult =
     match aResult with

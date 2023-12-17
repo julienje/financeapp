@@ -2,6 +2,8 @@
 
 open System
 open FinanceApp.DbType
+open FinanceApp.DomainType
+open MongoDB.Bson
 open MongoDB.Driver
 
 
@@ -30,23 +32,28 @@ let findAllAccountsAsync: GetAllDbAccount =
         }
 
 let insertAccountAsync: OpenDbAccount =
-    fun account ->
+    fun openAccount ->
         task {
+            let account = openAccount |> AccountDb.fromOpenAccount
             let! _ = accountCollection.InsertOneAsync(account)
             return account |> AccountDb.toAccount
         }
 
 let getAccountByNameAndCompanyAsync: GetDbAccountByNameAndCompany =
-    fun name company ->
+    fun accountName companyName ->
         task {
+            let name = accountName |> AccountName.value
+            let company = companyName |> CompanyName.value
             let! find = accountCollection.FindAsync(fun a -> a.Name = name && a.Company = company)
             let! result = find.ToListAsync()
             return result |> Seq.map AccountDb.toAccount
         }
 
 let updateCloseDateAsync: CloseDbAccount =
-    fun id date ->
+    fun closeAccount ->
         task {
+            let id = closeAccount.Id |> AccountId.value |> ObjectId.Parse
+            let date = closeAccount.CloseDate |> CloseDate.value
             let idFilter = Builders<AccountDb>.Filter.Eq((fun a -> a._id), id)
 
             let nonClosedFilter =
@@ -64,23 +71,26 @@ let updateCloseDateAsync: CloseDbAccount =
         }
 
 let findAccountAsync: GetDbAccount =
-    fun id ->
+    fun accountId ->
         task {
+            let id = accountId |> AccountId.value |> ObjectId.Parse
             let! find = accountCollection.FindAsync(fun a -> a._id = id)
             let! account = find.SingleOrDefaultAsync()
             return handleNull account AccountDb.toAccount
         }
 
 let insertBalanceAsync: AddDbBalanceAccount =
-    fun balance ->
+    fun addAccountBalance ->
         task {
+            let balance = addAccountBalance |> BalanceAccountDb.fromAddAccountBalance
             let! _ = balanceCollection.InsertOneAsync(balance)
             return balance |> BalanceAccountDb.toBalanceAccount
         }
 
 let findActiveDbAccountAsync: GetActiveDbAccount =
-    fun date ->
+    fun exportDate ->
         task {
+            let date = exportDate |> ExportDate.value
             let nonClosedFilter =
                 Builders<AccountDb>.Filter.Eq((fun a -> a.CloseDate), Nullable())
 
@@ -99,12 +109,14 @@ let findActiveDbAccountAsync: GetActiveDbAccount =
         }
 
 let findLastBalanceAccountAsync: GetLastBalanceAccount =
-    fun accountId date ->
+    fun accountId exportDate ->
         task {
+            let date = exportDate |> ExportDate.value
+            let accountIdDb = accountId |> AccountId.value |> ObjectId.Parse
             let before = Builders<BalanceAccountDb>.Filter.Lte((fun a -> a.CheckDate), date)
 
             let account =
-                Builders<BalanceAccountDb>.Filter.Eq((fun a -> a.AccountId), accountId)
+                Builders<BalanceAccountDb>.Filter.Eq((fun a -> a.AccountId), accountIdDb)
 
             let filter = Builders<BalanceAccountDb>.Filter.And(before, account)
 
@@ -123,16 +135,18 @@ let findLastBalanceAccountAsync: GetLastBalanceAccount =
 let findAllBalancesForAnAccountAsync: GetAllDbBalancesForAnAccount =
     fun accountId ->
         task {
+            let accountIdDb = accountId |> AccountId.value |> ObjectId.Parse
             let sort = Builders<BalanceAccountDb>.Sort.Descending "CheckDate"
             let options = FindOptions<BalanceAccountDb>(Sort = sort)
-            let! find = balanceCollection.FindAsync((fun a -> a.AccountId = accountId), options)
+            let! find = balanceCollection.FindAsync((fun a -> a.AccountId = accountIdDb), options)
             let! result = find.ToListAsync()
             return result |> Seq.map BalanceAccountDb.toBalanceAccount
         }
 
 let deleteBalanceAsync: DeleteDbBalance =
-    fun balanceId ->
+    fun accountBalanceId ->
         task {
+            let balanceId = accountBalanceId |> AccountBalanceId.value |> ObjectId.Parse
             let! find = balanceCollection.DeleteOneAsync(fun a -> a._id = balanceId)
             return find.DeletedCount
         }
