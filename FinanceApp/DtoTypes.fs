@@ -120,8 +120,8 @@ module WealthDto =
           Details = domain.Details |> Seq.map WealthAccountDto.fromDomain }
 
 module TrendDto =
-    let fromDomain (domain: DatedAmount seq) =
+    let fromDomain (domain: Trend seq) =
         domain
         |> Seq.map (fun x ->
             { AmountInChf = x.Amount |> ChfMoney.value |> decimal
-              CheckDate = x.Date |> ExportDate.value |> Utility.convertDateTime })
+              CheckDate = x.Date |> TrendDate.value |> Utility.convertDateTime })

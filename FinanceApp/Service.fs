@@ -20,7 +20,7 @@ type AllBalanceForAnAccount =
 
 type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
-type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<DatedAmount seq>
+type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend seq>
 
 let private failOnError aResult =
     match aResult with
@@ -85,7 +85,7 @@ let handleGetTrendsAsync: GetTrend =
                             |> Option.defaultValue ChfMoney.Zero)
                         |> Seq.sum
 
-                    let myDate = targetDate.ToString() |> ExportDate.create |> failOnError
+                    let myDate = targetDate.ToString() |> TrendDate.create |> failOnError
                     { Amount = sum; Date = myDate })
         }
 

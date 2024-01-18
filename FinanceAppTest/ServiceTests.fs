@@ -21,6 +21,7 @@ let private failOnError aResult =
 let createAccount (id, name, closeDate) =
     { Id = id |> AccountId.create |> failOnError
       Name = name |> AccountName.create |> failOnError
+      Type = Unknown
       Company = "My Company" |> CompanyName.create |> failOnError
       OpenDate = DateTime.MinValue |> OpenDate.createFromDate
       CloseDate = closeDate |> CloseDate.createOption |>failOnError }
@@ -76,17 +77,17 @@ let ``Get Trends works correctly`` () =
     let e= resp |> Seq.item 4
     let f= resp |> Seq.item 5
     let g= resp |> Seq.item 6
-    Assert.Equal(dateToDateTime "2023-01-27",ExportDate.value a.Date)
+    Assert.Equal(dateToDateTime "2023-01-27",TrendDate.value a.Date)
     Assert.Equal(AmountA, ChfMoney.value a.Amount)
-    Assert.Equal(dateToDateTime "2023-02-27",ExportDate.value b.Date)
+    Assert.Equal(dateToDateTime "2023-02-27",TrendDate.value b.Date)
     Assert.Equal(AmountA + AmountB, ChfMoney.value b.Amount)
-    Assert.Equal(dateToDateTime "2023-03-27",ExportDate.value c.Date)
+    Assert.Equal(dateToDateTime "2023-03-27",TrendDate.value c.Date)
     Assert.Equal(AmountA+AmountC, ChfMoney.value c.Amount)
-    Assert.Equal(dateToDateTime "2023-04-27",ExportDate.value d.Date)
+    Assert.Equal(dateToDateTime "2023-04-27",TrendDate.value d.Date)
     Assert.Equal(AmountC+AmountC, ChfMoney.value d.Amount)
-    Assert.Equal(dateToDateTime "2023-05-27",ExportDate.value e.Date)
+    Assert.Equal(dateToDateTime "2023-05-27",TrendDate.value e.Date)
     Assert.Equal(AmountA+AmountA, ChfMoney.value e.Amount)
-    Assert.Equal(dateToDateTime "2023-06-27",ExportDate.value f.Date)
+    Assert.Equal(dateToDateTime "2023-06-27",TrendDate.value f.Date)
     Assert.Equal(AmountA, ChfMoney.value f.Amount)
-    Assert.Equal(dateToDateTime "2023-07-27",ExportDate.value g.Date)
+    Assert.Equal(dateToDateTime "2023-07-27",TrendDate.value g.Date)
     Assert.Equal(AmountC, ChfMoney.value g.Amount)
