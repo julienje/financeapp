@@ -136,7 +136,7 @@ let webApp =
                         return! json dto next context
                     }
                 routef "/accounts/%s/balances" getBalancesAccountHandler
-                route "/company"
+                route "/companies"
                 >=> fun next context ->
                     task {
                         let! companies = Service.handleGetCompanyAsync MongoDb.getAllCompanyAsync

@@ -22,7 +22,7 @@ type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
 type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend seq>
 
-type AllCompany = GetAllDbCompany -> Task<CompanyName seq>
+type AllCompany = GetAllInvestmentDbCompany -> Task<CompanyName seq>
 
 let private failOnError aResult =
     match aResult with

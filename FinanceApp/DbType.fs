@@ -32,7 +32,7 @@ type GetLastBalanceAccount = AccountId -> ExportDate -> Task<AccountBalance opti
 type GetAllDbBalancesForAnAccount = AccountId -> Task<AccountBalance seq>
 type GetAllDbBalances = Unit -> Task<AccountBalance seq>
 type DeleteDbBalance = AccountBalanceId -> Task<int64>
-type GetAllDbCompany = Unit -> Task<CompanyName seq>
+type GetAllInvestmentDbCompany = Unit -> Task<CompanyName seq>
 
 let private failOnError aResult =
     match aResult with
