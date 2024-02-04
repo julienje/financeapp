@@ -32,6 +32,7 @@ type GetLastBalanceAccount = AccountId -> ExportDate -> Task<AccountBalance opti
 type GetAllDbBalancesForAnAccount = AccountId -> Task<AccountBalance seq>
 type GetAllDbBalances = Unit -> Task<AccountBalance seq>
 type DeleteDbBalance = AccountBalanceId -> Task<int64>
+type GetAllDbCompany = Unit -> Task<CompanyName seq>
 
 let private failOnError aResult =
     match aResult with
@@ -73,6 +74,8 @@ module AccountDb =
           OpenDate = openAccount.OpenDate |> OpenDate.value
           Type = openAccount.Type |> convertTypeFromDomain
           CloseDate = Nullable() }
+    let toCompanyName name : CompanyName =
+        name |> CompanyName.create |> failOnError
 
 module BalanceAccountDb =
     let fromAddAccountBalance (addAccountBalance: AddAccountBalance) : BalanceAccountDb =

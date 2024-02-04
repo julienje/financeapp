@@ -135,7 +135,14 @@ let webApp =
                         let dto = trend |> TrendDto.fromDomain
                         return! json dto next context
                     }
-                routef "/accounts/%s/balances" getBalancesAccountHandler ]
+                routef "/accounts/%s/balances" getBalancesAccountHandler
+                route "/company"
+                >=> fun next context ->
+                    task {
+                        let! companies = Service.handleGetCompanyAsync MongoDb.getAllCompanyAsync
+                        let dto = companies |> CompanyDto.fromDomain
+                        return! json dto next context
+                    } ]
           PUT
           >=> choose
               [ route "/accounts/new"

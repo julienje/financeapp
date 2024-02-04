@@ -158,3 +158,11 @@ let getAllBalancesAsync: GetAllDbBalances =
             let! result = find.ToListAsync()
             return result |> Seq.map BalanceAccountDb.toBalanceAccount
         }
+let getAllCompanyAsync: GetAllDbCompany=
+    fun()->
+        task {
+            let field = ExpressionFieldDefinition<AccountDb, string>(fun (a:AccountDb) -> a.Company);
+            let! find = accountCollection.DistinctAsync(field, Builders.Filter.Empty)
+            let! result = find.ToListAsync()
+            return result |> Seq.map AccountDb.toCompanyName
+        }

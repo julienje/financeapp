@@ -22,6 +22,8 @@ type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
 type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend seq>
 
+type AllCompany = GetAllDbCompany -> Task<CompanyName seq>
+
 let private failOnError aResult =
     match aResult with
     | Ok success -> success
@@ -173,4 +175,9 @@ let handleDeleteBalanceAsync: DeleteBalance =
         task {
             let! deleted = deleteDbAccount balanceId
             return deleted > 0
+        }
+let handleGetCompanyAsync: AllCompany =
+    fun db ->
+        task{
+            return! db()
         }
