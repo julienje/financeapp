@@ -165,7 +165,7 @@ let handleGetAllBalanceForAnAccountAsync: AllBalanceForAnAccount =
 
             match account with
             | None -> return Error "The account doesn't exit"
-            | Some value ->
+            | Some _ ->
                 let! forDb = getAllDbBalancesForAnAccount accountId
                 return Ok forDb
         }

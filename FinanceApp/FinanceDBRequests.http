@@ -7,7 +7,7 @@ Content-Type: application/json
 Authorization: Bearer {{$auth.token("julien")}}
 
 {
-  "Name": "A conto 10",
+  "Name": "A conto dsfasdf",
   "Company": "UBS",
   "OpenDate": "2022-01-01"
 }

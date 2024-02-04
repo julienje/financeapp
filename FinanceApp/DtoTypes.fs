@@ -58,6 +58,11 @@ type TrendDto =
 type CompanyDto =
     { Name: string }
 
+[<JsonFSharpConverter>]
+type AddInvestmentDto =
+    { AmountInChf: decimal
+      InvestmentDate: string }
+
 module Utility =
     let convertDateTime (input: DateTime) : string = input.ToString("o")
 
@@ -132,3 +137,15 @@ module TrendDto =
 module CompanyDto=
     let fromDomain(domain: CompanyName seq)=
         domain |> Seq.map CompanyName.value
+module InvestmentDto =
+    let toDomain companyName (input: AddInvestmentDto) =
+        result {
+            let! companyName = CompanyName.create companyName
+            let! date = InvestmentDate.create input.InvestmentDate
+            let! chfMoney = ChfMoney.create (input.AmountInChf * 1.0m<Chf>)
+            return {
+                Amount=chfMoney
+                Company= companyName
+                Date= date
+            }
+        }

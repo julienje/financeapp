@@ -66,7 +66,7 @@ type Wealth =
 
 type Trend = { Amount: ChfMoney; Date: TrendDate }
 
-type Investment = {
+type AddInvestment = {
     Amount: ChfMoney
     Company: CompanyName
     Date: InvestmentDate
@@ -192,3 +192,8 @@ module TrendDate =
 
     let create date =
         ConstrainedType.createDate "TrendDate" TrendDate date
+module InvestmentDate =
+    let value (InvestmentDate date) = date
+
+    let create date =
+        ConstrainedType.createDate "InvestmentDate" InvestmentDate date
