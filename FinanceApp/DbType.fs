@@ -11,6 +11,7 @@ type AccountDb =
       Name: string
       Company: string
       OpenDate: DateTime
+      Type: string
       CloseDate: Nullable<DateTime> }
 
 [<CLIMutable>]
@@ -31,6 +32,7 @@ type GetLastBalanceAccount = AccountId -> ExportDate -> Task<AccountBalance opti
 type GetAllDbBalancesForAnAccount = AccountId -> Task<AccountBalance seq>
 type GetAllDbBalances = Unit -> Task<AccountBalance seq>
 type DeleteDbBalance = AccountBalanceId -> Task<int64>
+type GetAllInvestmentDbCompany = Unit -> Task<CompanyName seq>
 
 let private failOnError aResult =
     match aResult with
@@ -38,21 +40,31 @@ let private failOnError aResult =
     | Error error -> failwithf $"%A{error}"
 
 module AccountDb =
+    let convertTypeFromDb(accountType: string)=
+        match accountType with
+            | null -> Unknown
+            | "3A" -> ThirdPillarA
+            | "ETF"-> ExchangeTradedFund
+            | _ -> Unknown
+
+    let convertTypeFromDomain (accountType :AccountType)=
+        match accountType with
+        | ExchangeTradedFund -> "ETF"
+        | ThirdPillarA -> "3A"
+        | Unknown -> "Unknown"
     let toAccount (accountDb: AccountDb) : Account =
         let accountName = AccountName.create accountDb.Name |> failOnError
-
         let accountId = accountDb._id.ToString() |> AccountId.create |> failOnError
-
         let companyName = CompanyName.create accountDb.Company |> failOnError
-
         let openDate = accountDb.OpenDate |> OpenDate.createFromDate
-
         let closeDate = accountDb.CloseDate |> CloseDate.createFromNullableDate
+        let accountType =convertTypeFromDb accountDb.Type
 
         { Id = accountId
           Name = accountName
           Company = companyName
           OpenDate = openDate
+          Type = accountType
           CloseDate = closeDate }
 
     let fromOpenAccount (openAccount: OpenAccount) : AccountDb =
@@ -60,7 +72,10 @@ module AccountDb =
           Name = openAccount.Name |> AccountName.value
           Company = openAccount.Company |> CompanyName.value
           OpenDate = openAccount.OpenDate |> OpenDate.value
+          Type = openAccount.Type |> convertTypeFromDomain
           CloseDate = Nullable() }
+    let toCompanyName name : CompanyName =
+        name |> CompanyName.create |> failOnError
 
 module BalanceAccountDb =
     let fromAddAccountBalance (addAccountBalance: AddAccountBalance) : BalanceAccountDb =

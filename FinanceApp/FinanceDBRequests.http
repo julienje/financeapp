@@ -1,10 +1,10 @@
 GET http://localhost:5165/accounts
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("julien")}}
 
 ###
 PUT http://localhost:5165/accounts/new
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("julien")}}
 
 {
   "Name": "A conto 10",
@@ -15,7 +15,7 @@ Authorization: Bearer {{token}}
 ###
 PUT http://localhost:5165/accounts/close
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("julien")}}
 
 {
   "Id": "631c42462559f9c5ba696a84",
@@ -25,7 +25,7 @@ Authorization: Bearer {{token}}
 ###
 PUT http://localhost:5165/accounts/648f43152c325d63225546a1/balances/new
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("julien")}}
 
 {
   "CheckDate": "2022-10-27T00:00:00",
@@ -34,15 +34,18 @@ Authorization: Bearer {{token}}
 
 ###
 GET http://localhost:5165/wealth
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("julien")}}
 
 ###
 GET http://localhost:5165/wealth?date=2021-06-01
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("julien")}}
 
 ###
 GET http://localhost:5165/accounts/64a573c6d14cd2d5915bee95/balances
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("julien")}}
 ###
 GET http://localhost:5165/trend
-Authorization: Bearer {{token}}
+Authorization: Bearer {{$auth.token("julien")}}
+###
+GET http://localhost:5165/companies
+Authorization: Bearer {{$auth.token("julien")}}
