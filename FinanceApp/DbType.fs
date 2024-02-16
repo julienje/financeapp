@@ -21,6 +21,13 @@ type BalanceAccountDb =
       CheckDate: DateTime
       AmountInChf: decimal }
 
+[<CLIMutable>]
+type InvestmentDb =
+    { _id: ObjectId
+      CompanyName: string
+      InvestmentDate: DateTime
+      AmountInChf: decimal }
+
 type GetAllDbAccount = Unit -> Task<Account seq>
 type GetDbAccountByNameAndCompany = AccountName -> CompanyName -> Task<Account seq>
 type OpenDbAccount = OpenAccount -> Task<Account>
@@ -33,6 +40,7 @@ type GetAllDbBalancesForAnAccount = AccountId -> Task<AccountBalance seq>
 type GetAllDbBalances = Unit -> Task<AccountBalance seq>
 type DeleteDbBalance = AccountBalanceId -> Task<int64>
 type GetAllInvestmentDbCompany = Unit -> Task<CompanyName seq>
+type AddDbInvestment = AddInvestment -> Task<Investment>
 
 let private failOnError aResult =
     match aResult with
@@ -40,25 +48,26 @@ let private failOnError aResult =
     | Error error -> failwithf $"%A{error}"
 
 module AccountDb =
-    let convertTypeFromDb(accountType: string)=
+    let convertTypeFromDb (accountType: string) =
         match accountType with
-            | null -> Unknown
-            | "3A" -> ThirdPillarA
-            | "ETF"-> ExchangeTradedFund
-            | _ -> Unknown
+        | null -> Unknown
+        | "3A" -> ThirdPillarA
+        | "ETF" -> ExchangeTradedFund
+        | _ -> Unknown
 
-    let convertTypeFromDomain (accountType :AccountType)=
+    let convertTypeFromDomain (accountType: AccountType) =
         match accountType with
         | ExchangeTradedFund -> "ETF"
         | ThirdPillarA -> "3A"
         | Unknown -> "Unknown"
+
     let toAccount (accountDb: AccountDb) : Account =
         let accountName = AccountName.create accountDb.Name |> failOnError
         let accountId = accountDb._id.ToString() |> AccountId.create |> failOnError
         let companyName = CompanyName.create accountDb.Company |> failOnError
         let openDate = accountDb.OpenDate |> OpenDate.createFromDate
         let closeDate = accountDb.CloseDate |> CloseDate.createFromNullableDate
-        let accountType =convertTypeFromDb accountDb.Type
+        let accountType = convertTypeFromDb accountDb.Type
 
         { Id = accountId
           Name = accountName
@@ -74,6 +83,7 @@ module AccountDb =
           OpenDate = openAccount.OpenDate |> OpenDate.value
           Type = openAccount.Type |> convertTypeFromDomain
           CloseDate = Nullable() }
+
     let toCompanyName name : CompanyName =
         name |> CompanyName.create |> failOnError
 
@@ -99,3 +109,16 @@ module BalanceAccountDb =
           AccountId = accountId
           CheckDate = checkDate
           Amount = amount }
+
+module InvestmentDb =
+    let fromAddInvestment (addInvestment: AddInvestment) : InvestmentDb =
+        { _id = ObjectId.Empty
+          CompanyName = addInvestment.Company |> CompanyName.value
+          InvestmentDate = addInvestment.Date |> InvestmentDate.value
+          AmountInChf = addInvestment.Amount |> ChfMoney.value |> decimal }
+
+    let toInvestment (db: InvestmentDb) : Investment =
+        { Id = db._id.ToString() |> InvestmentId.create |> failOnError
+          Amount = (db.AmountInChf * 1.0m<Chf>) |> ChfMoney.create |> failOnError
+          Company = db.CompanyName |> CompanyName.create |> failOnError
+          Date = db.InvestmentDate |> InvestmentDate.createFromDate }

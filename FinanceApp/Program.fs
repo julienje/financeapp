@@ -56,15 +56,15 @@ let newBalanceHandler (accountId: string) : HttpHandler =
 let newInvestmentHandler (companyName: string) : HttpHandler =
     fun (next: HttpFunc) (context: HttpContext) ->
         task {
-            let! inputDto = context.BindJsonAsync<AddBalanceDto>()
+            let! inputDto = context.BindJsonAsync<AddInvestmentDto>()
 
             let! result =
                 taskResult {
-                    let! toDomain = InvestmentDto.toDomain accountId inputDto
+                    let! toDomain = InvestmentDto.toDomain companyName inputDto
                     return! Service.handleAddInvestmentAsync MongoDb.getAllCompanyAsync MongoDb.insertInvestmentAsync toDomain
                 }
 
-            let resp = treatDtoResponse context result AccountBalanceDto.fromDomain
+            let resp = treatDtoResponse context result InvestmentDto.fromDomain
 
             return! resp next context
         }

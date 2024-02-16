@@ -23,6 +23,7 @@ type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend seq>
 
 type AllCompany = GetAllInvestmentDbCompany -> Task<CompanyName seq>
+type AddAnInvestment = GetAllInvestmentDbCompany -> AddDbInvestment-> AddInvestment->Task<Investment>
 
 let private failOnError aResult =
     match aResult with
@@ -180,4 +181,10 @@ let handleGetCompanyAsync: AllCompany =
     fun db ->
         task{
             return! db()
+        }
+let handleAddInvestmentAsync:AddAnInvestment =
+    fun allCompanyName addDbInvestment addInvestment ->
+        task {
+            let companies = allCompanyName
+            return companies
         }

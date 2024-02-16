@@ -8,6 +8,7 @@ type Chf
 
 type AccountId = private AccountId of string
 type AccountBalanceId = private AccountBalanceId of string
+type InvestmentId = private InvestmentId of string
 type AccountName = private AccountName of string
 type CompanyName = private CompanyName of string
 type OpenDate = private OpenDate of DateTime
@@ -70,6 +71,13 @@ type AddInvestment = {
     Amount: ChfMoney
     Company: CompanyName
     Date: InvestmentDate
+}
+
+type Investment ={
+   Id: InvestmentId
+   Amount: ChfMoney
+   Company: CompanyName
+   Date: InvestmentDate
 }
 
 module ConstrainedType =
@@ -197,3 +205,9 @@ module InvestmentDate =
 
     let create date =
         ConstrainedType.createDate "InvestmentDate" InvestmentDate date
+    let createFromDate date = InvestmentDate date
+module InvestmentId =
+    let value (InvestmentId str) = str
+
+    let create str =
+        ConstrainedType.createString "InvestmentId" InvestmentId str
