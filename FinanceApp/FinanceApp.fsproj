@@ -21,7 +21,7 @@
         <PackageReference Include="Giraffe" Version="6.2.0" />
         <PackageReference Include="Microsoft.Identity.Web" Version="2.17.0" />
         <PackageReference Include="MongoDB.Driver" Version="2.23.1" />
-        <PackageReference Update="FSharp.Core" Version="8.0.101" />
+        <PackageReference Update="FSharp.Core" Version="8.0.200" />
     </ItemGroup>
 
     <ItemGroup>
