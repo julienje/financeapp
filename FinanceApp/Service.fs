@@ -23,6 +23,7 @@ type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend seq>
 
 type AllCompany = GetAllInvestmentDbCompany -> Task<CompanyName seq>
+type AddAnInvestment = GetAllInvestmentDbCompany -> AddDbInvestment -> AddInvestment -> Task<Result<Investment, string>>
 
 let private failOnError aResult =
     match aResult with
@@ -133,10 +134,7 @@ let handleGetWealthAsync: ActualWealth =
         task {
             let! accounts = getActiveDbAccount exportDate
 
-            let accountsById =
-                accounts
-                |> Seq.map (fun a -> a.Id, a)
-                |> Map.ofSeq
+            let accountsById = accounts |> Seq.map (fun a -> a.Id, a) |> Map.ofSeq
 
             let details =
                 accounts
@@ -165,7 +163,7 @@ let handleGetAllBalanceForAnAccountAsync: AllBalanceForAnAccount =
 
             match account with
             | None -> return Error "The account doesn't exit"
-            | Some value ->
+            | Some _ ->
                 let! forDb = getAllDbBalancesForAnAccount accountId
                 return Ok forDb
         }
@@ -176,8 +174,16 @@ let handleDeleteBalanceAsync: DeleteBalance =
             let! deleted = deleteDbAccount balanceId
             return deleted > 0
         }
-let handleGetCompanyAsync: AllCompany =
-    fun db ->
-        task{
-            return! db()
+
+let handleGetCompanyAsync: AllCompany = fun db -> task { return! db () }
+
+let handleAddInvestmentAsync: AddAnInvestment =
+    fun getInvestmentCompany addDbInvestment addInvestment ->
+        task {
+            let! companies = getInvestmentCompany ()
+            match companies |> Seq.contains addInvestment.Company with
+            | false -> return Error "The company cannot be invested"
+            | true ->
+                let! investment = addDbInvestment addInvestment
+                return Ok investment
         }

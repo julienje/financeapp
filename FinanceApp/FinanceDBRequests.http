@@ -7,7 +7,7 @@ Content-Type: application/json
 Authorization: Bearer {{$auth.token("julien")}}
 
 {
-  "Name": "A conto 10",
+  "Name": "Conto A",
   "Company": "UBS",
   "OpenDate": "2022-01-01"
 }
@@ -23,12 +23,12 @@ Authorization: Bearer {{$auth.token("julien")}}
 }
 
 ###
-PUT http://localhost:5165/accounts/648f43152c325d63225546a1/balances/new
+PUT http://localhost:5165/accounts/65d904e960691020cf2122b1/balances/new
 Content-Type: application/json
 Authorization: Bearer {{$auth.token("julien")}}
 
 {
-  "CheckDate": "2022-10-27T00:00:00",
+  "CheckDate": "2023-10-27T00:00:00",
   "AmountInChf": 12.95
 }
 
@@ -46,6 +46,17 @@ Authorization: Bearer {{$auth.token("julien")}}
 ###
 GET http://localhost:5165/trend
 Authorization: Bearer {{$auth.token("julien")}}
+
 ###
 GET http://localhost:5165/companies
 Authorization: Bearer {{$auth.token("julien")}}
+
+###
+PUT http://localhost:5165/companies/UBS/investment/new
+Authorization: Bearer {{$auth.token("julien")}}
+Content-Type: application/json
+
+{
+  "InvestmentDate": "2023-10-27T00:00:00",
+  "AmountInChf": 100.00
+}

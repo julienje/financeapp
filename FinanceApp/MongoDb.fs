@@ -17,6 +17,7 @@ let private db = mongo.GetDatabase "financeDB"
 let private accountCollection = db.GetCollection<AccountDb>("Accounts")
 
 let private balanceCollection = db.GetCollection<BalanceAccountDb>("Balances")
+let private investmentCollection = db.GetCollection<InvestmentDb>("Investment")
 
 let private handleNull element transform =
     match box element with
@@ -166,4 +167,11 @@ let getAllCompanyAsync: GetAllInvestmentDbCompany=
             let! find = accountCollection.DistinctAsync(field, filter)
             let! result = find.ToListAsync()
             return result |> Seq.map AccountDb.toCompanyName
+        }
+let insertInvestmentAsync :AddDbInvestment=
+    fun addInvestment->
+        task {
+            let investment = addInvestment |> InvestmentDb.fromAddInvestment
+            let! _ = investmentCollection.InsertOneAsync(investment)
+            return investment |> InvestmentDb.toInvestment
         }

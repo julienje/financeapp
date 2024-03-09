@@ -53,7 +53,21 @@ let newBalanceHandler (accountId: string) : HttpHandler =
 
             return! resp next context
         }
+let newInvestmentHandler (companyName: string) : HttpHandler =
+    fun (next: HttpFunc) (context: HttpContext) ->
+        task {
+            let! inputDto = context.BindJsonAsync<AddInvestmentDto>()
 
+            let! result =
+                taskResult {
+                    let! toDomain = InvestmentDto.toDomain companyName inputDto
+                    return! Service.handleAddInvestmentAsync MongoDb.getAllCompanyAsync MongoDb.insertInvestmentAsync toDomain
+                }
+
+            let resp = treatDtoResponse context result InvestmentDto.fromDomain
+
+            return! resp next context
+        }
 let getBalancesAccountHandler (accountId: string) : HttpHandler =
     fun (next: HttpFunc) (context: HttpContext) ->
         task {
@@ -186,7 +200,8 @@ let webApp =
 
                         return! resp next context
                     }
-                routef "/accounts/%s/balances/new" newBalanceHandler ]
+                routef "/accounts/%s/balances/new" newBalanceHandler
+                routef "/companies/%s/investment/new" newInvestmentHandler ]
           DELETE >=> choose [ routef "/balances/%s" deleteBalancesAccountHandler ] ]
 
 let configureCors (builder: CorsPolicyBuilder) =
