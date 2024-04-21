@@ -1,6 +1,7 @@
 ﻿namespace FinanceApp.DtoTypes
 
 open System
+open System.Runtime.InteropServices.JavaScript
 open System.Text.Json.Serialization
 open FinanceApp.DomainType
 open FsToolkit.ErrorHandling
@@ -68,6 +69,21 @@ type InvestmentDto =
       CompanyName: string
       AmountInChf: decimal
       InvestmentDate: string }
+
+[<JsonFSharpConverter>]
+type ProfitMoneyDto =
+    { InvestmentInChf: decimal
+      WealthInChf: decimal }
+
+type CompanyProfitDto =
+    { Profit: ProfitMoneyDto
+      Company: string
+      Details: WealthAccountDto seq }
+
+type ProfitDto =
+    { Profit: ProfitMoneyDto
+      Details: CompanyProfitDto seq
+      ProfitDate: string }
 
 module Utility =
     let convertDateTime (input: DateTime) : string = input.ToString("o")
@@ -162,3 +178,25 @@ module InvestmentDto =
           CompanyName = investment.Company |> CompanyName.value
           AmountInChf = investment.Amount |> ChfMoney.value |> decimal
           InvestmentDate = investment.Date |> InvestmentDate.value |> Utility.convertDateTime }
+
+module ProfitDto =
+    let convertProfitMoney (profitMoney: ProfitMoney) : ProfitMoneyDto =
+        { InvestmentInChf = profitMoney.Investment |> ChfMoney.value |> decimal
+          WealthInChf = profitMoney.Wealth |> ChfMoney.value |> decimal }
+
+    let fromDomain (profit: Profit) : ProfitDto =
+        let profitMoney = convertProfitMoney profit.Profit
+
+        let companyDetails =
+            profit.Details
+            |> Seq.map (fun companyProfit ->
+                let wealthAccount =
+                    companyProfit.Details
+                    |> Seq.map(WealthAccountDto.fromDomain)
+                { Profit = companyProfit.Profit |> convertProfitMoney
+                  Company = companyProfit.CompanyName |> CompanyName.value
+                  Details = wealthAccount })
+
+        { Profit = profitMoney
+          Details = companyDetails
+          ProfitDate = profit.Date |> ProfitDate.value |> Utility.convertDateTime }

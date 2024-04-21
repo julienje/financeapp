@@ -156,7 +156,30 @@ let webApp =
                         let! companies = Service.handleGetCompanyAsync MongoDb.getAllCompanyAsync
                         let dto = companies |> CompanyDto.fromDomain
                         return! json dto next context
-                    } ]
+                    }
+                route "/profit"
+                >=> fun next context ->
+                    task {
+                        let! result =
+                            taskResult {
+                                let! date =
+                                    match context.TryGetQueryStringValue "date" with
+                                    | None -> Ok(ProfitDate.now)
+                                    | Some q -> ProfitDate.create q
+
+                                let! profit =
+                                    Service.handleGetInvestmentAsync
+                                        MongoDb.findAllInvestment
+                                        MongoDb.findActiveDbAccountAsync
+                                        MongoDb.findLastBalanceAccountAsync
+                                        date
+
+                                return profit
+                            }
+
+                        let resp = treatDtoResponse context result ProfitDto.fromDomain
+                        return! resp next context
+                    }]
           PUT
           >=> choose
               [ route "/accounts/new"

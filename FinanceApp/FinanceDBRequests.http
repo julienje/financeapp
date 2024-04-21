@@ -60,3 +60,8 @@ Content-Type: application/json
   "InvestmentDate": "2023-10-27T00:00:00",
   "AmountInChf": 100.00
 }
+
+###
+GET http://localhost:5165/profit
+Authorization: Bearer {{$auth.token("julien")}}
+Content-Type: application/json

@@ -13,7 +13,7 @@ type AccountName = private AccountName of string
 type CompanyName = private CompanyName of string
 type OpenDate = private OpenDate of DateTime
 type CloseDate = private CloseDate of DateTime
-type AccountType =  ThirdPillarA | ExchangeTradedFund | Unknown
+type AccountType =  ThirdPillarA | ExchangeTradedFund | AvailableToTrade | Unknown
 
 type ChfMoney =
     private
@@ -27,6 +27,7 @@ type CheckDate = private CheckDate of DateTime
 type ExportDate = private ExportDate of DateTime
 type TrendDate = private TrendDate of DateTime
 type InvestmentDate = private InvestmentDate of DateTime
+type ProfitDate = private ProfitDate of DateTime
 
 type Account =
     { Id: AccountId
@@ -78,6 +79,21 @@ type Investment ={
    Amount: ChfMoney
    Company: CompanyName
    Date: InvestmentDate
+}
+type ProfitMoney = {
+    Investment: ChfMoney
+    Wealth: ChfMoney
+}
+type CompanyProfit ={
+    CompanyName : CompanyName
+    Profit: ProfitMoney
+    Details: WealthAccount seq
+}
+
+type Profit = {
+    Profit: ProfitMoney
+    Details : CompanyProfit seq
+    Date: ProfitDate
 }
 
 module ConstrainedType =
@@ -194,6 +210,7 @@ module ExportDate =
         ConstrainedType.createDate "ExportDate" ExportDate date
 
     let now = ExportDate DateTime.Now
+    let createFromDate date = ExportDate date
 
 module TrendDate =
     let value (TrendDate date) = date
@@ -211,3 +228,10 @@ module InvestmentId =
 
     let create str =
         ConstrainedType.createString "InvestmentId" InvestmentId str
+
+module ProfitDate =
+    let value (ProfitDate date) = date
+    let createFromDate date = ProfitDate date
+    let create str =
+        ConstrainedType.createDate "ProfitDate" ProfitDate str
+    let now = ProfitDate DateTime.Now
