@@ -4,7 +4,6 @@ open System
 open System.Threading.Tasks
 open FinanceApp.DbType
 open FinanceApp.DomainType
-open MongoDB.Bson
 
 type AllAccount = GetAllDbAccount -> Task<Account seq>
 type OpenAnAccount = GetDbAccountByNameAndCompany -> OpenDbAccount -> OpenAccount -> Task<Result<Account, string>>
@@ -24,6 +23,7 @@ type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend seq>
 
 type AllCompany = GetAllInvestmentDbCompany -> Task<CompanyName seq>
 type AddAnInvestment = GetAllInvestmentDbCompany -> AddDbInvestment -> AddInvestment -> Task<Result<Investment, string>>
+type GetProfit = GetAllDbInvestment -> GetActiveDbAccount -> GetLastBalanceAccount -> ProfitDate -> Task<Profit>
 
 let private failOnError aResult =
     match aResult with
@@ -81,9 +81,9 @@ let handleGetTrendsAsync: GetTrend =
                             |> Map.tryFind accountId
                             |> Option.map (fun x ->
                                 x
-                                |> Seq.sortBy (fun b -> b.CheckDate)
+                                |> Seq.sortBy (_.CheckDate)
                                 |> Seq.tryFindBack (fun balance -> balance.CheckDate <= targetDate)
-                                |> Option.map (fun b -> b.Amount))
+                                |> Option.map (_.Amount))
                             |> Option.flatten
                             |> Option.defaultValue ChfMoney.Zero)
                         |> Seq.sum
@@ -140,7 +140,7 @@ let handleGetWealthAsync: ActualWealth =
                 accounts
                 |> Seq.map (_.Id)
                 |> Seq.map (fun a -> getLastBalanceAccount a exportDate)
-                |> Seq.map (_.Result)
+                |> Seq.map (_.Result) // TODO JJ Don't use Result in task
                 |> Seq.filter (_.IsSome)
                 |> Seq.map (_.Value)
                 |> Seq.map (fun b ->
@@ -181,9 +181,54 @@ let handleAddInvestmentAsync: AddAnInvestment =
     fun getInvestmentCompany addDbInvestment addInvestment ->
         task {
             let! companies = getInvestmentCompany ()
+
             match companies |> Seq.contains addInvestment.Company with
             | false -> return Error "The company cannot be invested"
             | true ->
                 let! investment = addDbInvestment addInvestment
                 return Ok investment
+        }
+
+let handleGetInvestmentAsync: GetProfit =
+    fun getInvestmentDb getActiveDbAccount getLastBalanceAccount profitDate ->
+        task {
+            let investmentDate = profitDate |> ProfitDate.value |> InvestmentDate.createFromDate
+            let exportDate = profitDate |> ProfitDate.value |> ExportDate.createFromDate
+            let! investment = getInvestmentDb investmentDate
+            let! accounts = getActiveDbAccount exportDate
+
+            let wealth =
+                accounts
+                |> Seq.filter (fun a -> a.Type <> Unknown)
+                |> Seq.map (fun a -> (a, getLastBalanceAccount a.Id exportDate))
+                |> Seq.map (fun (a, b) -> (a, b.Result)) //TODO JJ Use Result is not ok
+                |> Seq.filter (fun (_, b) -> b.IsSome)
+                |> Seq.map (fun (a, b) -> (a, b.Value))
+                |> Seq.map (fun (a, b) ->
+                    { Amount = b.Amount
+                      CheckDate = b.CheckDate
+                      Account = a })
+
+            let totalInvestment = investment |> Seq.sumBy (_.Amount)
+            let totalWealth = wealth |> Seq.sumBy (_.Amount)
+
+            let profit =
+                { Investment = totalInvestment
+                  Wealth = totalWealth }
+
+            let companyProfit =
+                investment
+                |> Seq.groupBy (_.Company)
+                |> Seq.map (fun (c, i) ->
+                    let wealth = wealth |> Seq.filter (fun a -> a.Account.Company = c)
+                    let profitMoney =
+                        { Investment = i |> Seq.sumBy (_.Amount)
+                          Wealth = wealth |> Seq.sumBy (_.Amount) }
+                    { CompanyName = c
+                      Profit = profitMoney
+                      Details = wealth })
+            return
+                { Profit = profit
+                  Details = companyProfit
+                  Date = profitDate }
         }

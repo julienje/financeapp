@@ -41,7 +41,7 @@ type GetAllDbBalances = Unit -> Task<AccountBalance seq>
 type DeleteDbBalance = AccountBalanceId -> Task<int64>
 type GetAllInvestmentDbCompany = Unit -> Task<CompanyName seq>
 type AddDbInvestment = AddInvestment -> Task<Investment>
-
+type GetAllDbInvestment = InvestmentDate -> Task<Investment seq>
 let private failOnError aResult =
     match aResult with
     | Ok success -> success
@@ -60,6 +60,7 @@ module AccountDb =
         | ExchangeTradedFund -> "ETF"
         | ThirdPillarA -> "3A"
         | Unknown -> "Unknown"
+        | AvailableToTrade -> "AvailableToTrade"
 
     let toAccount (accountDb: AccountDb) : Account =
         let accountName = AccountName.create accountDb.Name |> failOnError

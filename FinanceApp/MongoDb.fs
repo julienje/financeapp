@@ -22,7 +22,7 @@ let private investmentCollection = db.GetCollection<InvestmentDb>("Investment")
 let private handleNull element transform =
     match box element with
     | null -> None
-    | _ -> Some (element |> transform)
+    | _ -> Some(element |> transform)
 
 let findAllAccountsAsync: GetAllDbAccount =
     fun () ->
@@ -92,6 +92,7 @@ let findActiveDbAccountAsync: GetActiveDbAccount =
     fun exportDate ->
         task {
             let date = exportDate |> ExportDate.value
+
             let nonClosedFilter =
                 Builders<AccountDb>.Filter.Eq((fun a -> a.CloseDate), Nullable())
 
@@ -159,19 +160,33 @@ let getAllBalancesAsync: GetAllDbBalances =
             let! result = find.ToListAsync()
             return result |> Seq.map BalanceAccountDb.toBalanceAccount
         }
-let getAllCompanyAsync: GetAllInvestmentDbCompany=
-    fun()->
+
+let getAllCompanyAsync: GetAllInvestmentDbCompany =
+    fun () ->
         task {
-            let field = ExpressionFieldDefinition<AccountDb, string>(fun (a:AccountDb) -> a.Company)
-            let filter = Builders<AccountDb>.Filter.In((fun a -> a.Type), ["3A"; "ETF"])
+            let field =
+                ExpressionFieldDefinition<AccountDb, string>(fun (a: AccountDb) -> a.Company)
+
+            let filter = Builders<AccountDb>.Filter.In((fun a -> a.Type), [ "3A"; "ETF" ])
             let! find = accountCollection.DistinctAsync(field, filter)
             let! result = find.ToListAsync()
             return result |> Seq.map AccountDb.toCompanyName
         }
-let insertInvestmentAsync :AddDbInvestment=
-    fun addInvestment->
+
+let insertInvestmentAsync: AddDbInvestment =
+    fun addInvestment ->
         task {
             let investment = addInvestment |> InvestmentDb.fromAddInvestment
             let! _ = investmentCollection.InsertOneAsync(investment)
             return investment |> InvestmentDb.toInvestment
+        }
+
+let findAllInvestment: GetAllDbInvestment =
+    fun investmentDate ->
+        task {
+            let date = investmentDate |> InvestmentDate.value
+            let before = Builders<InvestmentDb>.Filter.Lte((fun a -> a.InvestmentDate), date)
+            let! find = investmentCollection.FindAsync(before)
+            let! result = find.ToListAsync()
+            return result |> Seq.map InvestmentDb.toInvestment
         }
