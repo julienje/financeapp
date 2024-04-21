@@ -53,6 +53,7 @@ module AccountDb =
         | null -> Unknown
         | "3A" -> ThirdPillarA
         | "ETF" -> ExchangeTradedFund
+        | "AvailableToTrade" -> AvailableToTrade
         | _ -> Unknown
 
     let convertTypeFromDomain (accountType: AccountType) =
