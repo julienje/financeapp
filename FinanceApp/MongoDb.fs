@@ -161,7 +161,7 @@ let getAllBalancesAsync: GetAllDbBalances =
             return result |> Seq.map BalanceAccountDb.toBalanceAccount
         }
 
-let getAllCompanyAsync: GetAllInvestmentDbCompany =
+let getAllInvestmentCompanyAsync: GetAllInvestmentDbCompany =
     fun () ->
         task {
             let field =
