@@ -21,7 +21,7 @@ type DeleteBalance = DeleteDbBalance -> AccountBalanceId -> Task<Boolean>
 
 type GetTrend = GetAllDbAccount -> GetAllDbBalances -> Task<Trend seq>
 
-type AllCompany = GetAllInvestmentDbCompany -> Task<CompanyName seq>
+type AllInvestmentCompany = GetAllInvestmentDbCompany -> Task<CompanyName seq>
 type AddAnInvestment = GetAllInvestmentDbCompany -> AddDbInvestment -> AddInvestment -> Task<Result<Investment, string>>
 type GetProfit = GetAllDbInvestment -> GetActiveDbAccount -> GetLastBalanceAccount -> ProfitDate -> Task<Profit>
 
@@ -175,7 +175,7 @@ let handleDeleteBalanceAsync: DeleteBalance =
             return deleted > 0
         }
 
-let handleGetCompanyAsync: AllCompany = fun db -> task { return! db () }
+let handleGetInvestmentCompanyAsync: AllInvestmentCompany = fun db -> task { return! db () }
 
 let handleAddInvestmentAsync: AddAnInvestment =
     fun getInvestmentCompany addDbInvestment addInvestment ->

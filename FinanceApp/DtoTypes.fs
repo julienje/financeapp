@@ -75,11 +75,13 @@ type ProfitMoneyDto =
     { InvestmentInChf: decimal
       WealthInChf: decimal }
 
+[<JsonFSharpConverter>]
 type CompanyProfitDto =
     { Profit: ProfitMoneyDto
       Company: string
       Details: WealthAccountDto seq }
 
+[<JsonFSharpConverter>]
 type ProfitDto =
     { Profit: ProfitMoneyDto
       Details: CompanyProfitDto seq
@@ -158,7 +160,7 @@ module TrendDto =
               CheckDate = x.Date |> TrendDate.value |> Utility.convertDateTime })
 
 module CompanyDto =
-    let fromDomain (domain: CompanyName seq) = domain |> Seq.map CompanyName.value
+    let fromDomain (domain: CompanyName seq) = domain |> Seq.map (fun x-> { Name = x |> CompanyName.value } )
 
 module InvestmentDto =
     let toDomain companyName (input: AddInvestmentDto) =
