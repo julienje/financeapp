@@ -20,7 +20,7 @@
         <PackageReference Include="FsToolkit.ErrorHandling.TaskResult" Version="4.16.0" />
         <PackageReference Include="Giraffe" Version="6.4.0" />
         <PackageReference Include="Microsoft.Identity.Web" Version="2.21.0" />
-        <PackageReference Include="MongoDB.Driver" Version="2.27.0" />
+        <PackageReference Include="MongoDB.Driver" Version="2.28.0" />
         <PackageReference Update="FSharp.Core" Version="8.0.301" />
     </ItemGroup>
 
