@@ -3,6 +3,7 @@ module FinanceApp.App
 open System.Net
 open System.Text.Json
 open System.Text.Json.Serialization
+open System.Threading.Tasks
 open FinanceApp
 open FinanceApp.DomainType
 open FinanceApp.DtoTypes
@@ -18,13 +19,24 @@ open Oxpecker
 open FsToolkit.ErrorHandling
 open Microsoft.Identity.Web
 
-let asdf (context: HttpContext) call convertToDto : EndpointHandler =
-    call context
+let resultHandler call (context: HttpContext) : EndpointHandler =
+    fun (context: HttpContext) ->
+        task {
+            let! resp = call context
+            match resp with
+            | Ok res ->
+                context.SetStatusCode 200
+                return! context.WriteJson res
+            | Error e ->
+                context.SetStatusCode 400
+                return! context.WriteJson { Error = e }
+        }
+
+let convertResponse (context : HttpContext) resp =
     match resp with
     | Ok res ->
         context.SetStatusCode 200
-        let dto = convertToDto res
-        json dto
+        json res
     | Error e ->
         context.SetStatusCode 400
         json { Error = e }
@@ -49,20 +61,37 @@ let treatResultResponse (context: HttpContext) resp : EndpointHandler =
         text $"""{{ "error": "{e}"}}"""
 
 let convertSeq convertToDto seq = seq |> Seq.map convertToDto
+let newBalanceHandlerTest
+    (accountId: string)
+    (context: HttpContext)
+    : Task<Result<AccountBalanceDto, string>> =
+
+    taskResult {
+        let! inputDto = context.BindJson<AddBalanceDto>()
+        let! toDomain = AddBalanceDto.toDomain accountId inputDto
+
+        let! result =
+            Service.handleAddBalanceAsync
+                MongoDb.findAccountAsync
+                MongoDb.insertBalanceAsync
+                toDomain
+
+        return result |> AccountBalanceDto.fromDomain
+    }
 
 let newBalanceHandler (accountId: string) : EndpointHandler =
     fun (context: HttpContext) ->
         task {
-            let! inputDto = context.BindJson<AddBalanceDto>()
+
 
             let! result =
                 taskResult {
+                    let! inputDto = context.BindJson<AddBalanceDto>()
                     let! toDomain = AddBalanceDto.toDomain accountId inputDto
-                    return! Service.handleAddBalanceAsync MongoDb.findAccountAsync MongoDb.insertBalanceAsync toDomain
+                    let! result = Service.handleAddBalanceAsync MongoDb.findAccountAsync MongoDb.insertBalanceAsync toDomain
+                    return result |> AccountBalanceDto.fromDomain
                 }
-
-            let resp = treatDtoResponse context result AccountBalanceDto.fromDomain
-            return! resp
+            return convertResponse context result
         }
 
 let newInvestmentHandler (companyName: string) : EndpointHandler =
@@ -152,7 +181,10 @@ let handleGetWealth: EndpointHandler =
 let handleGetTrend: EndpointHandler =
     fun (context: HttpContext) ->
         task {
-            let! trend = Service.handleGetTrendsAsync MongoDb.findAllAccountsAsync MongoDb.getAllBalancesAsync
+            let! trend =
+                Service.handleGetTrendsAsync
+                    MongoDb.findAllAccountsAsync
+                    MongoDb.getAllBalancesAsync
 
             let dto = trend |> TrendDto.fromDomain
             return! context.WriteJson dto
@@ -161,7 +193,9 @@ let handleGetTrend: EndpointHandler =
 let handleGetInvestmentCompanies: EndpointHandler =
     fun (context: HttpContext) ->
         task {
-            let! companies = Service.handleGetInvestmentCompanyAsync MongoDb.getAllInvestmentCompanyAsync
+            let! companies =
+                Service.handleGetInvestmentCompanyAsync MongoDb.getAllInvestmentCompanyAsync
+
             let dto = companies |> CompanyDto.fromDomain
             return! context.WriteJson dto
         }
@@ -222,7 +256,8 @@ let handlePutCloseAccounts: EndpointHandler =
                 taskResult {
                     let! toDomain = CloseAccountDto.toDomain inputDto
 
-                    let! closeAccount = Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
+                    let! closeAccount =
+                        Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
 
                     return closeAccount
                 }
