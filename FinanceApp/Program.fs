@@ -19,100 +19,55 @@ open Oxpecker
 open FsToolkit.ErrorHandling
 open Microsoft.Identity.Web
 
-let resultHandler call (context: HttpContext) : EndpointHandler =
-    fun (context: HttpContext) ->
-        task {
-            let! resp = call context
-            match resp with
-            | Ok res ->
-                context.SetStatusCode 200
-                return! context.WriteJson res
-            | Error e ->
-                context.SetStatusCode 400
-                return! context.WriteJson { Error = e }
-        }
 
-let convertResponse (context : HttpContext) resp =
+let convertResponse (context: HttpContext) resp =
     match resp with
     | Ok res ->
         context.SetStatusCode 200
-        json res
+        context.WriteJson res
     | Error e ->
         context.SetStatusCode 400
-        json { Error = e }
-
-let treatDtoResponse (context: HttpContext) resp convertToDto : EndpointHandler =
-    match resp with
-    | Ok res ->
-        context.SetStatusCode 200
-        let dto = convertToDto res
-        json dto
-    | Error e ->
-        context.SetStatusCode 400
-        json { Error = e }
-
-let treatResultResponse (context: HttpContext) resp : EndpointHandler =
-    match resp with
-    | Ok res ->
-        context.SetStatusCode 200
-        text ""
-    | Error e ->
-        context.SetStatusCode 400
-        text $"""{{ "error": "{e}"}}"""
+        context.WriteJson { Error = e }
 
 let convertSeq convertToDto seq = seq |> Seq.map convertToDto
-let newBalanceHandlerTest
-    (accountId: string)
-    (context: HttpContext)
-    : Task<Result<AccountBalanceDto, string>> =
-
-    taskResult {
-        let! inputDto = context.BindJson<AddBalanceDto>()
-        let! toDomain = AddBalanceDto.toDomain accountId inputDto
-
-        let! result =
-            Service.handleAddBalanceAsync
-                MongoDb.findAccountAsync
-                MongoDb.insertBalanceAsync
-                toDomain
-
-        return result |> AccountBalanceDto.fromDomain
-    }
 
 let newBalanceHandler (accountId: string) : EndpointHandler =
     fun (context: HttpContext) ->
         task {
-
-
             let! result =
                 taskResult {
                     let! inputDto = context.BindJson<AddBalanceDto>()
                     let! toDomain = AddBalanceDto.toDomain accountId inputDto
-                    let! result = Service.handleAddBalanceAsync MongoDb.findAccountAsync MongoDb.insertBalanceAsync toDomain
+
+                    let! result =
+                        Service.handleAddBalanceAsync
+                            MongoDb.findAccountAsync
+                            MongoDb.insertBalanceAsync
+                            toDomain
+
                     return result |> AccountBalanceDto.fromDomain
                 }
-            return convertResponse context result
+            return! convertResponse context result
         }
 
 let newInvestmentHandler (companyName: string) : EndpointHandler =
     fun (context: HttpContext) ->
         task {
-            let! inputDto = context.BindJson<AddInvestmentDto>()
-
             let! result =
                 taskResult {
+                    let! inputDto = context.BindJson<AddInvestmentDto>()
                     let! toDomain = InvestmentDto.toDomain companyName inputDto
 
-                    return!
+                    let! result =
                         Service.handleAddInvestmentAsync
                             MongoDb.getAllInvestmentCompanyAsync
                             MongoDb.insertInvestmentAsync
                             toDomain
+
+                    return result |> InvestmentDto.fromDomain
                 }
 
-            let resp = treatDtoResponse context result InvestmentDto.fromDomain
-
-            return! resp
+            return! convertResponse context result
         }
 
 let getBalancesAccountHandler (accountId: string) : EndpointHandler =
@@ -129,9 +84,7 @@ let getBalancesAccountHandler (accountId: string) : EndpointHandler =
                             accountIdDomain
                 }
 
-            let resp = treatDtoResponse context result (convertSeq AccountBalanceDto.fromDomain)
-
-            return! resp
+            return! convertResponse context result
         }
 
 let deleteBalancesAccountHandler (balanceId: string) : EndpointHandler =
@@ -143,8 +96,7 @@ let deleteBalancesAccountHandler (balanceId: string) : EndpointHandler =
                     return! Service.handleDeleteBalanceAsync MongoDb.deleteBalanceAsync idDomain
                 }
 
-            let resp = treatResultResponse context result
-            return! resp
+            return! convertResponse context result
         }
 
 let handleGetAccounts: EndpointHandler =
@@ -174,8 +126,7 @@ let handleGetWealth: EndpointHandler =
                     return wealth
                 }
 
-            let resp = treatDtoResponse context result WealthDto.fromDomain
-            return! resp
+            return! convertResponse context result
         }
 
 let handleGetTrend: EndpointHandler =
@@ -220,8 +171,7 @@ let handleGetInvestmentProfit: EndpointHandler =
                     return profit
                 }
 
-            let resp = treatDtoResponse context result ProfitDto.fromDomain
-            return! resp
+            return! convertResponse context result
         }
 
 let handlePutNewAccounts: EndpointHandler =
@@ -242,9 +192,7 @@ let handlePutNewAccounts: EndpointHandler =
                     return domain
                 }
 
-            let resp = treatDtoResponse context result AccountDto.fromDomain
-
-            return! resp
+            return! convertResponse context result
         }
 
 let handlePutCloseAccounts: EndpointHandler =
@@ -262,25 +210,25 @@ let handlePutCloseAccounts: EndpointHandler =
                     return closeAccount
                 }
 
-            let resp = treatDtoResponse context result AccountDto.fromDomain
-
-            return! resp
+            return! convertResponse context result
         }
 
 let webApp =
     [ GET
-          [ route "/accounts" <| handleGetAccounts
-            route "/wealth" <| handleGetWealth
-            route "/trend" <| handleGetTrend
-            routef "/accounts/%s/balances" getBalancesAccountHandler
-            route "/investment/companies" <| handleGetInvestmentCompanies
-            route "/investment/profit" <| handleGetInvestmentProfit ]
+          [ route "/accounts" handleGetAccounts
+            route "/wealth" handleGetWealth
+            route "/trend" handleGetTrend
+            routef "/accounts/{%s}/balances" getBalancesAccountHandler
+            route "/investment/companies" handleGetInvestmentCompanies
+            route "/investment/profit" handleGetInvestmentProfit ]
       PUT
-          [ route "/accounts/new" <| handlePutNewAccounts
-            route "/accounts/close" <| handlePutCloseAccounts
-            routef "/accounts/%s/balances/new" newBalanceHandler
-            routef "/investment/companies/%s/new" newInvestmentHandler ]
-      DELETE [ routef "/balances/%s" deleteBalancesAccountHandler ] ]
+          [ route "/accounts/new" handlePutNewAccounts
+            route "/accounts/close" handlePutCloseAccounts
+            routef "/accounts/{%s}/balances/new" newBalanceHandler
+            routef "/investment/companies/{%s}/new" newInvestmentHandler
+          ]
+      DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ]
+      ]
 
 let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
