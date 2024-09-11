@@ -5,8 +5,10 @@ open System.IO
 open System.Net
 open System.Net.Http
 open System.Security.Claims
+open System.Text
 open System.Text.Json.Nodes
 open System.Threading.Tasks
+open FinanceApp.DtoTypes
 open Microsoft.AspNetCore.Authentication
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.TestHost
@@ -26,6 +28,14 @@ let newBalancePayload amount =
     $"""
 {{
   "CheckDate": "{DateTime.UtcNow}",
+  "AmountInChf": {amount}
+}}
+"""
+
+let newInvestmentPayload amount =
+    $"""
+{{
+  "InvestmentDate": "{DateTime.UtcNow}",
   "AmountInChf": {amount}
 }}
 """
@@ -70,11 +80,11 @@ let httpGet (path: string) (client: HttpClient) = path |> client.GetAsync |> run
 let httpDelete (path: string) (client: HttpClient) = path |> client.DeleteAsync |> runTask
 
 let httpPost (path: string) (payload: string) (client: HttpClient) =
-    use content = new StringContent(payload)
+    use content = new StringContent(payload, Encoding.UTF8, "application/json")
     client.PostAsync(path, content) |> runTask
 
-let httpPut (path: string) (payload: string) (client: HttpClient) =
-    use content = new StringContent(payload)
+let httpPut(path: string) (payload: string) (client: HttpClient) =
+    use content = new StringContent(payload, Encoding.UTF8, "application/json")
     client.PutAsync(path, content) |> runTask
 
 let isStatus (code: HttpStatusCode) (response: HttpResponseMessage) =
@@ -127,7 +137,11 @@ type MongoDbFixture() =
 // Tests wit test container
 
 type TestContainerTest(mongoDb: MongoDbFixture) =
-    do Environment.SetEnvironmentVariable("CONNECTION_STRING", mongoDb.MyContainer.GetConnectionString())
+    do
+        Environment.SetEnvironmentVariable(
+            "CONNECTION_STRING",
+            mongoDb.MyContainer.GetConnectionString()
+        )
 
     [<Fact>]
     member this.``Smoke test``() =
@@ -185,7 +199,6 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> readText
         |> shouldJsonArrayLengthBe 1
 
-
         client
         |> httpDelete $"/balances/{balanceAccountA}"
         |> ensureSuccess
@@ -197,6 +210,27 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> ensureSuccess
         |> readText
         |> shouldJsonArrayLengthBe 0
+
+        let investmentA= 12.0m
+        //
+        // client
+        // |> httpGet $"/investment/companies"
+        // |> ensureSuccess
+        // |> readText
+        // |> shouldJsonArrayLengthBe 1
+        //
+        // client
+        // |> httpPut $"/investment/companies/UBS/new" (newInvestmentPayload investmentA)
+        // |> ensureSuccess
+        // |> readText
+        // |> shouldHaveId
+        // |> ignore
+        //
+        // client
+        // |> httpGet $"/investment/profit"
+        // |> ensureSuccess
+        // |> readText
+        // |> shouldJsonArrayLengthBe 1
 
         ()
 

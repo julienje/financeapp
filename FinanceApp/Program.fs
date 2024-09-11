@@ -1,7 +1,5 @@
 module FinanceApp.App
 
-open System.Text.Json
-open System.Text.Json.Serialization
 open FinanceApp
 open FinanceApp.DomainType
 open FinanceApp.DtoTypes
@@ -10,86 +8,83 @@ open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Cors.Infrastructure
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
-open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
-open Giraffe
+open Oxpecker
 open FsToolkit.ErrorHandling
 open Microsoft.Identity.Web
 
-let treatDtoResponse (context: HttpContext) resp convertToDto : HttpHandler =
-    match resp with
-    | Ok res ->
-        context.SetStatusCode 200
-        let dto = convertToDto res
-        json dto
-    | Error e ->
-        context.SetStatusCode 400
-        text $"""{{ "error": "{e}"}}"""
 
-let treatResultResponse (context: HttpContext) resp : HttpHandler =
+let convertResponse (context: HttpContext) resp =
     match resp with
     | Ok res ->
         context.SetStatusCode 200
-        text ""
+        context.WriteJson res
     | Error e ->
         context.SetStatusCode 400
-        text $"""{{ "error": "{e}"}}"""
+        context.WriteJson { Error = e }
 
 let convertSeq convertToDto seq = seq |> Seq.map convertToDto
 
-let newBalanceHandler (accountId: string) : HttpHandler =
-    fun (next: HttpFunc) (context: HttpContext) ->
+let newBalanceHandler (accountId: string) : EndpointHandler =
+    fun (context: HttpContext) ->
         task {
-            let! inputDto = context.BindJsonAsync<AddBalanceDto>()
-
             let! result =
                 taskResult {
+                    let! inputDto = context.BindJson<AddBalanceDto>()
                     let! toDomain = AddBalanceDto.toDomain accountId inputDto
-                    return! Service.handleAddBalanceAsync MongoDb.findAccountAsync MongoDb.insertBalanceAsync toDomain
+
+                    let! result =
+                        Service.handleAddBalanceAsync
+                            MongoDb.findAccountAsync
+                            MongoDb.insertBalanceAsync
+                            toDomain
+
+                    return result |> AccountBalanceDto.fromDomain
                 }
-
-            let resp = treatDtoResponse context result AccountBalanceDto.fromDomain
-
-            return! resp next context
+            return! convertResponse context result
         }
-let newInvestmentHandler (companyName: string) : HttpHandler =
-    fun (next: HttpFunc) (context: HttpContext) ->
-        task {
-            let! inputDto = context.BindJsonAsync<AddInvestmentDto>()
 
+let newInvestmentHandler (companyName: string) : EndpointHandler =
+    fun (context: HttpContext) ->
+        task {
             let! result =
                 taskResult {
+                    let! inputDto = context.BindJson<AddInvestmentDto>()
                     let! toDomain = InvestmentDto.toDomain companyName inputDto
-                    return! Service.handleAddInvestmentAsync MongoDb.getAllInvestmentCompanyAsync MongoDb.insertInvestmentAsync toDomain
+
+                    let! result =
+                        Service.handleAddInvestmentAsync
+                            MongoDb.getAllInvestmentCompanyAsync
+                            MongoDb.insertInvestmentAsync
+                            toDomain
+
+                    return result |> InvestmentDto.fromDomain
                 }
 
-            let resp = treatDtoResponse context result InvestmentDto.fromDomain
-
-            return! resp next context
+            return! convertResponse context result
         }
-let getBalancesAccountHandler (accountId: string) : HttpHandler =
-    fun (next: HttpFunc) (context: HttpContext) ->
+
+let getBalancesAccountHandler (accountId: string) : EndpointHandler =
+    fun (context: HttpContext) ->
         task {
             let! result =
                 taskResult {
                     let! accountIdDomain = AccountId.create accountId
 
-                    return!
+                    let! result=
                         Service.handleGetAllBalanceForAnAccountAsync
                             MongoDb.findAccountAsync
                             MongoDb.findAllBalancesForAnAccountAsync
                             accountIdDomain
+                    return result |> convertSeq AccountBalanceDto.fromDomain
                 }
 
-            let resp =
-                treatDtoResponse context result (convertSeq AccountBalanceDto.fromDomain)
-
-            return! resp next context
+            return! convertResponse context result
         }
 
-let deleteBalancesAccountHandler (balanceId: string) : HttpHandler =
-    fun (next: HttpFunc) (context: HttpContext) ->
+let deleteBalancesAccountHandler (balanceId: string) : EndpointHandler =
+    fun (context: HttpContext) ->
         task {
             let! result =
                 taskResult {
@@ -97,142 +92,146 @@ let deleteBalancesAccountHandler (balanceId: string) : HttpHandler =
                     return! Service.handleDeleteBalanceAsync MongoDb.deleteBalanceAsync idDomain
                 }
 
-            let resp = treatResultResponse context result
-            return! resp next context
+            return! convertResponse context result
         }
 
-let mustBeLoggedIn =
-    requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
+let handleGetAccounts: EndpointHandler =
+    fun (context: HttpContext) ->
+        task {
+            let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAccountsAsync
+            let dto = accounts |> Seq.map AccountDto.fromDomain
+            return! context.WriteJson dto
+        }
+
+let handleGetWealth: EndpointHandler =
+    fun (context: HttpContext) ->
+        task {
+            let! result =
+                taskResult {
+                    let! date =
+                        match context.TryGetQueryValue "date" with
+                        | None -> Ok(ExportDate.now)
+                        | Some q -> ExportDate.create q
+
+                    let! wealth =
+                        Service.handleGetWealthAsync
+                            MongoDb.findActiveDbAccountAsync
+                            MongoDb.findLastBalanceAccountAsync
+                            date
+
+                    return wealth |> WealthDto.fromDomain
+                }
+
+            return! convertResponse context result
+        }
+
+let handleGetTrend: EndpointHandler =
+    fun (context: HttpContext) ->
+        task {
+            let! trend =
+                Service.handleGetTrendsAsync
+                    MongoDb.findAllAccountsAsync
+                    MongoDb.getAllBalancesAsync
+
+            let dto = trend |> TrendDto.fromDomain
+            return! context.WriteJson dto
+        }
+
+let handleGetInvestmentCompanies: EndpointHandler =
+    fun (context: HttpContext) ->
+        task {
+            let! companies =
+                Service.handleGetInvestmentCompanyAsync MongoDb.getAllInvestmentCompanyAsync
+
+            let dto = companies |> CompanyDto.fromDomain
+            return! context.WriteJson dto
+        }
+
+let handleGetInvestmentProfit: EndpointHandler =
+    fun (context: HttpContext) ->
+        task {
+            let! result =
+                taskResult {
+                    let! date =
+                        match context.TryGetQueryValue "date" with
+                        | None -> Ok(ProfitDate.now)
+                        | Some q -> ProfitDate.create q
+
+                    let! profit =
+                        Service.handleGetInvestmentAsync
+                            MongoDb.findAllInvestment
+                            MongoDb.findActiveDbAccountAsync
+                            MongoDb.findLastBalanceAccountAsync
+                            date
+
+                    return profit
+                }
+
+            return! convertResponse context result
+        }
+
+let handlePutNewAccounts: EndpointHandler =
+    fun (context: HttpContext) ->
+        task {
+            let! result =
+                taskResult {
+                    let! inputDto = context.BindJson<OpenAccountDto>()
+                    let! toDomain = OpenAccountDto.toDomain inputDto
+
+                    let! domain =
+                        Service.handleOpenAccountAsync
+                            MongoDb.getAccountByNameAndCompanyAsync
+                            MongoDb.insertAccountAsync
+                            toDomain
+
+                    return domain |> AccountDto.fromDomain
+                }
+
+            return! convertResponse context result
+        }
+
+let handlePutCloseAccounts: EndpointHandler =
+    fun (context: HttpContext) ->
+        task {
+            let! inputDto = context.BindJson<CloseAccountDto>()
+
+            let! result =
+                taskResult {
+                    let! toDomain = CloseAccountDto.toDomain inputDto
+
+                    let! closeAccount =
+                        Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
+
+                    return closeAccount
+                }
+
+            return! convertResponse context result
+        }
 
 let webApp =
-    mustBeLoggedIn
-    >=> choose
-        [ GET
-          >=> choose
-              [ route "/accounts"
-                >=> fun next context ->
-                    task {
-                        let! accounts = Service.handleGetAllAccountAsync MongoDb.findAllAccountsAsync
-
-                        let dto = accounts |> Seq.map AccountDto.fromDomain
-
-                        return! json dto next context
-                    }
-                route "/wealth"
-                >=> fun next context ->
-                    task {
-                        let! result =
-                            taskResult {
-                                let! date =
-                                    match context.TryGetQueryStringValue "date" with
-                                    | None -> Ok(ExportDate.now)
-                                    | Some q -> ExportDate.create q
-
-                                let! wealth =
-                                    Service.handleGetWealthAsync
-                                        MongoDb.findActiveDbAccountAsync
-                                        MongoDb.findLastBalanceAccountAsync
-                                        date
-
-                                return wealth
-                            }
-
-                        let resp = treatDtoResponse context result WealthDto.fromDomain
-                        return! resp next context
-                    }
-                route "/trend"
-                >=> fun next context ->
-                    task {
-                        let! trend =
-                            Service.handleGetTrendsAsync MongoDb.findAllAccountsAsync MongoDb.getAllBalancesAsync
-
-                        let dto = trend |> TrendDto.fromDomain
-                        return! json dto next context
-                    }
-                routef "/accounts/%s/balances" getBalancesAccountHandler
-                route "/investment/companies"
-                >=> fun next context ->
-                    task {
-                        let! companies = Service.handleGetInvestmentCompanyAsync MongoDb.getAllInvestmentCompanyAsync
-                        let dto = companies |> CompanyDto.fromDomain
-                        return! json dto next context
-                    }
-                route "/investment/profit"
-                >=> fun next context ->
-                    task {
-                        let! result =
-                            taskResult {
-                                let! date =
-                                    match context.TryGetQueryStringValue "date" with
-                                    | None -> Ok(ProfitDate.now)
-                                    | Some q -> ProfitDate.create q
-
-                                let! profit =
-                                    Service.handleGetInvestmentAsync
-                                        MongoDb.findAllInvestment
-                                        MongoDb.findActiveDbAccountAsync
-                                        MongoDb.findLastBalanceAccountAsync
-                                        date
-
-                                return profit
-                            }
-
-                        let resp = treatDtoResponse context result ProfitDto.fromDomain
-                        return! resp next context
-                    }]
-          PUT
-          >=> choose
-              [ route "/accounts/new"
-                >=> fun next context ->
-                    task {
-                        let! inputDto = context.BindJsonAsync<OpenAccountDto>()
-
-                        let! result =
-                            taskResult {
-                                let! toDomain = OpenAccountDto.toDomain inputDto
-
-                                let! domain =
-                                    Service.handleOpenAccountAsync
-                                        MongoDb.getAccountByNameAndCompanyAsync
-                                        MongoDb.insertAccountAsync
-                                        toDomain
-
-                                return domain
-                            }
-
-                        let resp = treatDtoResponse context result AccountDto.fromDomain
-
-                        return! resp next context
-                    }
-                route "/accounts/close"
-                >=> fun next context ->
-                    task {
-                        let! inputDto = context.BindJsonAsync<CloseAccountDto>()
-
-                        let! result =
-                            taskResult {
-                                let! toDomain = CloseAccountDto.toDomain inputDto
-
-                                let! closeAccount =
-                                    Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
-
-                                return closeAccount
-                            }
-
-                        let resp = treatDtoResponse context result AccountDto.fromDomain
-
-                        return! resp next context
-                    }
-                routef "/accounts/%s/balances/new" newBalanceHandler
-                routef "/investment/companies/%s/new" newInvestmentHandler ]
-          DELETE >=> choose [ routef "/balances/%s" deleteBalancesAccountHandler ] ]
+    [ GET
+          [ route "/accounts" handleGetAccounts
+            route "/wealth" handleGetWealth
+            route "/trend" handleGetTrend
+            routef "/accounts/{%s}/balances" getBalancesAccountHandler
+            route "/investment/companies" handleGetInvestmentCompanies
+            route "/investment/profit" handleGetInvestmentProfit ]
+      PUT
+          [ route "/accounts/new" handlePutNewAccounts
+            route "/accounts/close" handlePutCloseAccounts
+            routef "/accounts/{%s}/balances/new" newBalanceHandler
+            routef "/investment/companies/{%s}/new" newInvestmentHandler
+          ]
+      DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ]
+      ]
 
 let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
 
 let configureApp (app: IApplicationBuilder) =
     // let env = app.ApplicationServices.GetService<IHostEnvironment>()
-    app.UseCors(configureCors).UseAuthentication().UseGiraffe webApp
+    app.UseCors(configureCors).UseAuthentication().UseRouting().UseOxpecker(webApp)
+    |> ignore
 
 let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
     option.Instance <- "https://login.microsoftonline.com"
@@ -240,15 +239,10 @@ let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
     option.TenantId <- "0829ce3c-dd9d-45a5-a7e4-b8fb69179085"
 
 let configureServices (services: IServiceCollection) =
-    // Add Giraffe dependencies
-    let jsonOptions = JsonSerializerOptions()
-    jsonOptions.Converters.Add(JsonFSharpConverter())
-
     services
-        .AddGiraffe()
-        .AddSingleton(jsonOptions)
+        .AddRouting()
+        .AddOxpecker()
         .AddCors()
-        .AddSingleton<Json.ISerializer, SystemTextJson.Serializer>()
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApi((fun o -> ()), configureMicrosoftAccount)
     |> ignore

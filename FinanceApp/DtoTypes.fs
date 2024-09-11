@@ -8,6 +8,10 @@ open FsToolkit.ErrorHandling
 open Microsoft.FSharp.Core
 
 [<JsonFSharpConverter>]
+type ErrorDto =
+    { Error: string }
+
+[<JsonFSharpConverter>]
 type AccountDto =
     { Id: string
       Name: string
