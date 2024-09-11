@@ -211,12 +211,6 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> readText
         |> shouldJsonArrayLengthBe 0
 
-        let newInvestmentAccount =
-            (client
-             |> httpPut "/accounts/new" (newAccountPayload "AccountB")
-             |> ensureSuccess
-             |> readText
-             |> shouldHaveId)
         let investmentA= 12.0m
         //
         // client
