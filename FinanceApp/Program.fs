@@ -1,9 +1,5 @@
 module FinanceApp.App
 
-open System.Net
-open System.Text.Json
-open System.Text.Json.Serialization
-open System.Threading.Tasks
 open FinanceApp
 open FinanceApp.DomainType
 open FinanceApp.DtoTypes
@@ -12,7 +8,6 @@ open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Cors.Infrastructure
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
-open Microsoft.Extensions.Configuration
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
 open Oxpecker
@@ -77,11 +72,12 @@ let getBalancesAccountHandler (accountId: string) : EndpointHandler =
                 taskResult {
                     let! accountIdDomain = AccountId.create accountId
 
-                    return!
+                    let! result=
                         Service.handleGetAllBalanceForAnAccountAsync
                             MongoDb.findAccountAsync
                             MongoDb.findAllBalancesForAnAccountAsync
                             accountIdDomain
+                    return result |> convertSeq AccountBalanceDto.fromDomain
                 }
 
             return! convertResponse context result
@@ -123,7 +119,7 @@ let handleGetWealth: EndpointHandler =
                             MongoDb.findLastBalanceAccountAsync
                             date
 
-                    return wealth
+                    return wealth |> WealthDto.fromDomain
                 }
 
             return! convertResponse context result
@@ -177,10 +173,9 @@ let handleGetInvestmentProfit: EndpointHandler =
 let handlePutNewAccounts: EndpointHandler =
     fun (context: HttpContext) ->
         task {
-            let! inputDto = context.BindJson<OpenAccountDto>()
-
             let! result =
                 taskResult {
+                    let! inputDto = context.BindJson<OpenAccountDto>()
                     let! toDomain = OpenAccountDto.toDomain inputDto
 
                     let! domain =
@@ -189,7 +184,7 @@ let handlePutNewAccounts: EndpointHandler =
                             MongoDb.insertAccountAsync
                             toDomain
 
-                    return domain
+                    return domain |> AccountDto.fromDomain
                 }
 
             return! convertResponse context result
