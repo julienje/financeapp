@@ -1,5 +1,7 @@
 module FinanceApp.App
 
+open System.Text.Json
+open System.Text.Json.Serialization
 open FinanceApp
 open FinanceApp.DomainType
 open FinanceApp.DtoTypes
@@ -239,10 +241,12 @@ let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
     option.TenantId <- "0829ce3c-dd9d-45a5-a7e4-b8fb69179085"
 
 let configureServices (services: IServiceCollection) =
+    let options = JsonFSharpOptions.Default().WithSkippableOptionFields().ToJsonSerializerOptions()
     services
         .AddRouting()
         .AddOxpecker()
         .AddCors()
+        .AddSingleton<IJsonSerializer>(SystemTextJsonSerializer(options))
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApi((fun o -> ()), configureMicrosoftAccount)
     |> ignore
