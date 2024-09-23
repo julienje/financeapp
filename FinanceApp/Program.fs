@@ -1,6 +1,5 @@
 module FinanceApp.App
 
-open System.Text.Json
 open System.Text.Json.Serialization
 open FinanceApp
 open FinanceApp.DomainType
@@ -166,7 +165,7 @@ let handleGetInvestmentProfit: EndpointHandler =
                             MongoDb.findLastBalanceAccountAsync
                             date
 
-                    return profit
+                    return profit |> ProfitDto.fromDomain
                 }
 
             return! convertResponse context result
@@ -204,7 +203,7 @@ let handlePutCloseAccounts: EndpointHandler =
                     let! closeAccount =
                         Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
 
-                    return closeAccount
+                    return closeAccount |> AccountDto.fromDomain
                 }
 
             return! convertResponse context result
