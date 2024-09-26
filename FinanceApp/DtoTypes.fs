@@ -23,6 +23,7 @@ type AccountDto =
 type OpenAccountDto =
     { Name: string
       Company: string
+      Type: string option
       OpenDate: string }
 
 [<JsonFSharpConverter>]
@@ -119,8 +120,9 @@ module OpenAccountDto =
             let! nameResult = AccountName.create input.Name
             let! companyResult = CompanyName.create input.Company
             let! openDateResult = OpenDate.createFromString input.OpenDate
+            let! typeResult = AccountType.create input.Type
 
-            let domain = OpenAccount.create nameResult companyResult openDateResult
+            let domain = OpenAccount.create nameResult companyResult openDateResult typeResult
 
             return domain
         }

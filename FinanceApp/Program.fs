@@ -1,5 +1,6 @@
 module FinanceApp.App
 
+open System.Text.Json.Serialization
 open FinanceApp
 open FinanceApp.DomainType
 open FinanceApp.DtoTypes
@@ -164,7 +165,7 @@ let handleGetInvestmentProfit: EndpointHandler =
                             MongoDb.findLastBalanceAccountAsync
                             date
 
-                    return profit
+                    return profit |> ProfitDto.fromDomain
                 }
 
             return! convertResponse context result
@@ -202,7 +203,7 @@ let handlePutCloseAccounts: EndpointHandler =
                     let! closeAccount =
                         Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
 
-                    return closeAccount
+                    return closeAccount |> AccountDto.fromDomain
                 }
 
             return! convertResponse context result
@@ -239,10 +240,12 @@ let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
     option.TenantId <- "0829ce3c-dd9d-45a5-a7e4-b8fb69179085"
 
 let configureServices (services: IServiceCollection) =
+    let options = JsonFSharpOptions.Default().WithSkippableOptionFields().ToJsonSerializerOptions()
     services
         .AddRouting()
         .AddOxpecker()
         .AddCors()
+        .AddSingleton<IJsonSerializer>(SystemTextJsonSerializer(options))
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApi((fun o -> ()), configureMicrosoftAccount)
     |> ignore

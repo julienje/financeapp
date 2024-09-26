@@ -6,7 +6,9 @@ open System.Net
 open System.Net.Http
 open System.Security.Claims
 open System.Text
+open System.Text.Json
 open System.Text.Json.Nodes
+open System.Text.Json.Serialization
 open System.Threading.Tasks
 open FinanceApp.DtoTypes
 open Microsoft.AspNetCore.Authentication
@@ -20,6 +22,15 @@ let newAccountPayload name =
     $"""
 {{
   "Name": "{name}",
+  "Company": "UBS",
+  "OpenDate": "2022-01-01"
+}}"""
+
+let newAccountWitTypePayload name accountType =
+    $"""
+{{
+  "Name": "{name}",
+  "Type": "{accountType}",
   "Company": "UBS",
   "OpenDate": "2022-01-01"
 }}"""
@@ -39,6 +50,19 @@ let newInvestmentPayload amount =
   "AmountInChf": {amount}
 }}
 """
+
+let closeAccountPayload accountId =
+    $"""
+{{
+  "Id": "{accountId}",
+  "CloseDate": "{DateTime.UtcNow}"
+}}
+"""
+
+let options = JsonFSharpOptions.Default().WithSkippableOptionFields().ToJsonSerializerOptions()
+
+let read (json:string) : 'a =
+    JsonSerializer.Deserialize<'a>(json, options)
 
 // ---------------------------------
 // Helper functions
@@ -83,7 +107,7 @@ let httpPost (path: string) (payload: string) (client: HttpClient) =
     use content = new StringContent(payload, Encoding.UTF8, "application/json")
     client.PostAsync(path, content) |> runTask
 
-let httpPut(path: string) (payload: string) (client: HttpClient) =
+let httpPut (path: string) (payload: string) (client: HttpClient) =
     use content = new StringContent(payload, Encoding.UTF8, "application/json")
     client.PutAsync(path, content) |> runTask
 
@@ -159,7 +183,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
 
         let newAccountB =
             (client
-             |> httpPut "/accounts/new" (newAccountPayload "AccountB")
+             |> httpPut "/accounts/new" (newAccountWitTypePayload "AccountB" "ETF")
              |> ensureSuccess
              |> readText
              |> shouldHaveId)
@@ -191,7 +215,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> httpGet "wealth?date=2021-06-01"
         |> ensureSuccess
         |> readText
-        |> shouldPropertyHasValue "AmountInChf" (0.0m)
+        |> shouldPropertyHasValue "AmountInChf" 0.0m
 
         client
         |> httpGet $"/accounts/{newAccountA}/balances"
@@ -211,26 +235,31 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> readText
         |> shouldJsonArrayLengthBe 0
 
-        let investmentA= 12.0m
-        //
-        // client
-        // |> httpGet $"/investment/companies"
-        // |> ensureSuccess
-        // |> readText
-        // |> shouldJsonArrayLengthBe 1
-        //
-        // client
-        // |> httpPut $"/investment/companies/UBS/new" (newInvestmentPayload investmentA)
-        // |> ensureSuccess
-        // |> readText
-        // |> shouldHaveId
-        // |> ignore
-        //
-        // client
-        // |> httpGet $"/investment/profit"
-        // |> ensureSuccess
-        // |> readText
-        // |> shouldJsonArrayLengthBe 1
+        let investmentA = 12.0m
+
+        client
+        |> httpGet $"/investment/companies"
+        |> ensureSuccess
+        |> readText
+        |> shouldJsonArrayLengthBe 1
+
+        client
+        |> httpPut $"/investment/companies/UBS/new" (newInvestmentPayload investmentA)
+        |> ensureSuccess
+        |> readText
+        |> shouldHaveId
+        |> ignore
+
+        let profit : ProfitDto= client |> httpGet $"/investment/profit" |> ensureSuccess |> readText |> read
+        Assert.Equal(profit.Profit.InvestmentInChf, investmentA)
+        Assert.Equal(profit.Profit.WealthInChf, amountB)
+        Assert.Equal(profit.Details |> Seq.length,1)
+        let details = profit.Details |> Seq.head
+        Assert.Equal(details.Profit.InvestmentInChf,investmentA)
+        Assert.Equal(details.Profit.WealthInChf,amountB)
+
+        let closeAccount : AccountDto= client |> httpPut $"/accounts/close" (closeAccountPayload newAccountA) |> ensureSuccess |> readText |> read
+        Assert.True(closeAccount.CloseDate.IsSome)
 
         ()
 

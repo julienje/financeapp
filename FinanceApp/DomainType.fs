@@ -164,11 +164,23 @@ module CloseDate =
         | true -> date.Value |> CloseDate |> Some
         | false -> None
 
+module AccountType =
+    let create (accountType:string option)=
+        match accountType with
+        | None -> Unknown |> Ok
+        | Some value -> match value with
+                        | "Unknown" -> Unknown|> Ok
+                        | "3A" -> ThirdPillarA|> Ok
+                        | "ETF" -> ExchangeTradedFund|> Ok
+                        | "AvailableToTrade" -> AvailableToTrade |> Ok
+                        | _ -> Error($"Type %s{value}  is not supported")
+
+
 module OpenAccount =
-    let create accountName companyName openDate =
+    let create accountName companyName openDate accountType =
         { Name = accountName
           Company = companyName
-          Type = Unknown
+          Type = accountType
           OpenDate = openDate }
 
 module CloseAccount =
