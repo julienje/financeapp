@@ -18,51 +18,12 @@ open Microsoft.Extensions.DependencyInjection
 open Testcontainers.MongoDb
 open Xunit
 
-let newAccountPayload name =
-    $"""
-{{
-  "Name": "{name}",
-  "Company": "UBS",
-  "OpenDate": "2022-01-01"
-}}"""
-
-let newAccountWitTypePayload name accountType =
-    $"""
-{{
-  "Name": "{name}",
-  "Type": "{accountType}",
-  "Company": "UBS",
-  "OpenDate": "2022-01-01"
-}}"""
-
-let newBalancePayload amount =
-    $"""
-{{
-  "CheckDate": "{DateTime.UtcNow}",
-  "AmountInChf": {amount}
-}}
-"""
-
-let newInvestmentPayload amount =
-    $"""
-{{
-  "InvestmentDate": "{DateTime.UtcNow}",
-  "AmountInChf": {amount}
-}}
-"""
-
-let closeAccountPayload accountId =
-    $"""
-{{
-  "Id": "{accountId}",
-  "CloseDate": "{DateTime.UtcNow}"
-}}
-"""
-
 let options = JsonFSharpOptions.Default().WithSkippableOptionFields().ToJsonSerializerOptions()
 
 let read (json:string) : 'a =
     JsonSerializer.Deserialize<'a>(json, options)
+let write dto : string =
+    JsonSerializer.Serialize<'a>(dto, options)
 
 // ---------------------------------
 // Helper functions
@@ -174,63 +135,95 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
 
         client |> httpGet "/accounts" |> ensureSuccess |> readText |> shouldEqual "[]"
 
-        let newAccountA =
-            (client
-             |> httpPut "/accounts/new" (newAccountPayload "AccountA")
-             |> ensureSuccess
-             |> readText
-             |> shouldHaveId)
+        let accountA= {
+            Name = "AccountA"
+            Type = None
+            Company= "UBS"
+            OpenDate= "2022-01-01"
+        }
 
-        let newAccountB =
+        let newAccountA: AccountDto =
             (client
-             |> httpPut "/accounts/new" (newAccountWitTypePayload "AccountB" "ETF")
+             |> httpPut "/accounts/new" (accountA |> write)
              |> ensureSuccess
              |> readText
-             |> shouldHaveId)
+             |> read)
+        Assert.NotNull newAccountA.Id
+
+        let etfAccount= {
+            Name = "AccountB"
+            Type = Some "ETF"
+            Company= "UBS"
+            OpenDate= "2022-01-01"
+        }
+
+        let newAccountB : AccountDto =
+            (client
+             |> httpPut "/accounts/new" (etfAccount |> write)
+             |> ensureSuccess
+             |> readText
+             |> read)
+        Assert.NotNull newAccountB.Id
 
         let amountA = 12.0m
         let amountB = 15.5m
 
-        let balanceAccountA =
+        let newBalanceA = {
+            CheckDate = DateTime.UtcNow.ToString()
+            AmountInChf = amountA
+        }
+
+        let balanceAccountA : AccountBalanceDto =
             (client
-             |> httpPut $"/accounts/{newAccountA}/balances/new" (newBalancePayload amountA)
+             |> httpPut $"/accounts/{newAccountA.Id}/balances/new" (newBalanceA |> write)
              |> ensureSuccess
              |> readText
-             |> shouldHaveId)
+             |> read)
+        Assert.NotNull balanceAccountA.Id
 
-        client
-        |> httpPut $"/accounts/{newAccountB}/balances/new" (newBalancePayload amountB)
+        let newBalanceB = {
+            CheckDate= DateTime.UtcNow.ToString()
+            AmountInChf= amountB
+        }
+
+        let balanceAccountB : AccountBalanceDto =(client
+        |> httpPut $"/accounts/{newAccountB.Id}/balances/new" (newBalanceB |> write)
         |> ensureSuccess
         |> readText
-        |> shouldHaveId
-        |> ignore
+        |> read)
+        Assert.NotNull balanceAccountA.Id
 
-        client
+        let wealth: WealthDto=(client
         |> httpGet "wealth"
         |> ensureSuccess
         |> readText
-        |> shouldPropertyHasValue "AmountInChf" (amountA + amountB)
+        |> read)
+        Assert.Equal (wealth.AmountInChf, (amountA + amountB))
 
-        client
+        let oldWealth : WealthDto = (client
         |> httpGet "wealth?date=2021-06-01"
         |> ensureSuccess
         |> readText
-        |> shouldPropertyHasValue "AmountInChf" 0.0m
+        |> read)
 
-        client
-        |> httpGet $"/accounts/{newAccountA}/balances"
+        Assert.Equal (oldWealth.AmountInChf, 0.0m)
+
+        let balances : AccountBalanceDto seq =( client
+        |> httpGet $"/accounts/{newAccountA.Id}/balances"
         |> ensureSuccess
         |> readText
-        |> shouldJsonArrayLengthBe 1
+        |> read)
+
+        Assert.Equal (1, balances |> Seq.length)
 
         client
-        |> httpDelete $"/balances/{balanceAccountA}"
+        |> httpDelete $"/balances/{balanceAccountA.Id}"
         |> ensureSuccess
         |> readText
         |> ignore
 
         client
-        |> httpGet $"/accounts/{newAccountA}/balances"
+        |> httpGet $"/accounts/{newAccountA.Id}/balances"
         |> ensureSuccess
         |> readText
         |> shouldJsonArrayLengthBe 0
@@ -243,8 +236,12 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> readText
         |> shouldJsonArrayLengthBe 1
 
+        let investmentDto = {
+            InvestmentDate = DateTime.UtcNow.ToString()
+            AmountInChf = investmentA
+        }
         client
-        |> httpPut $"/investment/companies/UBS/new" (newInvestmentPayload investmentA)
+        |> httpPut $"/investment/companies/UBS/new" (investmentDto |> write)
         |> ensureSuccess
         |> readText
         |> shouldHaveId
@@ -258,7 +255,11 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         Assert.Equal(details.Profit.InvestmentInChf,investmentA)
         Assert.Equal(details.Profit.WealthInChf,amountB)
 
-        let closeAccount : AccountDto= client |> httpPut $"/accounts/close" (closeAccountPayload newAccountA) |> ensureSuccess |> readText |> read
+        let closeAccountDto = {
+            Id= newAccountA.Id
+            CloseDate = DateTime.UtcNow.ToString()
+        }
+        let closeAccount : AccountDto= client |> httpPut $"/accounts/close" (closeAccountDto |> write) |> ensureSuccess |> readText |> read
         Assert.True(closeAccount.CloseDate.IsSome)
 
         ()
