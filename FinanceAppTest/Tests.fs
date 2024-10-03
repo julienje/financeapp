@@ -89,23 +89,6 @@ let readText (response: HttpResponseMessage) =
 
 let shouldEqual (expected: string) (actual: string) = Assert.Equal(expected, actual)
 
-let shouldContain (expected: string) (actual: string) = Assert.True(actual.Contains expected)
-
-let shouldHaveId (actual: String) : String =
-    Assert.True(actual.Contains "Id")
-    let parsed = actual |> JsonObject.Parse
-    parsed["Id"].GetValue()
-
-let shouldPropertyHasValue (property: String) expected (payload: String) =
-    let parsed = payload |> JsonObject.Parse
-    let result = parsed[property].GetValue<Decimal>()
-    Assert.Equal(expected, result)
-
-let shouldJsonArrayLengthBe expected (payload: String) =
-    let parsed = payload |> JsonObject.Parse
-    let result = parsed.AsArray().Count
-    Assert.Equal(expected, result)
-
 type MongoDbFixture() =
 
     let myContainer =
@@ -191,7 +174,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> ensureSuccess
         |> readText
         |> read)
-        Assert.NotNull balanceAccountA.Id
+        Assert.NotNull balanceAccountB.Id
 
         let wealth: WealthDto=(client
         |> httpGet "wealth"
@@ -222,30 +205,32 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> readText
         |> ignore
 
-        client
+        let newBalances: AccountBalanceDto seq = (client
         |> httpGet $"/accounts/{newAccountA.Id}/balances"
         |> ensureSuccess
         |> readText
-        |> shouldJsonArrayLengthBe 0
+        |> read)
+        Assert.Equal (0, newBalances |> Seq.length)
 
         let investmentA = 12.0m
 
-        client
+        let investmentCompanies = (client
         |> httpGet $"/investment/companies"
         |> ensureSuccess
         |> readText
-        |> shouldJsonArrayLengthBe 1
+        |> read)
+        Assert.Equal (1, investmentCompanies |> Seq.length)
 
         let investmentDto = {
             InvestmentDate = DateTime.UtcNow.ToString()
             AmountInChf = investmentA
         }
-        client
+        let newInvestment : InvestmentDto = (client
         |> httpPut $"/investment/companies/UBS/new" (investmentDto |> write)
         |> ensureSuccess
         |> readText
-        |> shouldHaveId
-        |> ignore
+        |> read)
+        Assert.NotNull newInvestment.Id
 
         let profit : ProfitDto= client |> httpGet $"/investment/profit" |> ensureSuccess |> readText |> read
         Assert.Equal(investmentA,profit.Profit.InvestmentInChf)
