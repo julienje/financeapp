@@ -198,7 +198,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> ensureSuccess
         |> readText
         |> read)
-        Assert.Equal (wealth.AmountInChf, (amountA + amountB))
+        Assert.Equal ((amountA + amountB),wealth.AmountInChf)
 
         let oldWealth : WealthDto = (client
         |> httpGet "wealth?date=2021-06-01"
@@ -206,7 +206,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> readText
         |> read)
 
-        Assert.Equal (oldWealth.AmountInChf, 0.0m)
+        Assert.Equal (0.0m,oldWealth.AmountInChf)
 
         let balances : AccountBalanceDto seq =( client
         |> httpGet $"/accounts/{newAccountA.Id}/balances"
@@ -248,12 +248,12 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> ignore
 
         let profit : ProfitDto= client |> httpGet $"/investment/profit" |> ensureSuccess |> readText |> read
-        Assert.Equal(profit.Profit.InvestmentInChf, investmentA)
-        Assert.Equal(profit.Profit.WealthInChf, amountB)
-        Assert.Equal(profit.Details |> Seq.length,1)
+        Assert.Equal(investmentA,profit.Profit.InvestmentInChf)
+        Assert.Equal(amountB, profit.Profit.WealthInChf)
+        Assert.Equal(1, profit.Details |> Seq.length)
         let details = profit.Details |> Seq.head
-        Assert.Equal(details.Profit.InvestmentInChf,investmentA)
-        Assert.Equal(details.Profit.WealthInChf,amountB)
+        Assert.Equal(investmentA,details.Profit.InvestmentInChf)
+        Assert.Equal(amountB,details.Profit.WealthInChf)
 
         let closeAccountDto = {
             Id= newAccountA.Id
