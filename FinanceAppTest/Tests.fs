@@ -121,7 +121,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         let accountA= {
             Name = "AccountA"
             Type = None
-            Company= "UBS"
+            Company= "banka"
             OpenDate= "2022-01-01"
         }
 
@@ -136,7 +136,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         let etfAccount= {
             Name = "AccountB"
             Type = Some "ETF"
-            Company= "UBS"
+            Company= "banka"
             OpenDate= "2022-01-01"
         }
 
@@ -226,7 +226,7 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
             AmountInChf = investmentA
         }
         let newInvestment : InvestmentDto = (client
-        |> httpPut $"/investment/companies/UBS/new" (investmentDto |> write)
+        |> httpPut $"/investment/companies/banka/new" (investmentDto |> write)
         |> ensureSuccess
         |> readText
         |> read)
