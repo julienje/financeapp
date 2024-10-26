@@ -172,8 +172,15 @@ module AccountType =
                         | "Unknown" -> Unknown|> Ok
                         | "3A" -> ThirdPillarA|> Ok
                         | "ETF" -> ExchangeTradedFund|> Ok
+                        | "Available To Trade" -> AvailableToTrade |> Ok
                         | "AvailableToTrade" -> AvailableToTrade |> Ok
                         | _ -> Error($"Type %s{value}  is not supported")
+    let value accountType =
+        match accountType with
+        | Unknown -> "Unknown"
+        | AvailableToTrade -> "Available To Trade"
+        | ThirdPillarA -> "3A"
+        | ExchangeTradedFund -> "ETF"
 
 
 module OpenAccount =

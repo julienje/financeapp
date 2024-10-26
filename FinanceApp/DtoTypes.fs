@@ -17,6 +17,7 @@ type AccountDto =
       Name: string
       Company: string
       OpenDate: string
+      Type: string
       CloseDate: string option }
 
 [<JsonFSharpConverter>]
@@ -100,6 +101,7 @@ module AccountDto =
         { Id = input.Id |> AccountId.value
           Name = input.Name |> AccountName.value
           Company = input.Company |> CompanyName.value
+          Type = input.Type |> AccountType.value
           OpenDate = input.OpenDate |> OpenDate.value |> Utility.convertDateTime
           CloseDate =
             input.CloseDate
