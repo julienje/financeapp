@@ -42,6 +42,7 @@ type DeleteDbBalance = AccountBalanceId -> Task<int64>
 type GetAllInvestmentDbCompany = Unit -> Task<CompanyName seq>
 type AddDbInvestment = AddInvestment -> Task<Investment>
 type GetAllDbInvestment = InvestmentDate -> Task<Investment seq>
+type GetAllDbInvestmentForACompany = CompanyName -> Task<Investment seq>
 let private failOnError aResult =
     match aResult with
     | Ok success -> success

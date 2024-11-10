@@ -14,6 +14,8 @@ type AddAnAccountBalance =
 
 type ActualWealth = GetActiveDbAccount -> GetLastBalanceAccount -> ExportDate -> Task<Wealth>
 
+type AllInvestmentForACompany = GetAllDbInvestmentForACompany -> CompanyName -> Task<Investment seq>
+
 type AllBalanceForAnAccount =
     GetDbAccount -> GetAllDbBalancesForAnAccount -> AccountId -> Task<Result<AccountBalance seq, string>>
 
@@ -154,6 +156,12 @@ let handleGetWealthAsync: ActualWealth =
                 { Amount = total
                   Date = exportDate
                   Details = details }
+        }
+
+let handleGetInvestmentPerCompanyAsync : AllInvestmentForACompany=
+    fun getDbInvestmentForACompany company ->
+        task {
+            return! getDbInvestmentForACompany company
         }
 
 let handleGetAllBalanceForAnAccountAsync: AllBalanceForAnAccount =

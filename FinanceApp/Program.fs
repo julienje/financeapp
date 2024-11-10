@@ -66,6 +66,23 @@ let newInvestmentHandler (companyName: string) : EndpointHandler =
             return! convertResponse context result
         }
 
+let handleGetInvestmentPerCompany (company : string) : EndpointHandler =
+    fun(context: HttpContext) ->
+        task {
+            let! result =
+                taskResult {
+                    let! companyName = CompanyName.create company
+
+                    let! result=
+                        Service.handleGetInvestmentPerCompanyAsync
+                            MongoDb.findAllInvestmentForACompany
+                            companyName
+                    return result |> convertSeq InvestmentDto.fromDomain
+                }
+
+            return! convertResponse context result
+        }
+
 let getBalancesAccountHandler (accountId: string) : EndpointHandler =
     fun (context: HttpContext) ->
         task {
@@ -216,6 +233,7 @@ let webApp =
             route "/trend" handleGetTrend
             routef "/accounts/{%s}/balances" getBalancesAccountHandler
             route "/investment/companies" handleGetInvestmentCompanies
+            routef "/investment/companies/{%s}" handleGetInvestmentPerCompany
             route "/investment/profit" handleGetInvestmentProfit ]
       PUT
           [ route "/accounts/new" handlePutNewAccounts
