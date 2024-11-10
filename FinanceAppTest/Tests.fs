@@ -10,6 +10,7 @@ open System.Text.Json
 open System.Text.Json.Nodes
 open System.Text.Json.Serialization
 open System.Threading.Tasks
+open FinanceApp.DomainType
 open FinanceApp.DtoTypes
 open Microsoft.AspNetCore.Authentication
 open Microsoft.AspNetCore.Hosting
@@ -231,6 +232,16 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
         |> readText
         |> read)
         Assert.NotNull newInvestment.Id
+
+        let investments: InvestmentDto seq= (client
+        |> httpGet $"/investment/companies/banka"
+        |> ensureSuccess
+        |> readText
+        |> read)
+        Assert.Equal (1, investmentCompanies |> Seq.length)
+        let investment = investments |> Seq.head
+        Assert.Equal ("banka",investment.CompanyName)
+        Assert.Equal (investmentA,investment.AmountInChf)
 
         let profit : ProfitDto= client |> httpGet $"/investment/profit" |> ensureSuccess |> readText |> read
         Assert.Equal(investmentA,profit.Profit.InvestmentInChf)

@@ -190,3 +190,14 @@ let findAllInvestment: GetAllDbInvestment =
             let! result = find.ToListAsync()
             return result |> Seq.map InvestmentDb.toInvestment
         }
+
+let findAllInvestmentForACompany: GetAllDbInvestmentForACompany =
+    fun companyName ->
+        task {
+            let company = companyName |> CompanyName.value
+            let sort = Builders<InvestmentDb>.Sort.Descending "InvestmentDate"
+            let options = FindOptions<InvestmentDb>(Sort = sort)
+            let! find = investmentCollection.FindAsync((fun a -> a.CompanyName = company), options)
+            let! result = find.ToListAsync()
+            return result |> Seq.map InvestmentDb.toInvestment
+        }
