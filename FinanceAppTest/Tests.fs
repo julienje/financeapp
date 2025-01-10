@@ -7,10 +7,8 @@ open System.Net.Http
 open System.Security.Claims
 open System.Text
 open System.Text.Json
-open System.Text.Json.Nodes
 open System.Text.Json.Serialization
 open System.Threading.Tasks
-open FinanceApp.DomainType
 open FinanceApp.DtoTypes
 open Microsoft.AspNetCore.Authentication
 open Microsoft.AspNetCore.Hosting
@@ -99,9 +97,9 @@ type MongoDbFixture() =
 
     interface IAsyncLifetime with
         member this.DisposeAsync() =
-            this.MyContainer.DisposeAsync().AsTask()
+            this.MyContainer.DisposeAsync()
 
-        member this.InitializeAsync() = this.MyContainer.StartAsync()
+        member this.InitializeAsync() = this.MyContainer.StartAsync() |> ValueTask
 
 // Tests wit test container
 
