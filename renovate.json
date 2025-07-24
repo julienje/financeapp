@@ -3,6 +3,7 @@
   "extends": [
     "config:best-practices"
   ],
+  "minimumReleaseAge": "7",
   "packageRules": [
     {
       "matchSourceUrls": ["https://github.com/testcontainers/testcontainers-dotnet"],
