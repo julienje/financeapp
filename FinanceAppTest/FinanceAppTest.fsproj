@@ -17,7 +17,7 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
         <PackageReference Include="Testcontainers" Version="4.7.0" />
         <PackageReference Include="Testcontainers.MongoDb" Version="4.7.0" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -26,7 +26,7 @@
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Update="FSharp.Core" Version="9.0.303" />
-        <PackageReference Include="xunit.v3" Version="3.0.1" />
+        <PackageReference Include="xunit.v3" Version="3.1.0" />
     </ItemGroup>
 
     <ItemGroup>
