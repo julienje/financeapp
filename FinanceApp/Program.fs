@@ -270,12 +270,9 @@ let configureServices (services: IServiceCollection) =
 
 [<EntryPoint>]
 let main _ =
-    Host
-        .CreateDefaultBuilder()
-        .ConfigureWebHostDefaults(fun webHostBuilder ->
-            webHostBuilder.Configure(configureApp).ConfigureServices(configureServices)
-            |> ignore)
-        .Build()
-        .Run()
-
+    let builder = WebApplication.CreateBuilder()
+    configureServices builder.Services
+    let app = builder.Build()
+    configureApp app
+    app.Run()
     0
