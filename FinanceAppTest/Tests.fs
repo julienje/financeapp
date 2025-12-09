@@ -14,6 +14,7 @@ open Microsoft.AspNetCore.Authentication
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.TestHost
 open Microsoft.Extensions.DependencyInjection
+open Microsoft.Extensions.Hosting
 open Testcontainers.MongoDb
 open Xunit
 
@@ -49,12 +50,21 @@ let configureTestServices (services: IServiceCollection) =
         .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(scheme, (fun o -> ()))
     |> ignore
 
-let createHost () =
-    WebHostBuilder()
-        .UseContentRoot(Directory.GetCurrentDirectory())
-        .Configure(FinanceApp.App.configureApp)
-        .ConfigureServices(FinanceApp.App.configureServices)
-        .ConfigureServices(configureTestServices)
+let webApp () =
+        task {
+            let host =
+                HostBuilder()
+                    .ConfigureWebHost(fun webHostBuilder ->
+                        webHostBuilder
+                            .UseTestServer()
+                                    .Configure(FinanceApp.App.configureApp)
+                            .ConfigureServices(FinanceApp.App.configureServices)
+                            .ConfigureServices(configureTestServices)
+                        |> ignore)
+                    .Build()
+            do! host.StartAsync()
+            return host
+        }
 
 let runTask task =
     task |> Async.AwaitTask |> Async.RunSynchronously
@@ -112,8 +122,8 @@ type TestContainerTest(mongoDb: MongoDbFixture) =
 
     [<Fact>]
     member this.``Smoke test``() =
-        use server = new TestServer(createHost ())
-        use client = server.CreateClient()
+        use server = webApp().GetAwaiter().GetResult()
+        use client = server.GetTestClient()
 
         client |> httpGet "/accounts" |> ensureSuccess |> readText |> shouldEqual "[]"
 
