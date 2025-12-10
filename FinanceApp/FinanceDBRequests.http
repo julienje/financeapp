@@ -1,5 +1,5 @@
 GET {{host}}/accounts
-Authorization: Bearer {{$auth.token("julien")}}
+
 
 ###
 PUT {{host}}/accounts/new
