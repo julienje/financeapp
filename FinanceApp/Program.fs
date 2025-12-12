@@ -250,10 +250,10 @@ let configureCors (builder: CorsPolicyBuilder) =
 
 let configureApp (app: IApplicationBuilder) =
     app
+        .UseRouting()
         .UseAuthentication()
         .UseAuthorization()
         .UseCors(configureCors)
-        .UseRouting()
         .UseOxpecker(webApp)
     |> ignore
 
