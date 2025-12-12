@@ -81,10 +81,6 @@ let httpPut (path: string) (payload: string) (client: HttpClient) =
     use content = new StringContent(payload, Encoding.UTF8, "application/json")
     client.PutAsync(path, content) |> runTask
 
-let isStatus (code: HttpStatusCode) (response: HttpResponseMessage) =
-    Assert.Equal(code, response.StatusCode)
-    response
-
 let ensureSuccess (response: HttpResponseMessage) =
     if not response.IsSuccessStatusCode then
         response.Content.ReadAsStringAsync()

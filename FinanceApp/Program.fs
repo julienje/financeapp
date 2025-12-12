@@ -234,22 +234,27 @@ let webApp =
             routef "/accounts/{%s}/balances" getBalancesAccountHandler
             route "/investment/companies" handleGetInvestmentCompanies
             routef "/investment/companies/{%s}" handleGetInvestmentPerCompany
-            route "/investment/profit" handleGetInvestmentProfit ]
+            route "/investment/profit" handleGetInvestmentProfit ] |> configureEndpoint _.RequireAuthorization()
       PUT
           [ route "/accounts/new" handlePutNewAccounts
             route "/accounts/close" handlePutCloseAccounts
             routef "/accounts/{%s}/balances/new" newBalanceHandler
             routef "/investment/companies/{%s}/new" newInvestmentHandler
-          ]
-      DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ]
+          ] |> configureEndpoint _.RequireAuthorization()
+      DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ]|> configureEndpoint _.RequireAuthorization()
       ]
 
 let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
+    
 
 let configureApp (app: IApplicationBuilder) =
-    // let env = app.ApplicationServices.GetService<IHostEnvironment>()
-    app.UseCors(configureCors).UseAuthentication().UseRouting().UseOxpecker(webApp)
+    app
+        .UseRouting()
+        .UseAuthentication()
+        .UseAuthorization()
+        .UseCors(configureCors)
+        .UseOxpecker(webApp)
     |> ignore
 
 let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
@@ -264,6 +269,7 @@ let configureServices (services: IServiceCollection) =
         .AddOxpecker()
         .AddCors()
         .AddSingleton<IJsonSerializer>(SystemTextJsonSerializer(options))
+        .AddAuthorization()
         .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApi((fun o -> ()), configureMicrosoftAccount)
     |> ignore
