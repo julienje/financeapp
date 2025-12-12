@@ -46,7 +46,6 @@ type TestAuthHandler(options, logger, encoder) =
 
 let configureTestServices (services: IServiceCollection) =
     services
-        .AddAuthorization()
         .AddAuthentication(scheme)
         .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(scheme, (fun o -> ()))
     |> ignore
