@@ -1,8 +1,6 @@
 module Tests
 
 open System
-open System.IO
-open System.Net
 open System.Net.Http
 open System.Security.Claims
 open System.Text
@@ -97,7 +95,7 @@ let shouldEqual (expected: string) (actual: string) = Assert.Equal(expected, act
 type MongoDbFixture() =
 
     let myContainer =
-        MongoDbBuilder().WithUsername("unitest").WithPassword("1234").Build()
+        MongoDbBuilder().WithImage("mongo:8").WithUsername("unitest").WithPassword("1234").Build()
 
     member this.MyContainer = myContainer
 
