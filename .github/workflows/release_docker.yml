@@ -1,10 +1,12 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Deploy ASP.NET Core app to Azure Web App
+name: Docker Build
 
 on:
   push:
+    branches:
+      - feature/JJ/DockerBuild
     tags:
       - '*'
 
@@ -42,6 +44,6 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
-          context: .
+          context: ./FinanceApp
           push: true
           tags: ${{ steps.meta.outputs.tags }}
