@@ -17,7 +17,7 @@
     <ItemGroup>
         <PackageReference Include="FSharp.SystemTextJson" Version="1.4.36" />
         <PackageReference Include="FsToolkit.ErrorHandling" Version="5.1.0" />
-        <PackageReference Include="Microsoft.Identity.Web" Version="4.1.1" />
+        <PackageReference Include="Microsoft.Identity.Web" Version="4.2.0" />
         <PackageReference Include="MongoDB.Driver" Version="3.5.2" />
         <PackageReference Update="FSharp.Core" Version="10.0.101" />
         <PackageReference Include="Oxpecker" Version="2.0.0" />
