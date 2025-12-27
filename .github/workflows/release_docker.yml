@@ -5,8 +5,6 @@ name: Docker Build
 
 on:
   push:
-    branches:
-      - feature/JJ/DockerBuild
     tags:
       - '*'
 
@@ -22,8 +20,8 @@ permissions:
 
 jobs:
   build-and-deploy:
-    runs-on: ubuntu-latest
-    environment: dev
+    runs-on: ubuntu-24.04-arm
+    environment: azure-finance-jj
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
@@ -47,3 +45,19 @@ jobs:
           context: ./FinanceApp
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: 'finance-jj'
+          slot-name: 'Production'
+          images: '${{ env.REGISTRY }}/julienje/${{ env.IMAGE_NAME }}:${{ steps.meta.outputs.tags }}'
+      - name: logout
+          run: |
+            az logout
