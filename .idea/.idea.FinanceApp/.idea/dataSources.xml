@@ -15,7 +15,7 @@
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
     <data-source source="LOCAL" name="@jj.vynwhhn.mongodb.net" uuid="f484ec49-0039-4980-9d77-9ed6a43f0e91">
-      <driver-ref>mongo</driver-ref>
+      <driver-ref>mongo.4</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.dbschema.MongoJdbcDriver</jdbc-driver>
       <jdbc-url>mongodb+srv://jj.vynwhhn.mongodb.net/?retryWrites=true&amp;w=majority</jdbc-url>
