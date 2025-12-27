@@ -6,7 +6,7 @@ name: Deploy ASP.NET Core app to Azure Web App
 on:
   push:
     tags:
-      - '*'
+      - 'backup'
 
 env:
   AZURE_WEBAPP_NAME: financeapp-jj    # set this to your application's name
