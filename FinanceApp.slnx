@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="FinanceApp/FinanceApp.fsproj" />
+  <Project Path="FinanceAppTest/FinanceAppTest.fsproj" />
+</Solution>
