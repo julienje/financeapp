@@ -61,7 +61,7 @@ jobs:
         with:
           app-name: 'finance-jj'
           slot-name: 'Production'
-          images: '${{ env.REGISTRY }}/julienje/${{ env.IMAGE_NAME }}:${{ github.ref_name }}'
+          images: '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.ref_name }}'
       - name: logout
         run: |
           az logout
