@@ -1,7 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:best-practices"
+    "config:best-practices",
+    ":pinVersions"
   ],
   "minimumReleaseAge": "7 days",
   "packageRules": [
@@ -24,6 +25,13 @@
       "https://github.com/dotnet/fsharp"
     ],
       "groupName": "Extended dotnet"
+    },
+    {
+      "matchPackageNames": [
+        "@azure/msal-browser",
+        "@azure/msal-react"
+      ],
+      "groupName": "msal"
     }
   ]
 }

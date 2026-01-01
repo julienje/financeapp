@@ -1,0 +1,44 @@
+{
+  "name": "financeweb",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": "22.20.0"
+  },
+  "dependencies": {
+    "@azure/msal-browser": "4.27.0",
+    "@azure/msal-react": "3.0.23",
+    "@emotion/react": "11.14.0",
+    "@emotion/styled": "11.14.1",
+    "@mui/icons-material": "7.3.6",
+    "@mui/material": "7.3.6",
+    "@mui/x-charts": "8.23.0",
+    "@mui/x-data-grid": "8.23.0",
+    "@mui/x-date-pickers": "8.23.0",
+    "dayjs": "1.11.19",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "react-router": "7.11.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.2",
+    "@types/react": "19.2.7",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react-swc": "4.2.2",
+    "eslint": "9.39.2",
+    "eslint-plugin-react": "7.37.5",
+    "eslint-plugin-react-hooks": "7.0.1",
+    "eslint-plugin-react-refresh": "0.4.26",
+    "globals": "16.5.0",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.50.1",
+    "vite": "7.3.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  }
+}
