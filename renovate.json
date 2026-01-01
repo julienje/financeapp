@@ -4,6 +4,9 @@
     "config:best-practices",
     ":pinVersions"
   ],
+  "lockFileMaintenance": {
+    "enabled": true
+  },
   "minimumReleaseAge": "7 days",
   "packageRules": [
     {
