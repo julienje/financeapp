@@ -7,7 +7,6 @@ open FinanceApp.DtoTypes
 open Microsoft.AspNetCore.Authentication.JwtBearer
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Cors.Infrastructure
-open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
@@ -36,13 +35,11 @@ let newBalanceHandler (accountId: string) : EndpointHandler =
                     let! toDomain = AddBalanceDto.toDomain accountId inputDto
 
                     let! result =
-                        Service.handleAddBalanceAsync
-                            MongoDb.findAccountAsync
-                            MongoDb.insertBalanceAsync
-                            toDomain
+                        Service.handleAddBalanceAsync MongoDb.findAccountAsync MongoDb.insertBalanceAsync toDomain
 
                     return result |> AccountBalanceDto.fromDomain
                 }
+
             return! convertResponse context result
         }
 
@@ -66,17 +63,16 @@ let newInvestmentHandler (companyName: string) : EndpointHandler =
             return! convertResponse context result
         }
 
-let handleGetInvestmentPerCompany (company : string) : EndpointHandler =
-    fun(context: HttpContext) ->
+let handleGetInvestmentPerCompany (company: string) : EndpointHandler =
+    fun (context: HttpContext) ->
         task {
             let! result =
                 taskResult {
                     let! companyName = CompanyName.create company
 
-                    let! result=
-                        Service.handleGetInvestmentPerCompanyAsync
-                            MongoDb.findAllInvestmentForACompany
-                            companyName
+                    let! result =
+                        Service.handleGetInvestmentPerCompanyAsync MongoDb.findAllInvestmentForACompany companyName
+
                     return result |> convertSeq InvestmentDto.fromDomain
                 }
 
@@ -90,11 +86,12 @@ let getBalancesAccountHandler (accountId: string) : EndpointHandler =
                 taskResult {
                     let! accountIdDomain = AccountId.create accountId
 
-                    let! result=
+                    let! result =
                         Service.handleGetAllBalanceForAnAccountAsync
                             MongoDb.findAccountAsync
                             MongoDb.findAllBalancesForAnAccountAsync
                             accountIdDomain
+
                     return result |> convertSeq AccountBalanceDto.fromDomain
                 }
 
@@ -146,10 +143,7 @@ let handleGetWealth: EndpointHandler =
 let handleGetTrend: EndpointHandler =
     fun (context: HttpContext) ->
         task {
-            let! trend =
-                Service.handleGetTrendsAsync
-                    MongoDb.findAllAccountsAsync
-                    MongoDb.getAllBalancesAsync
+            let! trend = Service.handleGetTrendsAsync MongoDb.findAllAccountsAsync MongoDb.getAllBalancesAsync
 
             let dto = trend |> TrendDto.fromDomain
             return! context.WriteJson dto
@@ -158,8 +152,7 @@ let handleGetTrend: EndpointHandler =
 let handleGetInvestmentCompanies: EndpointHandler =
     fun (context: HttpContext) ->
         task {
-            let! companies =
-                Service.handleGetInvestmentCompanyAsync MongoDb.getAllInvestmentCompanyAsync
+            let! companies = Service.handleGetInvestmentCompanyAsync MongoDb.getAllInvestmentCompanyAsync
 
             let dto = companies |> CompanyDto.fromDomain
             return! context.WriteJson dto
@@ -217,8 +210,7 @@ let handlePutCloseAccounts: EndpointHandler =
                 taskResult {
                     let! toDomain = CloseAccountDto.toDomain inputDto
 
-                    let! closeAccount =
-                        Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
+                    let! closeAccount = Service.handleCloseAccountAsync MongoDb.updateCloseDateAsync toDomain
 
                     return closeAccount |> AccountDto.fromDomain
                 }
@@ -234,27 +226,23 @@ let webApp =
             routef "/accounts/{%s}/balances" getBalancesAccountHandler
             route "/investment/companies" handleGetInvestmentCompanies
             routef "/investment/companies/{%s}" handleGetInvestmentPerCompany
-            route "/investment/profit" handleGetInvestmentProfit ] |> configureEndpoint _.RequireAuthorization()
+            route "/investment/profit" handleGetInvestmentProfit ]
+      |> configureEndpoint _.RequireAuthorization()
       PUT
           [ route "/accounts/new" handlePutNewAccounts
             route "/accounts/close" handlePutCloseAccounts
             routef "/accounts/{%s}/balances/new" newBalanceHandler
-            routef "/investment/companies/{%s}/new" newInvestmentHandler
-          ] |> configureEndpoint _.RequireAuthorization()
-      DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ]|> configureEndpoint _.RequireAuthorization()
-      ]
+            routef "/investment/companies/{%s}/new" newInvestmentHandler ]
+      |> configureEndpoint _.RequireAuthorization()
+      DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ]
+      |> configureEndpoint _.RequireAuthorization() ]
 
 let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
-    
+
 
 let configureApp (app: IApplicationBuilder) =
-    app
-        .UseRouting()
-        .UseAuthentication()
-        .UseAuthorization()
-        .UseCors(configureCors)
-        .UseOxpecker(webApp)
+    app.UseRouting().UseAuthentication().UseAuthorization().UseCors(configureCors).UseOxpecker(webApp)
     |> ignore
 
 let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
@@ -263,7 +251,9 @@ let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
     option.TenantId <- "0829ce3c-dd9d-45a5-a7e4-b8fb69179085"
 
 let configureServices (services: IServiceCollection) =
-    let options = JsonFSharpOptions.Default().WithSkippableOptionFields().ToJsonSerializerOptions()
+    let options =
+        JsonFSharpOptions.Default().WithSkippableOptionFields().ToJsonSerializerOptions()
+
     services
         .AddRouting()
         .AddOxpecker()
@@ -280,5 +270,6 @@ let main _ =
     configureServices builder.Services
     let app = builder.Build()
     configureApp app
+    app.MapStaticAssets() |> ignore
     app.Run()
     0

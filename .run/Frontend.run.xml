@@ -1,0 +1,17 @@
+<component name="ProjectRunConfigurationManager">
+    <configuration default="false" name="Frontend" type="js.build_tools.npm">
+        <package-json value="$PROJECT_DIR$/FinanceWeb/package.json"/>
+        <command value="run"/>
+        <scripts>
+            <script value="dev"/>
+        </scripts>
+        <node-interpreter value="project"/>
+        <envs>
+            <env name="VITE_APP_BACKEND_URL" value="http://localhost:5165"/>
+        </envs>
+        <EXTENSION ID="com.intellij.javascript.debugger.execution.StartBrowserRunConfigurationExtension">
+            <browser with-js-debugger="true"/>
+        </EXTENSION>
+        <method v="2"/>
+    </configuration>
+</component>
