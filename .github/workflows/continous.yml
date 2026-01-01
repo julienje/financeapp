@@ -9,9 +9,7 @@ on:
 
 jobs:
   build-dotnet:
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
       - name: Setup .NET
@@ -25,6 +23,9 @@ jobs:
       - name: Test
         run: dotnet test --no-build --verbosity normal
   build-react:
+    defaults:
+      run:
+        working-directory: ./FinanceWeb
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
