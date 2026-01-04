@@ -270,6 +270,7 @@ let main _ =
     configureServices builder.Services
     let app = builder.Build()
     configureApp app
-    app.MapStaticAssets() |> ignore
+    app.UseStaticFiles() |> ignore
+    app.MapFallbackToFile("index.html") |> ignore
     app.Run()
     0
