@@ -26,7 +26,6 @@
 
     <ItemGroup>
         <Content Include="FinanceDBRequests.http" />
-        <Content Include="Dockerfile" />
     </ItemGroup>
 
     <ItemGroup>

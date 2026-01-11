@@ -227,17 +227,15 @@ let endpoints =
             route "/investment/companies" handleGetInvestmentCompanies
             routef "/investment/companies/{%s}" handleGetInvestmentPerCompany
             route "/investment/profit" handleGetInvestmentProfit ]
-      |> configureEndpoint _.RequireAuthorization()
       PUT
           [ route "/accounts/new" handlePutNewAccounts
             route "/accounts/close" handlePutCloseAccounts
             routef "/accounts/{%s}/balances/new" newBalanceHandler
             routef "/investment/companies/{%s}/new" newInvestmentHandler ]
-      |> configureEndpoint _.RequireAuthorization()
-      DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ]
-      |> configureEndpoint _.RequireAuthorization() ]
+      DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ] ]
 
-let apiEndPoint = subRoute "/api" endpoints
+let apiEndPoint =
+    subRoute "/api" endpoints |> configureEndpoint _.RequireAuthorization()
 
 
 let configureCors (builder: CorsPolicyBuilder) =
