@@ -6,7 +6,6 @@ open FinanceApp.DomainType
 open FinanceApp.DtoTypes
 open Microsoft.AspNetCore.Authentication.JwtBearer
 open Microsoft.AspNetCore.Builder
-open Microsoft.AspNetCore.Cors.Infrastructure
 open Microsoft.AspNetCore.Http
 open Microsoft.Extensions.Hosting
 open Microsoft.Extensions.DependencyInjection
@@ -238,12 +237,8 @@ let apiEndPoint =
     subRoute "/api" endpoints |> configureEndpoint _.RequireAuthorization()
 
 
-let configureCors (builder: CorsPolicyBuilder) =
-    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
-
-
 let configureApp (app: IApplicationBuilder) =
-    app.UseRouting().UseAuthentication().UseAuthorization().UseCors(configureCors).UseOxpecker(apiEndPoint)
+    app.UseRouting().UseAuthentication().UseAuthorization().UseOxpecker(apiEndPoint)
     |> ignore
 
 let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
