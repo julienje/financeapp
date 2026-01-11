@@ -96,7 +96,7 @@ let shouldEqual (expected: string) (actual: string) = Assert.Equal(expected, act
 type MongoDbFixture() =
 
     let myContainer =
-        MongoDbBuilder().WithImage("mongo:8").WithUsername("unitest").WithPassword("1234").Build()
+        MongoDbBuilder("mongo:8").WithUsername("unitest").WithPassword("1234").Build()
 
     member this.MyContainer = myContainer
 
