@@ -6,5 +6,10 @@ export default defineConfig({
     plugins: [react()],
     resolve: {
         conditions: ['mui-modern', 'module', 'browser', 'development|production']
+    },
+    server: {
+        proxy: {
+            '/api': 'http://localhost:5165'
+        }
     }
 })

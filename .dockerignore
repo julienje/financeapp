@@ -1,0 +1,7 @@
+FinanceApp/bin
+FinanceApp/obj
+FinanceWeb/node_modules
+**/.git
+**/.vs
+**/.idea
+**/dist

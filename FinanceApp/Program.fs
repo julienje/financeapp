@@ -218,7 +218,7 @@ let handlePutCloseAccounts: EndpointHandler =
             return! convertResponse context result
         }
 
-let webApp =
+let endpoints =
     [ GET
           [ route "/accounts" handleGetAccounts
             route "/wealth" handleGetWealth
@@ -227,22 +227,23 @@ let webApp =
             route "/investment/companies" handleGetInvestmentCompanies
             routef "/investment/companies/{%s}" handleGetInvestmentPerCompany
             route "/investment/profit" handleGetInvestmentProfit ]
-      |> configureEndpoint _.RequireAuthorization()
       PUT
           [ route "/accounts/new" handlePutNewAccounts
             route "/accounts/close" handlePutCloseAccounts
             routef "/accounts/{%s}/balances/new" newBalanceHandler
             routef "/investment/companies/{%s}/new" newInvestmentHandler ]
-      |> configureEndpoint _.RequireAuthorization()
-      DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ]
-      |> configureEndpoint _.RequireAuthorization() ]
+      DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ] ]
+
+let apiEndPoint =
+    subRoute "/api" endpoints |> configureEndpoint _.RequireAuthorization()
+
 
 let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
 
 
 let configureApp (app: IApplicationBuilder) =
-    app.UseRouting().UseAuthentication().UseAuthorization().UseCors(configureCors).UseOxpecker(webApp)
+    app.UseRouting().UseAuthentication().UseAuthorization().UseCors(configureCors).UseOxpecker(apiEndPoint)
     |> ignore
 
 let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
@@ -270,6 +271,7 @@ let main _ =
     configureServices builder.Services
     let app = builder.Build()
     configureApp app
-    app.MapStaticAssets() |> ignore
+    app.UseStaticFiles() |> ignore
+    app.MapFallbackToFile("index.html") |> ignore
     app.Run()
     0

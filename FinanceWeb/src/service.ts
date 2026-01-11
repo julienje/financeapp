@@ -101,7 +101,7 @@ export const getWealth = async (signal: AbortSignal, instance: IPublicClientAppl
     const params = new URLSearchParams();
     params.set('date', date.toISOString());
 
-    const request = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/wealth?${params.toString()}`, {
+    const request = await fetch(`api/wealth?${params.toString()}`, {
         signal,
         headers
     });
@@ -110,19 +110,19 @@ export const getWealth = async (signal: AbortSignal, instance: IPublicClientAppl
 
 export const getTrend = async (signal: AbortSignal, instance: IPublicClientApplication): Promise<TrendDto[]> => {
     const headers = await getAuthorizedHeaders(instance);
-    const request = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/trend`, {signal, headers});
+    const request = await fetch(`api/trend`, {signal, headers});
     return await request.json() as TrendDto[];
 };
 
 export const getAccounts = async (signal: AbortSignal, instance: IPublicClientApplication): Promise<AccountDto[]> => {
     const headers = await getAuthorizedHeaders(instance);
-    const request = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/accounts`, {signal, headers});
+    const request = await fetch(`api/accounts`, {signal, headers});
     return await request.json() as AccountDto[];
 };
 
 export const getBalanceForAccount = async (signal: AbortSignal, instance: IPublicClientApplication, accountId: string): Promise<AccountBalanceDto[]> => {
     const headers = await getAuthorizedHeaders(instance);
-    const request = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/accounts/${accountId}/balances`, {
+    const request = await fetch(`api/accounts/${accountId}/balances`, {
         signal,
         headers
     });
@@ -138,7 +138,7 @@ export const addBalances = async (signal: AbortSignal, instance: IPublicClientAp
         body: JSON.stringify(balance),
         signal
     };
-    const request = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/accounts/${accountId}/balances/new`, requestOptions);
+    const request = await fetch(`api/accounts/${accountId}/balances/new`, requestOptions);
     return await request.json() as AccountBalanceDto;
 };
 
@@ -151,7 +151,7 @@ export const addAccount = async (signal: AbortSignal, instance: IPublicClientApp
         body: JSON.stringify(newAccount),
         signal
     };
-    const request = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/accounts/new`, requestOptions);
+    const request = await fetch(`api/accounts/new`, requestOptions);
     if (request.ok) {
         return await request.json() as AccountDto;
     }
@@ -168,7 +168,7 @@ export const addInvestment = async (signal: AbortSignal, instance: IPublicClient
         body: JSON.stringify(newInvestment),
         signal
     };
-    const request = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/investment/companies/${company}/new`, requestOptions);
+    const request = await fetch(`api/investment/companies/${company}/new`, requestOptions);
     if (request.ok) {
         return await request.json() as InvestmentDto;
     }
@@ -184,7 +184,7 @@ export const getInvestmentCompany = async (signal: AbortSignal, instance: IPubli
         headers,
         signal
     };
-    const request = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/investment/companies`, requestOptions);
+    const request = await fetch(`api/investment/companies`, requestOptions);
     if (request.ok) {
         return await request.json() as CompanyDto[];
     }
@@ -202,7 +202,7 @@ export const getProfit = async (signal: AbortSignal, instance: IPublicClientAppl
     };
     const params = new URLSearchParams();
     params.set('date', date.toISOString());
-    const request = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/investment/profit?${params.toString()}`, requestOptions);
+    const request = await fetch(`api/investment/profit?${params.toString()}`, requestOptions);
     if (request.ok) {
         return await request.json() as ProfitDto;
     }
@@ -218,7 +218,7 @@ export const getInvestmentForCompany = async (signal: AbortSignal, instance: IPu
         headers,
         signal
     };
-    const request = await fetch(`${import.meta.env.VITE_APP_BACKEND_URL}/investment/companies/${company}`, requestOptions);
+    const request = await fetch(`api/investment/companies/${company}`, requestOptions);
     if (request.ok) {
         return await request.json() as InvestmentDto[];
     }

@@ -16,10 +16,12 @@ open Microsoft.Extensions.Hosting
 open Testcontainers.MongoDb
 open Xunit
 
-let options = JsonFSharpOptions.Default().WithSkippableOptionFields().ToJsonSerializerOptions()
+let options =
+    JsonFSharpOptions.Default().WithSkippableOptionFields().ToJsonSerializerOptions()
 
-let read (json:string) : 'a =
+let read (json: string) : 'a =
     JsonSerializer.Deserialize<'a>(json, options)
+
 let write dto : string =
     JsonSerializer.Serialize<'a>(dto, options)
 
@@ -43,26 +45,25 @@ type TestAuthHandler(options, logger, encoder) =
         Task.FromResult(result)
 
 let configureTestServices (services: IServiceCollection) =
-    services
-        .AddAuthentication(scheme)
-        .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(scheme, (fun o -> ()))
+    services.AddAuthentication(scheme).AddScheme<AuthenticationSchemeOptions, TestAuthHandler>(scheme, (fun o -> ()))
     |> ignore
 
 let webApp () =
-        task {
-            let host =
-                HostBuilder()
-                    .ConfigureWebHost(fun webHostBuilder ->
-                        webHostBuilder
-                            .UseTestServer()
-                                    .Configure(FinanceApp.App.configureApp)
-                            .ConfigureServices(FinanceApp.App.configureServices)
-                            .ConfigureServices(configureTestServices)
-                        |> ignore)
-                    .Build()
-            do! host.StartAsync()
-            return host
-        }
+    task {
+        let host =
+            HostBuilder()
+                .ConfigureWebHost(fun webHostBuilder ->
+                    webHostBuilder
+                        .UseTestServer()
+                        .Configure(FinanceApp.App.configureApp)
+                        .ConfigureServices(FinanceApp.App.configureServices)
+                        .ConfigureServices(configureTestServices)
+                    |> ignore)
+                .Build()
+
+        do! host.StartAsync()
+        return host
+    }
 
 let runTask task =
     task |> Async.AwaitTask |> Async.RunSynchronously
@@ -95,169 +96,186 @@ let shouldEqual (expected: string) (actual: string) = Assert.Equal(expected, act
 type MongoDbFixture() =
 
     let myContainer =
-        MongoDbBuilder().WithImage("mongo:8").WithUsername("unitest").WithPassword("1234").Build()
+        MongoDbBuilder("mongo:8").WithUsername("unitest").WithPassword("1234").Build()
 
     member this.MyContainer = myContainer
 
     interface IAsyncLifetime with
-        member this.DisposeAsync() =
-            this.MyContainer.DisposeAsync()
+        member this.DisposeAsync() = this.MyContainer.DisposeAsync()
 
-        member this.InitializeAsync() = this.MyContainer.StartAsync() |> ValueTask
+        member this.InitializeAsync() =
+            this.MyContainer.StartAsync() |> ValueTask
 
 // Tests wit test container
 
 type TestContainerTest(mongoDb: MongoDbFixture) =
-    do
-        Environment.SetEnvironmentVariable(
-            "CONNECTION_STRING",
-            mongoDb.MyContainer.GetConnectionString()
-        )
+    do Environment.SetEnvironmentVariable("CONNECTION_STRING", mongoDb.MyContainer.GetConnectionString())
 
     [<Fact>]
     member this.``Smoke test``() =
         use server = webApp().GetAwaiter().GetResult()
         use client = server.GetTestClient()
 
-        client |> httpGet "/accounts" |> ensureSuccess |> readText |> shouldEqual "[]"
+        client
+        |> httpGet "api/accounts"
+        |> ensureSuccess
+        |> readText
+        |> shouldEqual "[]"
 
-        let accountA= {
-            Name = "AccountA"
-            Type = None
-            Company= "banka"
-            OpenDate= "2022-01-01"
-        }
+        let accountA =
+            { Name = "AccountA"
+              Type = None
+              Company = "banka"
+              OpenDate = "2022-01-01" }
 
         let newAccountA: AccountDto =
             (client
-             |> httpPut "/accounts/new" (accountA |> write)
+             |> httpPut "api/accounts/new" (accountA |> write)
              |> ensureSuccess
              |> readText
              |> read)
+
         Assert.NotNull newAccountA.Id
 
-        let etfAccount= {
-            Name = "AccountB"
-            Type = Some "ETF"
-            Company= "banka"
-            OpenDate= "2022-01-01"
-        }
+        let etfAccount =
+            { Name = "AccountB"
+              Type = Some "ETF"
+              Company = "banka"
+              OpenDate = "2022-01-01" }
 
-        let newAccountB : AccountDto =
+        let newAccountB: AccountDto =
             (client
-             |> httpPut "/accounts/new" (etfAccount |> write)
+             |> httpPut "api/accounts/new" (etfAccount |> write)
              |> ensureSuccess
              |> readText
              |> read)
+
         Assert.NotNull newAccountB.Id
 
         let amountA = 12.0m
         let amountB = 15.5m
 
-        let newBalanceA = {
-            CheckDate = DateTime.UtcNow.ToString()
-            AmountInChf = amountA
-        }
+        let newBalanceA =
+            { CheckDate = DateTime.UtcNow.ToString()
+              AmountInChf = amountA }
 
-        let balanceAccountA : AccountBalanceDto =
+        let balanceAccountA: AccountBalanceDto =
             (client
-             |> httpPut $"/accounts/{newAccountA.Id}/balances/new" (newBalanceA |> write)
+             |> httpPut $"api/accounts/{newAccountA.Id}/balances/new" (newBalanceA |> write)
              |> ensureSuccess
              |> readText
              |> read)
+
         Assert.NotNull balanceAccountA.Id
 
-        let newBalanceB = {
-            CheckDate= DateTime.UtcNow.ToString()
-            AmountInChf= amountB
-        }
+        let newBalanceB =
+            { CheckDate = DateTime.UtcNow.ToString()
+              AmountInChf = amountB }
 
-        let balanceAccountB : AccountBalanceDto =(client
-        |> httpPut $"/accounts/{newAccountB.Id}/balances/new" (newBalanceB |> write)
-        |> ensureSuccess
-        |> readText
-        |> read)
+        let balanceAccountB: AccountBalanceDto =
+            (client
+             |> httpPut $"api/accounts/{newAccountB.Id}/balances/new" (newBalanceB |> write)
+             |> ensureSuccess
+             |> readText
+             |> read)
+
         Assert.NotNull balanceAccountB.Id
 
-        let wealth: WealthDto=(client
-        |> httpGet "wealth"
-        |> ensureSuccess
-        |> readText
-        |> read)
-        Assert.Equal ((amountA + amountB),wealth.AmountInChf)
+        let wealth: WealthDto =
+            (client |> httpGet "api/wealth" |> ensureSuccess |> readText |> read)
 
-        let oldWealth : WealthDto = (client
-        |> httpGet "wealth?date=2021-06-01"
-        |> ensureSuccess
-        |> readText
-        |> read)
+        Assert.Equal((amountA + amountB), wealth.AmountInChf)
 
-        Assert.Equal (0.0m,oldWealth.AmountInChf)
+        let oldWealth: WealthDto =
+            (client
+             |> httpGet "api/wealth?date=2021-06-01"
+             |> ensureSuccess
+             |> readText
+             |> read)
 
-        let balances : AccountBalanceDto seq =( client
-        |> httpGet $"/accounts/{newAccountA.Id}/balances"
-        |> ensureSuccess
-        |> readText
-        |> read)
+        Assert.Equal(0.0m, oldWealth.AmountInChf)
 
-        Assert.Equal (1, balances |> Seq.length)
+        let balances: AccountBalanceDto seq =
+            (client
+             |> httpGet $"api/accounts/{newAccountA.Id}/balances"
+             |> ensureSuccess
+             |> readText
+             |> read)
+
+        Assert.Equal(1, balances |> Seq.length)
 
         client
-        |> httpDelete $"/balances/{balanceAccountA.Id}"
+        |> httpDelete $"api/balances/{balanceAccountA.Id}"
         |> ensureSuccess
         |> readText
         |> ignore
 
-        let newBalances: AccountBalanceDto seq = (client
-        |> httpGet $"/accounts/{newAccountA.Id}/balances"
-        |> ensureSuccess
-        |> readText
-        |> read)
-        Assert.Equal (0, newBalances |> Seq.length)
+        let newBalances: AccountBalanceDto seq =
+            (client
+             |> httpGet $"api/accounts/{newAccountA.Id}/balances"
+             |> ensureSuccess
+             |> readText
+             |> read)
+
+        Assert.Equal(0, newBalances |> Seq.length)
 
         let investmentA = 12.0m
 
-        let investmentCompanies = (client
-        |> httpGet $"/investment/companies"
-        |> ensureSuccess
-        |> readText
-        |> read)
-        Assert.Equal (1, investmentCompanies |> Seq.length)
+        let investmentCompanies =
+            (client
+             |> httpGet "api/investment/companies"
+             |> ensureSuccess
+             |> readText
+             |> read)
 
-        let investmentDto = {
-            InvestmentDate = DateTime.UtcNow.ToString()
-            AmountInChf = investmentA
-        }
-        let newInvestment : InvestmentDto = (client
-        |> httpPut $"/investment/companies/banka/new" (investmentDto |> write)
-        |> ensureSuccess
-        |> readText
-        |> read)
+        Assert.Equal(1, investmentCompanies |> Seq.length)
+
+        let investmentDto =
+            { InvestmentDate = DateTime.UtcNow.ToString()
+              AmountInChf = investmentA }
+
+        let newInvestment: InvestmentDto =
+            (client
+             |> httpPut "api/investment/companies/banka/new" (investmentDto |> write)
+             |> ensureSuccess
+             |> readText
+             |> read)
+
         Assert.NotNull newInvestment.Id
 
-        let investments: InvestmentDto seq= (client
-        |> httpGet $"/investment/companies/banka"
-        |> ensureSuccess
-        |> readText
-        |> read)
-        Assert.Equal (1, investmentCompanies |> Seq.length)
-        let investment = investments |> Seq.head
-        Assert.Equal ("banka",investment.CompanyName)
-        Assert.Equal (investmentA,investment.AmountInChf)
+        let investments: InvestmentDto seq =
+            (client
+             |> httpGet "api/investment/companies/banka"
+             |> ensureSuccess
+             |> readText
+             |> read)
 
-        let profit : ProfitDto= client |> httpGet $"/investment/profit" |> ensureSuccess |> readText |> read
-        Assert.Equal(investmentA,profit.Profit.InvestmentInChf)
+        Assert.Equal(1, investmentCompanies |> Seq.length)
+        let investment = investments |> Seq.head
+        Assert.Equal("banka", investment.CompanyName)
+        Assert.Equal(investmentA, investment.AmountInChf)
+
+        let profit: ProfitDto =
+            client |> httpGet "api/investment/profit" |> ensureSuccess |> readText |> read
+
+        Assert.Equal(investmentA, profit.Profit.InvestmentInChf)
         Assert.Equal(amountB, profit.Profit.WealthInChf)
         Assert.Equal(1, profit.Details |> Seq.length)
         let details = profit.Details |> Seq.head
-        Assert.Equal(investmentA,details.Profit.InvestmentInChf)
-        Assert.Equal(amountB,details.Profit.WealthInChf)
+        Assert.Equal(investmentA, details.Profit.InvestmentInChf)
+        Assert.Equal(amountB, details.Profit.WealthInChf)
 
-        let closeAccountDto = {
-            Id= newAccountA.Id
-            CloseDate = DateTime.UtcNow.ToString()
-        }
-        let closeAccount : AccountDto= client |> httpPut $"/accounts/close" (closeAccountDto |> write) |> ensureSuccess |> readText |> read
+        let closeAccountDto =
+            { Id = newAccountA.Id
+              CloseDate = DateTime.UtcNow.ToString() }
+
+        let closeAccount: AccountDto =
+            client
+            |> httpPut "api/accounts/close" (closeAccountDto |> write)
+            |> ensureSuccess
+            |> readText
+            |> read
+
         Assert.True(closeAccount.CloseDate.IsSome)
 
         ()
