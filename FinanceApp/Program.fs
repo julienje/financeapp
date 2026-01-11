@@ -218,7 +218,7 @@ let handlePutCloseAccounts: EndpointHandler =
             return! convertResponse context result
         }
 
-let webApp =
+let endpoints =
     [ GET
           [ route "/accounts" handleGetAccounts
             route "/wealth" handleGetWealth
@@ -237,12 +237,15 @@ let webApp =
       DELETE [ routef "/balances/{%s}" deleteBalancesAccountHandler ]
       |> configureEndpoint _.RequireAuthorization() ]
 
+let apiEndPoint = subRoute "/api" endpoints
+
+
 let configureCors (builder: CorsPolicyBuilder) =
     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader() |> ignore
 
 
 let configureApp (app: IApplicationBuilder) =
-    app.UseRouting().UseAuthentication().UseAuthorization().UseCors(configureCors).UseOxpecker(webApp)
+    app.UseRouting().UseAuthentication().UseAuthorization().UseCors(configureCors).UseOxpecker(apiEndPoint)
     |> ignore
 
 let configureMicrosoftAccount (option: MicrosoftIdentityOptions) =
