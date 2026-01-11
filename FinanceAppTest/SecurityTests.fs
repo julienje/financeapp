@@ -1,21 +1,14 @@
 module SecurityTests
 
-open System
-open System.IO
 open System.Net
 open System.Net.Http
-open System.Security.Claims
 open System.Text
 open System.Text.Json
 open System.Text.Json.Serialization
-open System.Threading.Tasks
 open FinanceApp.DtoTypes
-open Microsoft.AspNetCore.Authentication
 open Microsoft.AspNetCore.Hosting
 open Microsoft.AspNetCore.TestHost
-open Microsoft.Extensions.DependencyInjection
 open Microsoft.Extensions.Hosting
-open Testcontainers.MongoDb
 open Xunit
 
 let options =
@@ -69,7 +62,7 @@ let ``Security test`` () =
     use server = webApp().GetAwaiter().GetResult()
     use client = server.GetTestClient()
 
-    let responseGet = client |> httpGet "/accounts"
+    let responseGet = client |> httpGet "api/accounts"
 
     Assert.Equal(HttpStatusCode.Unauthorized, responseGet.StatusCode)
 
@@ -79,8 +72,8 @@ let ``Security test`` () =
           Company = "banka"
           OpenDate = "2022-01-01" }
 
-    let responsePut = client |> httpPut "/accounts/new" (accountA |> write)
+    let responsePut = client |> httpPut "api/accounts/new" (accountA |> write)
     Assert.Equal(HttpStatusCode.Unauthorized, responsePut.StatusCode)
 
-    let responseDelete = client |> httpDelete $"/balances/1"
+    let responseDelete = client |> httpDelete "api/balances/1"
     Assert.Equal(HttpStatusCode.Unauthorized, responseDelete.StatusCode)
