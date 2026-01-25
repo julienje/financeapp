@@ -30,7 +30,7 @@ const PageLayout = () => {
                     <Link href={`/balances`}>Balance</Link>
                     <Link href={`/investment`}>Investment</Link>
                     <Link href={`/accounts`}>Accounts</Link>
-                    <Link href={`/account/new`}>New account</Link>
+                    <Link href={`/account`}>New account</Link>
                 </Box>
                 <Box sx={{
                     p: theme.spacing(1)

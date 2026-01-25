@@ -41,7 +41,7 @@ const router = createBrowserRouter([
                 element: <AddBalances/>
             },
             {
-                path: "account/new",
+                path: "account",
                 element: <AddAccount/>,
             },
             {
