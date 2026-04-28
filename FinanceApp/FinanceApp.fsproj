@@ -20,7 +20,7 @@
         <PackageReference Include="FsToolkit.ErrorHandling" Version="[5.2.0]" />
         <PackageReference Include="Microsoft.Identity.Web" Version="[4.7.0]" />
         <PackageReference Include="MongoDB.Driver" Version="[3.7.1]" />
-        <PackageReference Update="FSharp.Core" Version="[10.1.202]" />
+        <PackageReference Update="FSharp.Core" Version="[10.1.203]" />
         <PackageReference Include="Oxpecker" Version="[2.0.0]" />
     </ItemGroup>
 
