@@ -6,7 +6,7 @@ RUN npm run build
 
 # Learn about building .NET container images:
 # https://github.com/dotnet/dotnet-docker/blob/main/samples/README.md
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-azurelinux3.0@sha256:4f08dbd55f00d1f7eb232ddacb24ecdab62fd64774a25c1da5b6daeb76e76a75 AS backend-build
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0-azurelinux3.0@sha256:28e3d18f3e172d554d7002ee1af97c0a24b31b26ae3b5dd8d2e40a9a6c5760b1 AS backend-build
 ARG TARGETARCH
 WORKDIR /source
 
@@ -20,7 +20,7 @@ COPY --link --from=frontend-build /app/dist ./wwwroot
 RUN dotnet publish -a $TARGETARCH --no-restore -o /app
 
 # Runtime stage
-FROM mcr.microsoft.com/dotnet/aspnet:10.0-azurelinux3.0-distroless@sha256:b782ff63dec54c5537b217ef1f3ab1900058f070c786bc214687c6fe53bba1e6
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-azurelinux3.0-distroless@sha256:ad10865ffdf5706ef7e8cdb3ccb25fe6f766e643b17d7d2b8ee0e1cc00c99efb
 EXPOSE 8080
 WORKDIR /app
 COPY --link --from=backend-build /app .
